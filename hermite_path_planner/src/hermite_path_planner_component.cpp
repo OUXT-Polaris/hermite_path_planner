@@ -18,7 +18,7 @@ namespace hermite_path_planner
         goal_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>
             (goal_pose_topic_, 1, std::bind(&HermitePathPlannerComponent::GoalPoseCallback, this, std::placeholders::_1));
         current_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>
-            (current_pose_topic_, 1, std::bind(&HermitePathPlannerComponent::GoalPoseCallback, this, std::placeholders::_1));
+            (current_pose_topic_, 1, std::bind(&HermitePathPlannerComponent::CurrentPoseCallback, this, std::placeholders::_1));
     }
 
     geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanningFrame(geometry_msgs::msg::PoseStamped pose)
@@ -41,6 +41,7 @@ namespace hermite_path_planner
     {
         if(!current_pose_)
         {
+            RCLCPP_ERROR(this->get_logger(), "Current Pose does not recieved yet");
             return;
         }
         geometry_msgs::msg::PoseStamped goal_pose = TransformToPlanningFrame(*msg);
@@ -50,6 +51,7 @@ namespace hermite_path_planner
         path.header.stamp = msg->header.stamp;
         path.header.frame_id = planning_frame_id_;
         hermite_path_pub_->publish(path);
+        marker_pub_->publish(generateMarker(path,200));
         return;
     }
 
@@ -62,8 +64,8 @@ namespace hermite_path_planner
     hermite_path_msgs::msg::HermitePath HermitePathPlannerComponent::generateHermitePath(geometry_msgs::msg::Pose start,geometry_msgs::msg::Pose goal)
     {
         hermite_path_msgs::msg::HermitePath path;
-        geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start,10.0);
-        geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal,10.0);
+        geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start,30.0);
+        geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal,30.0);
         path.ax = 2*start.position.x - 2*goal.position.x + start_vector.x + goal_vector.x;
         path.ay = 2*start.position.y - 2*goal.position.y + start_vector.y + goal_vector.y;
         path.bx = -3*start.position.x + 3*goal.position.x - 2*start_vector.x - goal_vector.x;
@@ -75,13 +77,15 @@ namespace hermite_path_planner
         return path;
     }
 
+    #include <sstream>
+
     geometry_msgs::msg::Vector3 HermitePathPlannerComponent::getVectorFromPose(geometry_msgs::msg::Pose pose,double magnitude)
     {
-        geometry_msgs::msg::Vector3 vector = quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
+        geometry_msgs::msg::Vector3 dir = quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
+        geometry_msgs::msg::Vector3 vector;
+        vector.x = magnitude * std::cos(dir.z);
+        vector.y = magnitude * std::sin(dir.z);
         vector.z = 0;
-        double ratio = magnitude/std::sqrt(vector.x*vector.x + vector.y*vector.y);
-        vector.x = vector.x * ratio;
-        vector.y = vector.y * ratio;
         return vector;
     }
 
@@ -113,13 +117,15 @@ namespace hermite_path_planner
         center_line.id = 0;
         center_line.type = visualization_msgs::msg::Marker::LINE_STRIP;
         center_line.action = visualization_msgs::msg::Marker::ADD;
-        center_line.frame_locked = true;
-        for(int i=0;i<resolution;i++)
+        center_line.frame_locked = false;
+        center_line.scale.x = 0.1;
+        for(int i=0;i<(resolution+1);i++)
         {
             double t = step_size * (double)i;
             center_line.points.push_back(getPointOnHermitePath(path.path,t));
             center_line.colors.push_back(color_center_line);
         }
+        marker.markers.push_back(center_line);
         return marker;
     }
 }
