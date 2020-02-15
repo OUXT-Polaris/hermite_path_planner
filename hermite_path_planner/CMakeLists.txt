@@ -21,6 +21,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(visualization_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -32,7 +33,7 @@ add_library(hermite_path_planner_component SHARED src/hermite_path_planner_compo
 target_compile_definitions(hermite_path_planner_component 
   PRIVATE "HERMITE_PATH_PLANNER_HERMITE_PATH_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(hermite_path_planner_component
-  rclcpp rclcpp_components geometry_msgs quaternion_operation)
+  rclcpp rclcpp_components geometry_msgs quaternion_operation visualization_msgs)
 rclcpp_components_register_nodes(hermite_path_planner_component
   "hermite_path_planner::HermitePathPlannerComponent")
 
@@ -41,7 +42,7 @@ add_executable(hermite_path_planner_node
 )
 target_link_libraries(hermite_path_planner_node hermite_path_planner_component)
 ament_target_dependencies(hermite_path_planner_node
-  rclcpp rclcpp_components geometry_msgs quaternion_operation)
+  rclcpp rclcpp_components geometry_msgs quaternion_operation visualization_msgs)
 install(TARGETS
   hermite_path_planner_node 
   DESTINATION lib/hermite_path_planner

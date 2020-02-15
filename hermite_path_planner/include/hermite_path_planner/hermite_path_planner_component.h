@@ -40,6 +40,7 @@ extern "C" {
 #endif
 
 #include <rclcpp/rclcpp.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace hermite_path_planner
 {
@@ -48,6 +49,8 @@ namespace hermite_path_planner
     public:
         HERMITE_PATH_PLANNER_HERMITE_PATH_PLANNER_COMPONENT_PUBLIC
         explicit HermitePathPlannerComponent(const rclcpp::NodeOptions & options);
+    private:
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
     };
 }
 
