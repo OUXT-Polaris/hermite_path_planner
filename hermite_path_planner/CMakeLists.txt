@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -38,6 +39,7 @@ target_compile_definitions(hermite_path_planner_component
 ament_target_dependencies(hermite_path_planner_component
   rclcpp 
   rclcpp_components 
+  std_msgs
   geometry_msgs
   quaternion_operation
   visualization_msgs
@@ -54,6 +56,7 @@ target_link_libraries(hermite_path_planner_node hermite_path_planner_component)
 ament_target_dependencies(hermite_path_planner_node
   rclcpp 
   rclcpp_components 
+  std_msgs
   geometry_msgs 
   quaternion_operation 
   visualization_msgs

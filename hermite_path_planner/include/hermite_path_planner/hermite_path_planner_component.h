@@ -59,7 +59,7 @@ namespace hermite_path_planner
     private:
         geometry_msgs::msg::PoseStamped TransformToPlanningFrame(geometry_msgs::msg::PoseStamped pose);
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
-        rclcpp::Publisher<hermite_path_msgs::msg::HermitePath>::SharedPtr hermite_path_pub_;
+        rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pose_sub_;
         void GoalPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
@@ -72,6 +72,8 @@ namespace hermite_path_planner
         tf2_ros::TransformListener listener_;
         hermite_path_msgs::msg::HermitePath generateHermitePath(geometry_msgs::msg::Pose start,geometry_msgs::msg::Pose goal);
         geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose,double magnitude);
+        visualization_msgs::msg::MarkerArray generateMarker(hermite_path_msgs::msg::HermitePathStamped path,int resolution);
+        geometry_msgs::msg::Point getPointOnHermitePath(hermite_path_msgs::msg::HermitePath path,double t);
     };
 }
 
