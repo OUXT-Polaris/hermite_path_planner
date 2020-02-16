@@ -79,6 +79,7 @@ ament_target_dependencies(hermite_path_planner_node
   tf2_geometry_msgs
   hermite_path_msgs)
 target_link_libraries(hermite_path_planner_node hermite_path_planner_component)
+
 install(TARGETS
   hermite_path_planner_node 
   DESTINATION lib/hermite_path_planner

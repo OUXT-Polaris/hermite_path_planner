@@ -22,6 +22,39 @@ find_package(rclcpp_components REQUIRED)
 find_package(hermite_path_planner REQUIRED)
 find_package(hermite_path_msgs REQUIRED)
 
+include_directories(
+  include
+)
+
+add_library(pure_pursuit_planner_component SHARED 
+  src/pure_pursuit_planner_component.cpp)
+target_compile_definitions(pure_pursuit_planner_component
+  PRIVATE "PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_BUILDING_DLL")
+ament_target_dependencies(pure_pursuit_planner_component
+  rclcpp 
+  rclcpp_components 
+  hermite_path_msgs)
+rclcpp_components_register_nodes(pure_pursuit_planner_component
+  "pure_pursuit_planner::PurePursuitPlannerComponent")
+
+add_executable(pure_pursuit_planner_node
+  src/pure_pursuit_planner_node.cpp
+)
+target_link_libraries(pure_pursuit_planner_node pure_pursuit_planner_component)
+ament_target_dependencies(pure_pursuit_planner_node
+  rclcpp 
+  rclcpp_components 
+  hermite_path_msgs)
+
+install(TARGETS
+  pure_pursuit_planner_node
+  DESTINATION lib/pure_pursuit_planner
+)
+install(TARGETS pure_pursuit_planner_component
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
