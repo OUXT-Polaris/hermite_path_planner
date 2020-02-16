@@ -33,6 +33,21 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
+add_library(hermite_path_generator SHARED
+  src/hermite_path_generator.cpp
+)
+ament_target_dependencies(hermite_path_generator
+  rclcpp
+  std_msgs
+  geometry_msgs
+  visualization_msgs
+  tf2_ros
+  tf2_geometry_msgs
+  quaternion_operation
+  hermite_path_msgs)
+ament_export_interfaces(export_hermite_path_generator HAS_LIBRARY_TARGET)
+ament_export_libraries(hermite_path_generator)
+
 add_library(hermite_path_planner_component SHARED 
   src/hermite_path_planner_component.cpp
   src/hermite_path_generator.cpp)
@@ -68,8 +83,8 @@ install(TARGETS
   hermite_path_planner_node 
   DESTINATION lib/hermite_path_planner
 )
-install(TARGETS
-  hermite_path_planner_component
+install(TARGETS hermite_path_planner_component hermite_path_generator
+EXPORT export_hermite_path_generator
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
