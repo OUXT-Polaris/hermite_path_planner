@@ -70,9 +70,7 @@ namespace hermite_path_planner
         std::string current_pose_topic_;
         tf2_ros::Buffer buffer_;
         tf2_ros::TransformListener listener_;
-        double robot_width_;
-        double robot_length_;
-        HermitePathGenerator generator_;
+        std::shared_ptr<HermitePathGenerator> generator_;
     };
 }
 

@@ -2,6 +2,12 @@
 
 namespace hermite_path_planner
 {
+    HermitePathGenerator::HermitePathGenerator(double robot_length,double robot_width)
+    {
+        robot_length_ = robot_length;
+        robot_width_ = robot_width;
+    }
+
     hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(geometry_msgs::msg::Pose start,geometry_msgs::msg::Pose goal)
     {
         hermite_path_msgs::msg::HermitePath path;

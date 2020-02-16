@@ -14,9 +14,11 @@ namespace hermite_path_planner
         declare_parameter("current_pose_topic","/current_pose");
         get_parameter("current_pose_topic",current_pose_topic_);
         declare_parameter("robot_width",3.0);
-        get_parameter("robot_width",robot_width_);
+        double robot_width,robot_length;
+        get_parameter("robot_width",robot_width);
         declare_parameter("robot_length",5.0);
-        get_parameter("robot_length",robot_length_);
+        get_parameter("robot_length",robot_length);
+        generator_ = std::make_shared<HermitePathGenerator>(robot_length,robot_width);
         hermite_path_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>(get_name()+std::string("/hermite_path"),1);
         marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(get_name()+std::string("/marker"),1);
         goal_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>
@@ -51,11 +53,11 @@ namespace hermite_path_planner
         geometry_msgs::msg::PoseStamped goal_pose = TransformToPlanningFrame(*msg);
         geometry_msgs::msg::PoseStamped current_pose = TransformToPlanningFrame(*current_pose_);
         hermite_path_msgs::msg::HermitePathStamped path;
-        path.path = generator_.generateHermitePath(current_pose.pose,goal_pose.pose);
+        path.path = generator_->generateHermitePath(current_pose.pose,goal_pose.pose);
         path.header.stamp = msg->header.stamp;
         path.header.frame_id = planning_frame_id_;
         hermite_path_pub_->publish(path);
-        marker_pub_->publish(generator_.generateMarker(path,200));
+        marker_pub_->publish(generator_->generateMarker(path,200));
         return;
     }
 
