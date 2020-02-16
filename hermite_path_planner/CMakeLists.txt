@@ -33,7 +33,9 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
-add_library(hermite_path_planner_component SHARED src/hermite_path_planner_component.cpp)
+add_library(hermite_path_planner_component SHARED 
+  src/hermite_path_planner_component.cpp
+  src/hermite_path_generator.cpp)
 target_compile_definitions(hermite_path_planner_component 
   PRIVATE "HERMITE_PATH_PLANNER_HERMITE_PATH_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(hermite_path_planner_component
@@ -50,9 +52,7 @@ rclcpp_components_register_nodes(hermite_path_planner_component
   "hermite_path_planner::HermitePathPlannerComponent")
 
 add_executable(hermite_path_planner_node
-  src/hermite_path_planner_node.cpp
-)
-target_link_libraries(hermite_path_planner_node hermite_path_planner_component)
+  src/hermite_path_planner_node.cpp)
 ament_target_dependencies(hermite_path_planner_node
   rclcpp 
   rclcpp_components 
@@ -63,6 +63,7 @@ ament_target_dependencies(hermite_path_planner_node
   tf2_ros
   tf2_geometry_msgs
   hermite_path_msgs)
+target_link_libraries(hermite_path_planner_node hermite_path_planner_component)
 install(TARGETS
   hermite_path_planner_node 
   DESTINATION lib/hermite_path_planner

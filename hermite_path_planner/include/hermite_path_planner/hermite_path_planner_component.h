@@ -43,11 +43,11 @@ extern "C" {
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
-#include <quaternion_operation/quaternion_operation.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <boost/optional.hpp>
+#include <hermite_path_planner/hermite_path_generator.h>
 
 namespace hermite_path_planner
 {
@@ -70,10 +70,9 @@ namespace hermite_path_planner
         std::string current_pose_topic_;
         tf2_ros::Buffer buffer_;
         tf2_ros::TransformListener listener_;
-        hermite_path_msgs::msg::HermitePath generateHermitePath(geometry_msgs::msg::Pose start,geometry_msgs::msg::Pose goal);
-        geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose,double magnitude);
-        visualization_msgs::msg::MarkerArray generateMarker(hermite_path_msgs::msg::HermitePathStamped path,int resolution);
-        geometry_msgs::msg::Point getPointOnHermitePath(hermite_path_msgs::msg::HermitePath path,double t);
+        double robot_width_;
+        double robot_length_;
+        HermitePathGenerator generator_;
     };
 }
 
