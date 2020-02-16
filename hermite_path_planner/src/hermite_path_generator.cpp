@@ -2,17 +2,16 @@
 
 namespace hermite_path_planner
 {
-    HermitePathGenerator::HermitePathGenerator(double robot_length,double robot_width)
+    HermitePathGenerator::HermitePathGenerator(double robot_width)
     {
-        robot_length_ = robot_length;
         robot_width_ = robot_width;
     }
 
     hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(geometry_msgs::msg::Pose start,geometry_msgs::msg::Pose goal)
     {
         hermite_path_msgs::msg::HermitePath path;
-        geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start,100.0);
-        geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal,100.0);
+        geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start,50.0);
+        geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal,50.0);
         path.ax = 2*start.position.x - 2*goal.position.x + start_vector.x + goal_vector.x;
         path.ay = 2*start.position.y - 2*goal.position.y + start_vector.y + goal_vector.y;
         path.bx = -3*start.position.x + 3*goal.position.x - 2*start_vector.x - goal_vector.x;
@@ -47,20 +46,11 @@ namespace hermite_path_planner
             double theta = std::atan2(vec.y,vec.x);
             geometry_msgs::msg::Point p = getPointOnHermitePath(path,t);
             geometry_msgs::msg::Point point;
-            point.x = p.x - robot_width_*std::cos(theta);
-            point.y = p.y - robot_width_*std::sin(theta);
+            point.x = p.x - 0.5*robot_width_*std::cos(theta);
+            point.y = p.y - 0.5*robot_width_*std::sin(theta);
             points.push_back(point);
         }
         return points;
-    }
-
-    geometry_msgs::msg::Point HermitePathGenerator::getPointOnHermitePath(hermite_path_msgs::msg::HermitePath path,double t)
-    {
-        geometry_msgs::msg::Point p;
-        p.z = 0;
-        p.x = path.ax*std::pow(t,3) + path.bx*std::pow(t,2) + path.cx*t + path.dx;
-        p.y = path.ay*std::pow(t,3) + path.by*std::pow(t,2) + path.cy*t + path.dy;
-        return p;
     }
 
     std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getRightBounds(hermite_path_msgs::msg::HermitePath path,int resolution)
@@ -74,11 +64,63 @@ namespace hermite_path_planner
             double theta = std::atan2(vec.y,vec.x);
             geometry_msgs::msg::Point p = getPointOnHermitePath(path,t);
             geometry_msgs::msg::Point point;
-            point.x = p.x + robot_width_*std::cos(theta);
-            point.y = p.y + robot_width_*std::sin(theta);
+            point.x = p.x + 0.5*robot_width_*std::cos(theta);
+            point.y = p.y + 0.5*robot_width_*std::sin(theta);
             points.push_back(point);
         }
         return points;
+    }
+
+    visualization_msgs::msg::Marker HermitePathGenerator::getBoundsPolygon(hermite_path_msgs::msg::HermitePathStamped path,int resolution,double z_offset)
+    {
+        std_msgs::msg::ColorRGBA color;
+        color.r = 0.2;
+        color.g = 0.8;
+        color.b = 0.8;
+        color.a = 0.5;
+        visualization_msgs::msg::Marker marker;
+        marker.header = path.header;
+        marker.ns = "polygon";
+        marker.id = 0;
+        marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
+        marker.action = visualization_msgs::msg::Marker::ADD;
+        std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(path.path,resolution);
+        std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(path.path,resolution);
+        int num_sections = left_bounds.size()-1;
+        assert(left_bounds.size()==right_bounds.size());
+        marker.scale.x = 1.0;
+        marker.scale.y = 1.0;
+        marker.scale.z = 1.0;
+        marker.color = color;
+        for(int i=0; i<num_sections; i++)
+        {
+            geometry_msgs::msg::Point pr_0 = right_bounds[i];
+            pr_0.z = z_offset;
+            geometry_msgs::msg::Point pl_0 = left_bounds[i];
+            pl_0.z = z_offset;
+            geometry_msgs::msg::Point pr_1 = right_bounds[i+1];
+            pr_1.z = z_offset;
+            geometry_msgs::msg::Point pl_1 = left_bounds[i+1];
+            pl_1.z = z_offset;
+            marker.points.push_back(pr_0);
+            marker.points.push_back(pl_0);
+            marker.points.push_back(pr_1);
+            marker.colors.push_back(color);
+            marker.points.push_back(pl_0);
+            marker.points.push_back(pl_1);
+            marker.points.push_back(pr_1);
+            marker.colors.push_back(color);
+        }
+        return marker;
+    }
+
+    geometry_msgs::msg::Point HermitePathGenerator::getPointOnHermitePath(hermite_path_msgs::msg::HermitePath path,double t)
+    {
+        geometry_msgs::msg::Point p;
+        p.z = 0;
+        p.x = path.ax*std::pow(t,3) + path.bx*std::pow(t,2) + path.cx*t + path.dx;
+        p.y = path.ay*std::pow(t,3) + path.by*std::pow(t,2) + path.cy*t + path.dy;
+        return p;
     }
 
     geometry_msgs::msg::Vector3 HermitePathGenerator::getVectorFromPose(geometry_msgs::msg::Pose pose,double magnitude)
@@ -89,6 +131,14 @@ namespace hermite_path_planner
         vector.y = magnitude * std::sin(dir.z);
         vector.z = 0;
         return vector;
+    }
+
+    geometry_msgs::msg::Vector3 HermitePathGenerator::getTangentVector(hermite_path_msgs::msg::HermitePath path,double t)
+    {
+        geometry_msgs::msg::Vector3 vec;
+        vec.x = 3*path.ax*t*t + 2*path.bx*t + path.cx;
+        vec.y = 3*path.ay*t*t + 2*path.by*t + path.cy;
+        return vec;
     }
 
     geometry_msgs::msg::Vector3 HermitePathGenerator::getNormalVector(hermite_path_msgs::msg::HermitePath path,double t)
@@ -130,35 +180,7 @@ namespace hermite_path_planner
         marker.markers.push_back(center_line);
 
         //Setup Left Bounds Marker
-        /*
-        visualization_msgs::msg::Marker left_bounds;
-        left_bounds.header = path.header;
-        left_bounds.ns = "left_bounds";
-        left_bounds.id = 0;
-        left_bounds.type = visualization_msgs::msg::Marker::LINE_STRIP;
-        left_bounds.action = visualization_msgs::msg::Marker::ADD;
-        left_bounds.frame_locked = false;
-        left_bounds.scale.x = 0.1;
-        left_bounds.points = getLeftBounds(path.path,resolution);
-        left_bounds.colors = std::vector<std_msgs::msg::ColorRGBA>(left_bounds.points.size(),color_bounds);
-        marker.markers.push_back(left_bounds);
-        */
-
-        //Setup Right Bounds Marker
-        /*
-        visualization_msgs::msg::Marker right_bounds;
-        right_bounds.header = path.header;
-        right_bounds.ns = "right_bounds";
-        right_bounds.id = 0;
-        right_bounds.type = visualization_msgs::msg::Marker::LINE_STRIP;
-        right_bounds.action = visualization_msgs::msg::Marker::ADD;
-        right_bounds.frame_locked = false;
-        right_bounds.scale.x = 0.1;
-        right_bounds.points = getRightBounds(path.path,resolution);
-        right_bounds.colors = std::vector<std_msgs::msg::ColorRGBA>(right_bounds.points.size(),color_bounds);
-        marker.markers.push_back(right_bounds);
-        */
-
+        marker.markers.push_back(getBoundsPolygon(path,resolution,-0.3));
         return marker;
     }
 }
