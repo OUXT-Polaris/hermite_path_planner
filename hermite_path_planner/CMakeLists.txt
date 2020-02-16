@@ -91,6 +91,12 @@ EXPORT export_hermite_path_generator
   RUNTIME DESTINATION bin)
 ament_export_libraries(hermite_path_planner_component)
 
+# Install header files
+install(
+  DIRECTORY "include/"
+  DESTINATION include
+)
+
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
@@ -106,4 +112,5 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+ament_export_include_directories(include)
 ament_package()

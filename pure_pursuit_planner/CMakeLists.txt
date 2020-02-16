@@ -21,9 +21,12 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(hermite_path_planner REQUIRED)
 find_package(hermite_path_msgs REQUIRED)
+find_package(quaternion_operation REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 include_directories(
   include
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 add_library(pure_pursuit_planner_component SHARED 
@@ -32,7 +35,9 @@ target_compile_definitions(pure_pursuit_planner_component
   PRIVATE "PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(pure_pursuit_planner_component
   rclcpp 
-  rclcpp_components 
+  rclcpp_components
+  quaternion_operation
+  hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(pure_pursuit_planner_component
   "pure_pursuit_planner::PurePursuitPlannerComponent")
@@ -43,7 +48,9 @@ add_executable(pure_pursuit_planner_node
 target_link_libraries(pure_pursuit_planner_node pure_pursuit_planner_component)
 ament_target_dependencies(pure_pursuit_planner_node
   rclcpp 
-  rclcpp_components 
+  rclcpp_components
+  quaternion_operation
+  hermite_path_planner
   hermite_path_msgs)
 
 install(TARGETS

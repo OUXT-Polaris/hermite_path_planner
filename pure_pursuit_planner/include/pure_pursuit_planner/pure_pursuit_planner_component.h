@@ -40,6 +40,7 @@ extern "C" {
 #endif
 
 #include <rclcpp/rclcpp.hpp>
+#include <hermite_path_planner/hermite_path_generator.h>
 
 namespace pure_pursuit_planner
 {
