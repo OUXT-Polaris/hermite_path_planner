@@ -41,6 +41,12 @@ extern "C" {
 
 #include <rclcpp/rclcpp.hpp>
 #include <hermite_path_planner/hermite_path_generator.h>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <boost/optional.hpp>
 
 namespace pure_pursuit_planner
 {
@@ -49,6 +55,23 @@ namespace pure_pursuit_planner
     public:
         PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_PUBLIC
         explicit PurePursuitPlannerComponent(const rclcpp::NodeOptions & options);
+    private:
+        void currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data);
+        rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
+        void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
+        rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
+        boost::optional<geometry_msgs::msg::Twist> current_twist_;
+        void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
+        boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
+        rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
+        std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
+        double lookahead_distance_;
+        double minimum_lookahead_distance_;
+        double lookahead_ratio_;
+        tf2_ros::Buffer buffer_;
+        tf2_ros::TransformListener listener_;
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+        boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
     };
 }
 

@@ -7,6 +7,59 @@ namespace hermite_path_planner
         robot_width_ = robot_width;
     }
 
+    double HermitePathGenerator::calculateNewtonMethodStepSize(hermite_path_msgs::msg::HermitePath path,
+        geometry_msgs::msg::Point center,double radius,double t)
+    {
+        double t3 = t*t*t;
+        double t2 = t*t;
+        double f = std::pow((path.ax*t3 + path.bx*t2 + path.cx*t + path.dx - center.x),2) 
+            + std::pow((path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y),2) - radius*radius;
+        double term_x = 2 * (path.ax*t3 + path.bx*t2 + path.cx*t + path.dx - center.x) * (3*path.ax*t3 + 2*path.bx*t2 + path.cx);
+        double term_y = 2 * (path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y) * (3*path.ay*t3 + 2*path.by*t2 + path.cy);
+        return f/(term_x+term_y);
+    }
+
+    boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(hermite_path_msgs::msg::HermitePath path,
+        geometry_msgs::msg::Point center,double radius)
+    {
+        constexpr int initial_resolution = 100;
+        constexpr int max_iteration = 30;
+        constexpr double torelance = 0.001;
+        double step_size = 1.0/(double)initial_resolution;
+        std::vector<geometry_msgs::msg::Point> points_on_path = getPointsOnHermitePath(path,initial_resolution);
+        std::array<double,initial_resolution> errors;
+        for(int i=0; i<initial_resolution; i++)
+        {
+            errors[i] = std::fabs(std::sqrt(std::pow(points_on_path[i].x-center.x,2)+std::pow(points_on_path[i].y-center.y,2))-radius);
+        }
+        double ret;
+        bool initial_point_finded = false;
+        for(int i=0; i<initial_resolution-1; i++)
+        {
+            if((errors[i]*errors[i+1])<0)
+            {
+                ret = step_size*initial_resolution;
+                initial_point_finded = true;
+            }
+        }
+        if(initial_point_finded)
+        {
+            return boost::none;
+        }
+        for(int i=0; i<max_iteration; i++)
+        {
+            geometry_msgs::msg::Point p = getPointOnHermitePath(path,ret);
+            double error = std::sqrt(std::pow(p.x-center.x,2)+std::pow(p.y-center.y,2)) - radius;
+            if(std::fabs(error)<torelance)
+            {
+                return ret;
+            }
+            double diff = calculateNewtonMethodStepSize(path,center,radius,ret);
+            ret = ret + diff;
+        }
+        return ret;
+    }
+
     hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(geometry_msgs::msg::Pose start,geometry_msgs::msg::Pose goal)
     {
         hermite_path_msgs::msg::HermitePath path;
