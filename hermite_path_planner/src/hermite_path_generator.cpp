@@ -1,4 +1,5 @@
 #include <hermite_path_planner/hermite_path_generator.h>
+#include <iostream>
 
 namespace hermite_path_planner
 {
@@ -16,13 +17,14 @@ namespace hermite_path_planner
             + std::pow((path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y),2) - radius*radius;
         double term_x = 2 * (path.ax*t3 + path.bx*t2 + path.cx*t + path.dx - center.x) * (3*path.ax*t3 + 2*path.bx*t2 + path.cx);
         double term_y = 2 * (path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y) * (3*path.ay*t3 + 2*path.by*t2 + path.cy);
+        //std::cout << term_x << std::endl;
         return f/(term_x+term_y);
     }
 
     boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(hermite_path_msgs::msg::HermitePath path,
         geometry_msgs::msg::Point center,double radius)
     {
-        constexpr int initial_resolution = 100;
+        constexpr int initial_resolution = 30;
         constexpr int max_iteration = 30;
         constexpr double torelance = 0.001;
         double step_size = 1.0/(double)initial_resolution;
@@ -30,7 +32,7 @@ namespace hermite_path_planner
         std::array<double,initial_resolution> errors;
         for(int i=0; i<initial_resolution; i++)
         {
-            errors[i] = std::fabs(std::sqrt(std::pow(points_on_path[i].x-center.x,2)+std::pow(points_on_path[i].y-center.y,2))-radius);
+            errors[i] = std::sqrt(std::pow(points_on_path[i].x-center.x,2)+std::pow(points_on_path[i].y-center.y,2))-radius;
         }
         double ret;
         bool initial_point_finded = false;
@@ -38,11 +40,12 @@ namespace hermite_path_planner
         {
             if((errors[i]*errors[i+1])<0)
             {
-                ret = step_size*initial_resolution;
+                ret = step_size*(double)(2*i+1)/2.0;
                 initial_point_finded = true;
+                break;
             }
         }
-        if(initial_point_finded)
+        if(!initial_point_finded)
         {
             return boost::none;
         }
@@ -55,7 +58,7 @@ namespace hermite_path_planner
                 return ret;
             }
             double diff = calculateNewtonMethodStepSize(path,center,radius,ret);
-            ret = ret + diff;
+            ret = ret - diff;
         }
         return ret;
     }

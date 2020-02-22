@@ -77,7 +77,7 @@ namespace pure_pursuit_planner
         visualization_msgs::msg::MarkerArray marker;
         if(t)
         {
-            RCLCPP_ERROR(get_logger(), std::to_string(t.get()));
+            //RCLCPP_ERROR(get_logger(), std::to_string(t.get()));
             geometry_msgs::msg::Point target_position = generator_->getPointOnHermitePath(path_->path,t.get());
             // draw target marker
             visualization_msgs::msg::Marker target_marker;
@@ -91,13 +91,13 @@ namespace pure_pursuit_planner
             target_marker.pose.orientation.y = 0.0f;
             target_marker.pose.orientation.z = 0.0f;
             target_marker.pose.orientation.w = 1.0f;
-            target_marker.scale.x = 0.3;
-            target_marker.scale.y = 0.3;
-            target_marker.scale.z = 0.3;
-            target_marker.color.r = 0.5;
+            target_marker.scale.x = 1.0;
+            target_marker.scale.y = 1.0;
+            target_marker.scale.z = 1.0;
+            target_marker.color.r = 0.1;
             target_marker.color.g = 1.0;
-            target_marker.color.b = 0.5;
-            target_marker.color.a = 0.5;
+            target_marker.color.b = 0.1;
+            target_marker.color.a = 0.8;
             marker.markers.push_back(target_marker);
         }
         // draw search circle
