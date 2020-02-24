@@ -27,16 +27,20 @@ find_package(quaternion_operation REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Ceres REQUIRED)
 
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIR}
+  ${CERESS_INCLUDE_DIRS}
 )
 
 add_library(velocity_planner_component SHARED 
-  src/velocity_planner_component.cpp)
+  src/velocity_planner_component.cpp
+  src/velocity_optimizer.cpp)
 target_compile_definitions(velocity_planner_component
   PRIVATE "VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_BUILDING_DLL")
+target_link_libraries(velocity_planner_component ${CERES_LIBRARIES})
 ament_target_dependencies(velocity_planner_component
   rclcpp 
   rclcpp_components

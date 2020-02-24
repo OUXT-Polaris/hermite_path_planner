@@ -8,6 +8,94 @@ namespace hermite_path_planner
         robot_width_ = robot_width;
     }
 
+    boost::optional<double> HermitePathGenerator::getDistanceInFrenetCoordinate(
+        hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p)
+    {
+        double coefficients[6];
+        coefficients[0] = path.cy*(p.x-path.dx) +path.cx*(p.y-path.dy);
+        coefficients[1] = 2*path.by*(p.x-path.dx) +2*path.bx*(p.y-path.dy);
+        coefficients[2] = 3*path.ay*(p.x-path.dx) -2*path.by*path.cx +3*path.ax*(p.y-path.dy) -2*path.bx*path.cy;
+        coefficients[3] = -3*path.ax*path.cy -2*path.by*path.bx -path.cx*path.ay 
+            - 3*path.ay*path.cx -2*path.bx*path.by -path.cy*path.ax;
+        coefficients[4] = -3*path.ay*path.bx -3*path.ax*path.by;
+        coefficients[5] = -6*path.ay*path.ax;
+        auto func = [](double coefficients[6],double t)
+        {
+            double t5 = std::pow(t,5);
+            double t4 = std::pow(t,4);
+            double t3 = std::pow(t,3);
+            double t2 = std::pow(t,2);
+            double a = t5*coefficients[5] + t4*coefficients[4] + 
+                t3*coefficients[3] + t2*coefficients[2] + 
+                t*coefficients[1] + coefficients[0];
+            return a;
+        };
+        
+        auto get_newton_step_size_func = [](double coefficients[6],double t)
+        {
+            double t5 = std::pow(t,5);
+            double t4 = std::pow(t,4);
+            double t3 = std::pow(t,3);
+            double t2 = std::pow(t,2);
+            double a = t5*coefficients[5] + t4*coefficients[4] + 
+                t3*coefficients[3] + t2*coefficients[2] + 
+                t*coefficients[1] + coefficients[0];
+            double b = 5*t4*coefficients[5] + 4*t3*coefficients[4] + 
+                3*t2*coefficients[3] + 2*t*coefficients[2]+coefficients[1];
+            return -1*b/a;
+	    };
+
+        constexpr int initial_resolution = 30;
+        constexpr int max_iteration = 30;
+        constexpr double torelance = 0.001;
+
+        bool initial_point_finded = false;
+        double step_size = (double)1.0/(double)initial_resolution;
+        double ret = 0.0;
+        std::array<double,initial_resolution> initial_value_candidates;
+        std::array<double,initial_resolution> errors;
+        for(int i=0; i<initial_resolution; i++)
+        {
+            initial_value_candidates[i] = (0.5+(double)i)*step_size;
+            errors[i] = func(coefficients,initial_value_candidates[i]);
+        }
+        for(int i=0; i<initial_resolution-1; i++)
+        {
+            if((errors[i]*errors[i+1])<0)
+            {
+                initial_point_finded = true;
+                ret = (initial_value_candidates[i]+initial_value_candidates[i+1])/2;
+                break;
+            }
+        }
+        if(!initial_point_finded)
+        {
+            return boost::none;
+        }
+        for(int i=0; i<max_iteration; i++)
+        {
+            double error = func(coefficients,ret);
+            if(std::fabs(error)<torelance)
+            {
+                return ret;
+            }
+            ret = ret + get_newton_step_size_func(coefficients,ret);
+        }
+        return ret;
+    }
+
+    double HermitePathGenerator::getLength(hermite_path_msgs::msg::HermitePath path,int resolution)
+    {
+        double ret = 0.0;
+        std::vector<geometry_msgs::msg::Point> points = getPointsOnHermitePath(path,resolution);
+        for(int i=0; i<(resolution-1); i++) 
+        {
+            double length_segment = std::sqrt(std::pow(points[i].x-points[i+1].x,2)+std::pow(points[i].y-points[i+1].y,2));
+            ret = length_segment + ret;
+        }
+        return ret;
+    }
+
     double HermitePathGenerator::calculateNewtonMethodStepSize(hermite_path_msgs::msg::HermitePath path,
         geometry_msgs::msg::Point center,double radius,double t)
     {

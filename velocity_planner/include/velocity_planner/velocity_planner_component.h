@@ -41,8 +41,13 @@ extern "C" {
 
 #include <rclcpp/rclcpp.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
+#include <hermite_path_planner/hermite_path_generator.h>
+#include <visualization_msgs/msg/marker_array.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <boost/optional.hpp>
 
 namespace velocity_planner
 {
@@ -52,9 +57,24 @@ namespace velocity_planner
         VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_PUBLIC
         explicit VelocityPlannerComponent(const rclcpp::NodeOptions & options);
     private:
+        rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
+        boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
         tf2_ros::Buffer buffer_;
         tf2_ros::TransformListener listener_;
+        rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
+        boost::optional<geometry_msgs::msg::Twist> current_twist_;
+        void currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data);
+        rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
+        boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
+        void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+        rclcpp::TimerBase::SharedPtr timer_;
+        void updatePath();
+        std::mutex mtx_;
+        std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
+        double maximum_accerelation_ = 0.3;
+        double minimum_deceleration_ = -0.1;
     };
 }
 
