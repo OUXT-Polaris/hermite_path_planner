@@ -17,8 +17,8 @@ namespace hermite_path_planner
         double robot_width;
         get_parameter("robot_width",robot_width);
         generator_ = std::make_shared<HermitePathGenerator>(robot_width);
-        hermite_path_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>(get_name()+std::string("/hermite_path"),1);
-        marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(get_name()+std::string("/marker"),1);
+        hermite_path_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>("~/hermite_path",1);
+        marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker",1);
         goal_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>
             (goal_pose_topic_, 1, std::bind(&HermitePathPlannerComponent::GoalPoseCallback, this, std::placeholders::_1));
         current_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>

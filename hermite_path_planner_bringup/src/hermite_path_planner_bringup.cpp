@@ -6,11 +6,11 @@
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::executors::MultiThreadedExecutor exec;
+  rclcpp::executors::SingleThreadedExecutor exec;
   rclcpp::NodeOptions options;
   auto hermite_path_planner = std::make_shared<hermite_path_planner::HermitePathPlannerComponent>(options);
   auto pure_pursuit_planner = std::make_shared<pure_pursuit_planner::PurePursuitPlannerComponent>(options);
-  auto velocity_planner = std::make_shared<velocity_planner::VelocityPlannerComponent>(options);
+  //auto velocity_planner = std::make_shared<velocity_planner::VelocityPlannerComponent>(options);
   exec.add_node(hermite_path_planner);
   exec.add_node(pure_pursuit_planner);
   exec.spin();

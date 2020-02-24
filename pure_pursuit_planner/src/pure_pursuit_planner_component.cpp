@@ -30,12 +30,12 @@ namespace pure_pursuit_planner
             (current_pose_topic, 1, std::bind(&PurePursuitPlannerComponent::currentPoseCallback, this, std::placeholders::_1));
 
         std::string hermite_path_topic;
-        declare_parameter("hermite_path_topic","/hermite_path_planner_node/hermite_path");
+        declare_parameter("hermite_path_topic","/hermite_path_planner/hermite_path");
         get_parameter("hermite_path_topic",hermite_path_topic);
         hermite_path_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>
             (hermite_path_topic, 1, std::bind(&PurePursuitPlannerComponent::hermitePathCallback, this, std::placeholders::_1));
 
-        marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(get_name()+std::string("/marker"),1);
+        marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker",1);
     }
 
     void PurePursuitPlannerComponent::currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data)
