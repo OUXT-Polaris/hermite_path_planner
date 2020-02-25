@@ -3,7 +3,7 @@
 namespace velocity_planner
 {
     ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & options)
-    : Node("curve_planner", options)
+    : Node("obstacle_planner", options)
     {
         std::string hermite_path_topic;
         declare_parameter("hermite_path_topic","/hermite_path_planner/hermite_path");
