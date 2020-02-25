@@ -79,6 +79,10 @@ namespace hermite_path_planner
             {
                 return ret;
             }
+            if(ret<0.0 || ret>1.0)
+            {
+                return boost::none;
+            }
             ret = ret + get_newton_step_size_func(coefficients,ret);
         }
         return ret;

@@ -35,6 +35,7 @@ include_directories(
   ${CERESS_INCLUDE_DIRS}
 )
 
+# Velocity Planner
 add_library(velocity_planner_component SHARED 
   src/velocity_planner_component.cpp
   src/velocity_optimizer.cpp)
@@ -67,16 +68,87 @@ ament_target_dependencies(velocity_planner_node
   hermite_path_planner
   hermite_path_msgs)
 
+# Curve Planner
+add_library(curve_planner_component SHARED
+  src/curve_planner_component.cpp
+)
+target_compile_definitions(curve_planner_component
+  PRIVATE "VELOCITY_PLANNER_CURVE_PLANNER_COMPONENT_BUILDING_DLL")
+ament_target_dependencies(curve_planner_component
+  rclcpp 
+  rclcpp_components
+  quaternion_operation
+  tf2_geometry_msgs
+  tf2_ros
+  visualization_msgs
+  hermite_path_planner
+  hermite_path_msgs)
+rclcpp_components_register_nodes(curve_planner_component
+  "velocity_planner::CurvePlannerComponent")
+
+add_executable(curve_planner_node
+  src/curve_planner_node.cpp
+)
+target_link_libraries(curve_planner_node curve_planner_component)
+ament_target_dependencies(curve_planner_node
+  rclcpp 
+  rclcpp_components
+  quaternion_operation
+  tf2_geometry_msgs
+  tf2_ros
+  visualization_msgs
+  hermite_path_planner
+  hermite_path_msgs)
+
+# Obstacle Planner
+add_library(obstacle_planner_component SHARED
+  src/obstacle_planner_component.cpp
+)
+target_compile_definitions(obstacle_planner_component
+  PRIVATE "VELOCITY_PLANNER_CURVE_PLANNER_COMPONENT_BUILDING_DLL")
+ament_target_dependencies(obstacle_planner_component
+  rclcpp 
+  rclcpp_components
+  quaternion_operation
+  tf2_geometry_msgs
+  tf2_ros
+  visualization_msgs
+  hermite_path_planner
+  hermite_path_msgs)
+rclcpp_components_register_nodes(obstacle_planner_component
+  "velocity_planner::ObstaclePlannerComponent")
+
+add_executable(obstacle_planner_node
+  src/obstacle_planner_node.cpp
+)
+target_link_libraries(obstacle_planner_node obstacle_planner_component)
+ament_target_dependencies(obstacle_planner_node
+  rclcpp 
+  rclcpp_components
+  quaternion_operation
+  tf2_geometry_msgs
+  tf2_ros
+  visualization_msgs
+  hermite_path_planner
+  hermite_path_msgs)
+
 install(TARGETS
+  obstacle_planner_node
   velocity_planner_node
+  curve_planner_node
   DESTINATION lib/velocity_planner
 )
-install(TARGETS velocity_planner_component
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin)
-ament_export_libraries(velocity_planner_component)
+install(TARGETS 
+  velocity_planner_component
+  curve_planner_component
+  obstacle_planner_component
+  
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+ament_export_libraries(velocity_planner_component curve_planner_component obstacle_planner_component)
 
+# launch file
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
