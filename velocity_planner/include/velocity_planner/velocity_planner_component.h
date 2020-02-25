@@ -48,6 +48,8 @@ extern "C" {
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <boost/optional.hpp>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 
 namespace velocity_planner
 {
@@ -57,6 +59,8 @@ namespace velocity_planner
         VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_PUBLIC
         explicit VelocityPlannerComponent(const rclcpp::NodeOptions & options);
     private:
+        void callback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr curve_path,
+            const hermite_path_msgs::msg::HermitePathStamped::SharedPtr obstacle_path);
         rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;

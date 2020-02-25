@@ -34,6 +34,12 @@ namespace velocity_planner
         timer_ = this->create_wall_timer(100ms, std::bind(&VelocityPlannerComponent::updatePath, this));
     }
 
+    void VelocityPlannerComponent::callback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr curve_path,
+        const hermite_path_msgs::msg::HermitePathStamped::SharedPtr obstacle_path)
+        {
+            
+        }
+
     void VelocityPlannerComponent::updatePath()
     {
         mtx_.lock();

@@ -5,6 +5,8 @@ namespace velocity_planner
     ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & options)
     : Node("obstacle_planner", options)
     {
+        hermite_path_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>
+            ("~/hermite_path", 1);
         std::string hermite_path_topic;
         declare_parameter("hermite_path_topic","/hermite_path_planner/hermite_path");
         get_parameter("hermite_path_topic",hermite_path_topic);

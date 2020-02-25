@@ -1,0 +1,5 @@
+planner_concatenator:
+  ros__parameters:
+    num_input : 2
+    input_topic0: "curve_planner/hermite_path"
+    input_topic1: "obstacle_planner/hermite_path"

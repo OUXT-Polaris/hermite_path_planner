@@ -20,6 +20,7 @@
   <depend>quaternion_operation</depend>
   <depend>eigen</depend>
   <depend>ceres</depend>
+  <depend>message_filters</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -54,6 +54,7 @@ namespace velocity_planner
         rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
+        rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
     };
 }
 

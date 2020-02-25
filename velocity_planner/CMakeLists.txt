@@ -28,6 +28,7 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Ceres REQUIRED)
+find_package(message_filters REQUIRED)
 
 include_directories(
   include
@@ -59,6 +60,7 @@ add_executable(velocity_planner_node
 )
 target_link_libraries(velocity_planner_node velocity_planner_component)
 ament_target_dependencies(velocity_planner_node
+  message_filters
   rclcpp 
   rclcpp_components
   quaternion_operation
@@ -105,7 +107,7 @@ add_library(obstacle_planner_component SHARED
   src/obstacle_planner_component.cpp
 )
 target_compile_definitions(obstacle_planner_component
-  PRIVATE "VELOCITY_PLANNER_CURVE_PLANNER_COMPONENT_BUILDING_DLL")
+  PRIVATE "VELOCITY_PLANNER_OBSTACLE_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(obstacle_planner_component
   rclcpp 
   rclcpp_components
@@ -132,24 +134,57 @@ ament_target_dependencies(obstacle_planner_node
   hermite_path_planner
   hermite_path_msgs)
 
+# Planner Concatenator
+add_library(planner_concatenator_component SHARED
+  src/planner_concatenator_component.cpp
+)
+target_compile_definitions(planner_concatenator_component
+  PRIVATE "VELOCITY_PLANNER_PLANNER_CONCATENATOR_COMPONENT_BUILDING_DLL")
+ament_target_dependencies(planner_concatenator_component
+  rclcpp 
+  rclcpp_components
+  message_filters
+  hermite_path_planner
+  hermite_path_msgs)
+rclcpp_components_register_nodes(planner_concatenator_component
+  "velocity_planner::PlannerConcatenatorComponent")
+
+add_executable(planner_concatenator_node
+  src/planner_concatenator_node.cpp
+)
+target_link_libraries(planner_concatenator_node planner_concatenator_component)
+ament_target_dependencies(planner_concatenator_node
+  rclcpp 
+  rclcpp_components
+  message_filters
+  hermite_path_planner
+  hermite_path_msgs)
+
+# install
 install(TARGETS
   obstacle_planner_node
   velocity_planner_node
   curve_planner_node
+  planner_concatenator_node
   DESTINATION lib/velocity_planner
 )
 install(TARGETS 
   velocity_planner_component
   curve_planner_component
   obstacle_planner_component
+  planner_concatenator_component
   
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
-ament_export_libraries(velocity_planner_component curve_planner_component obstacle_planner_component)
+ament_export_libraries(
+  velocity_planner_component 
+  curve_planner_component
+  obstacle_planner_component
+  planner_concatenator_component)
 
-# launch file
-install(DIRECTORY launch
+# launch/conifg file
+install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
 
