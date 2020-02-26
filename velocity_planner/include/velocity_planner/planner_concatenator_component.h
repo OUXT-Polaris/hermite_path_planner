@@ -40,6 +40,7 @@ extern "C" {
 #endif
 
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
+#include <message_filters/time_synchronizer.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/pass_through.h>
 #include <message_filters/sync_policies/exact_time.h>
@@ -64,10 +65,12 @@ namespace velocity_planner
         message_filters::PassThrough<HermitePathStamped> nf_;
         int num_input_;
         std::array<std::string,8> input_topics_;
-        void callback(const HermitePathStamped::SharedPtr &in0, const HermitePathStamped::SharedPtr &in1,
-            const HermitePathStamped::SharedPtr &in2, const HermitePathStamped::SharedPtr &in3,
-            const HermitePathStamped::SharedPtr &in4, const HermitePathStamped::SharedPtr &in5,
-            const HermitePathStamped::SharedPtr &in6, const HermitePathStamped::SharedPtr &in7);
+        std::shared_ptr<message_filters::TimeSynchronizer<HermitePathStamped, HermitePathStamped> > sync;
+        void test_callback(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1);
+        void callback(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
+            const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
+            const HermitePathStamped::ConstSharedPtr in4, const HermitePathStamped::ConstSharedPtr in5,
+            const HermitePathStamped::ConstSharedPtr in6, const HermitePathStamped::ConstSharedPtr in7);
     };
 }
 
