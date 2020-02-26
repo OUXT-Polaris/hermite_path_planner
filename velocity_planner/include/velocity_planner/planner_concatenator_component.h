@@ -42,7 +42,6 @@ extern "C" {
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/subscriber.h>
-#include <message_filters/pass_through.h>
 #include <message_filters/sync_policies/exact_time.h>
 
 namespace velocity_planner
@@ -61,13 +60,49 @@ namespace velocity_planner
     private:
         std::array<std::shared_ptr<HermitePathSubscriber>,8> sub_ptrs_;
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
-        std::shared_ptr<message_filters::Synchronizer<SyncPolicy> > sync_;
-        message_filters::PassThrough<HermitePathStamped> nf_;
         int num_input_;
         std::array<std::string,8> input_topics_;
-        std::shared_ptr<message_filters::TimeSynchronizer<HermitePathStamped, HermitePathStamped> > sync;
-        void test_callback(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1);
-        void callback(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
+
+        std::shared_ptr<message_filters::TimeSynchronizer
+            <HermitePathStamped, HermitePathStamped> > sync2_;
+        void callback2(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1);
+
+        std::shared_ptr<message_filters::TimeSynchronizer
+            <HermitePathStamped, HermitePathStamped, HermitePathStamped> > sync3_;
+        void callback3(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
+            const HermitePathStamped::ConstSharedPtr in2);
+
+        std::shared_ptr<message_filters::TimeSynchronizer
+            <HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped> > sync4_;
+        void callback4(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
+            const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3);
+
+        std::shared_ptr<message_filters::TimeSynchronizer
+            <HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+            HermitePathStamped> > sync5_;
+        void callback5(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
+            const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
+            const HermitePathStamped::ConstSharedPtr in4);
+
+        std::shared_ptr<message_filters::TimeSynchronizer
+            <HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+            HermitePathStamped, HermitePathStamped> > sync6_;
+        void callback6(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
+            const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
+            const HermitePathStamped::ConstSharedPtr in4, const HermitePathStamped::ConstSharedPtr in5);
+
+        std::shared_ptr<message_filters::TimeSynchronizer
+            <HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+            HermitePathStamped, HermitePathStamped, HermitePathStamped> > sync7_;
+        void callback7(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
+            const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
+            const HermitePathStamped::ConstSharedPtr in4, const HermitePathStamped::ConstSharedPtr in5,
+            const HermitePathStamped::ConstSharedPtr in6);
+
+        std::shared_ptr<message_filters::TimeSynchronizer
+            <HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+            HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped> > sync8_;
+        void callback8(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
             const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
             const HermitePathStamped::ConstSharedPtr in4, const HermitePathStamped::ConstSharedPtr in5,
             const HermitePathStamped::ConstSharedPtr in6, const HermitePathStamped::ConstSharedPtr in7);
