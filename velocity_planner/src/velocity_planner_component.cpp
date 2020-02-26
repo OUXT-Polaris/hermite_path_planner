@@ -14,7 +14,7 @@ namespace velocity_planner
             (current_twist_topic, 1, std::bind(&VelocityPlannerComponent::currentTwistCallback, this, std::placeholders::_1));
 
         std::string hermite_path_topic;
-        declare_parameter("hermite_path_topic","/hermite_path_planner/hermite_path");
+        declare_parameter("hermite_path_topic","/planner_concatenator/hermite_path");
         get_parameter("hermite_path_topic",hermite_path_topic);
         hermite_path_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>
             (hermite_path_topic, 1, std::bind(&VelocityPlannerComponent::hermitePathCallback, this, std::placeholders::_1));
@@ -37,7 +37,7 @@ namespace velocity_planner
     void VelocityPlannerComponent::callback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr curve_path,
         const hermite_path_msgs::msg::HermitePathStamped::SharedPtr obstacle_path)
         {
-            
+
         }
 
     void VelocityPlannerComponent::updatePath()

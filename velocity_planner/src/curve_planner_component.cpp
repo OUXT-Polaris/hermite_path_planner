@@ -17,5 +17,6 @@ namespace velocity_planner
     void CurvePlannerComponent::hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
     {
         path_ = *data;
+        hermite_path_pub_->publish(path_.get());
     }
 }
