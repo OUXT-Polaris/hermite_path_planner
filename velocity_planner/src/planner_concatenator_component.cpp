@@ -91,22 +91,16 @@ namespace velocity_planner
 
     void PlannerConcatenatorComponent::callback2(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1)
     {
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> target_vels;
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v0 = in0->target_velocity;
-            target_vels.insert(target_vels.end(),v0.begin(),v0.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;
             reference_vels.insert(reference_vels.end(),r0.begin(),r0.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v1 = in1->target_velocity;
-            target_vels.insert(target_vels.end(),v1.begin(),v1.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r1 = in1->reference_velocity;
             reference_vels.insert(reference_vels.end(),r1.begin(),r1.end());
 
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.target_velocity = target_vels;
             path.reference_velocity = reference_vels;
             hermite_path_pub_->publish(path);
     }
@@ -114,26 +108,18 @@ namespace velocity_planner
     void PlannerConcatenatorComponent::callback3(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
         const HermitePathStamped::ConstSharedPtr in2)
         {
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> target_vels;
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v0 = in0->target_velocity;
-            target_vels.insert(target_vels.end(),v0.begin(),v0.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;
             reference_vels.insert(reference_vels.end(),r0.begin(),r0.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v1 = in1->target_velocity;
-            target_vels.insert(target_vels.end(),v1.begin(),v1.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r1 = in1->reference_velocity;
             reference_vels.insert(reference_vels.end(),r1.begin(),r1.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v2 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v2.begin(),v2.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r2 = in2->reference_velocity;
             reference_vels.insert(reference_vels.end(),r2.begin(),r2.end());
 
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.target_velocity = target_vels;
             path.reference_velocity = reference_vels;
             hermite_path_pub_->publish(path);
         }
@@ -141,30 +127,20 @@ namespace velocity_planner
     void PlannerConcatenatorComponent::callback4(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
         const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3)
         {
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> target_vels;
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v0 = in0->target_velocity;
-            target_vels.insert(target_vels.end(),v0.begin(),v0.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;
             reference_vels.insert(reference_vels.end(),r0.begin(),r0.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v1 = in1->target_velocity;
-            target_vels.insert(target_vels.end(),v1.begin(),v1.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r1 = in1->reference_velocity;
             reference_vels.insert(reference_vels.end(),r1.begin(),r1.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v2 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v2.begin(),v2.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r2 = in2->reference_velocity;
             reference_vels.insert(reference_vels.end(),r2.begin(),r2.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v3 = in3->target_velocity;
-            target_vels.insert(target_vels.end(),v3.begin(),v3.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r3 = in3->reference_velocity;
             reference_vels.insert(reference_vels.end(),r3.begin(),r3.end());
 
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.target_velocity = target_vels;
             path.reference_velocity = reference_vels;
             hermite_path_pub_->publish(path);
         }
@@ -173,34 +149,22 @@ namespace velocity_planner
         const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
         const HermitePathStamped::ConstSharedPtr in4)
         {
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> target_vels;
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v0 = in0->target_velocity;
-            target_vels.insert(target_vels.end(),v0.begin(),v0.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;
             reference_vels.insert(reference_vels.end(),r0.begin(),r0.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v1 = in1->target_velocity;
-            target_vels.insert(target_vels.end(),v1.begin(),v1.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r1 = in1->reference_velocity;
             reference_vels.insert(reference_vels.end(),r1.begin(),r1.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v2 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v2.begin(),v2.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r2 = in2->reference_velocity;
             reference_vels.insert(reference_vels.end(),r2.begin(),r2.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v3 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v3.begin(),v3.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r3 = in3->reference_velocity;
             reference_vels.insert(reference_vels.end(),r3.begin(),r3.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v4 = in4->target_velocity;
-            target_vels.insert(target_vels.end(),v4.begin(),v4.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r4 = in4->reference_velocity;
             reference_vels.insert(reference_vels.end(),r4.begin(),r4.end());
 
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.target_velocity = target_vels;
             path.reference_velocity = reference_vels;
             hermite_path_pub_->publish(path);
         }
@@ -209,38 +173,24 @@ namespace velocity_planner
         const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
         const HermitePathStamped::ConstSharedPtr in4, const HermitePathStamped::ConstSharedPtr in5)
         {
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> target_vels;
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v0 = in0->target_velocity;
-            target_vels.insert(target_vels.end(),v0.begin(),v0.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;
             reference_vels.insert(reference_vels.end(),r0.begin(),r0.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v1 = in1->target_velocity;
-            target_vels.insert(target_vels.end(),v1.begin(),v1.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r1 = in1->reference_velocity;
             reference_vels.insert(reference_vels.end(),r1.begin(),r1.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v2 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v2.begin(),v2.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r2 = in2->reference_velocity;
             reference_vels.insert(reference_vels.end(),r2.begin(),r2.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v3 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v3.begin(),v3.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r3 = in3->reference_velocity;
             reference_vels.insert(reference_vels.end(),r3.begin(),r3.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v4 = in4->target_velocity;
-            target_vels.insert(target_vels.end(),v4.begin(),v4.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r4 = in4->reference_velocity;
             reference_vels.insert(reference_vels.end(),r4.begin(),r4.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v5 = in5->target_velocity;
-            target_vels.insert(target_vels.end(),v5.begin(),v5.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r5 = in5->reference_velocity;
             reference_vels.insert(reference_vels.end(),r5.begin(),r5.end());
 
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.target_velocity = target_vels;
             path.reference_velocity = reference_vels;
             hermite_path_pub_->publish(path);
         }
@@ -253,39 +203,24 @@ namespace velocity_planner
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> target_vels;
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v0 = in0->target_velocity;
-            target_vels.insert(target_vels.end(),v0.begin(),v0.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;
             reference_vels.insert(reference_vels.end(),r0.begin(),r0.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v1 = in1->target_velocity;
-            target_vels.insert(target_vels.end(),v1.begin(),v1.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r1 = in1->reference_velocity;
             reference_vels.insert(reference_vels.end(),r1.begin(),r1.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v2 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v2.begin(),v2.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r2 = in2->reference_velocity;
             reference_vels.insert(reference_vels.end(),r2.begin(),r2.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v3 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v3.begin(),v3.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r3 = in3->reference_velocity;
             reference_vels.insert(reference_vels.end(),r3.begin(),r3.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v4 = in4->target_velocity;
-            target_vels.insert(target_vels.end(),v4.begin(),v4.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r4 = in4->reference_velocity;
             reference_vels.insert(reference_vels.end(),r4.begin(),r4.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v5 = in5->target_velocity;
-            target_vels.insert(target_vels.end(),v5.begin(),v5.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r5 = in5->reference_velocity;
             reference_vels.insert(reference_vels.end(),r5.begin(),r5.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v6 = in6->target_velocity;
-            target_vels.insert(target_vels.end(),v6.begin(),v6.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r6 = in6->reference_velocity;
             reference_vels.insert(reference_vels.end(),r6.begin(),r6.end());
 
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.target_velocity = target_vels;
             path.reference_velocity = reference_vels;
             hermite_path_pub_->publish(path);
         }
@@ -298,43 +233,26 @@ namespace velocity_planner
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> target_vels;
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v0 = in0->target_velocity;
-            target_vels.insert(target_vels.end(),v0.begin(),v0.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;
             reference_vels.insert(reference_vels.end(),r0.begin(),r0.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v1 = in1->target_velocity;
-            target_vels.insert(target_vels.end(),v1.begin(),v1.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r1 = in1->reference_velocity;
             reference_vels.insert(reference_vels.end(),r1.begin(),r1.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v2 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v2.begin(),v2.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r2 = in2->reference_velocity;
             reference_vels.insert(reference_vels.end(),r2.begin(),r2.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v3 = in2->target_velocity;
-            target_vels.insert(target_vels.end(),v3.begin(),v3.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r3 = in3->reference_velocity;
             reference_vels.insert(reference_vels.end(),r3.begin(),r3.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v4 = in4->target_velocity;
-            target_vels.insert(target_vels.end(),v4.begin(),v4.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r4 = in4->reference_velocity;
             reference_vels.insert(reference_vels.end(),r4.begin(),r4.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v5 = in5->target_velocity;
-            target_vels.insert(target_vels.end(),v5.begin(),v5.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r5 = in5->reference_velocity;
             reference_vels.insert(reference_vels.end(),r5.begin(),r5.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v6 = in6->target_velocity;
-            target_vels.insert(target_vels.end(),v6.begin(),v6.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r6 = in6->reference_velocity;
             reference_vels.insert(reference_vels.end(),r6.begin(),r6.end());
-            std::vector<hermite_path_msgs::msg::ReferenceVelocity> v7 = in7->target_velocity;
-            target_vels.insert(target_vels.end(),v7.begin(),v7.end());
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> r7 = in7->reference_velocity;
             reference_vels.insert(reference_vels.end(),r7.begin(),r7.end());
 
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.target_velocity = target_vels;
             path.reference_velocity = reference_vels;
             hermite_path_pub_->publish(path);
         }

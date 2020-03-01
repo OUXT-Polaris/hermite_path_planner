@@ -61,12 +61,12 @@ namespace velocity_planner
             mtx_.unlock();
             return;
         }
-        if(path_->target_velocity.size() == 0)
+        if(path_->reference_velocity.size() == 0)
         {
             hermite_path_msgs::msg::ReferenceVelocity vel;
             vel.t = 1.0;
             vel.linear_velocity = 0.0;
-            path_->target_velocity.push_back(vel);
+            path_->reference_velocity.push_back(vel);
         }
         mtx_.unlock();
     }
