@@ -27,7 +27,7 @@ namespace velocity_planner
             double curvature = generator_.getCurvature(path_->path,t);
             hermite_path_msgs::msg::ReferenceVelocity vel;
             vel.t = t;
-            vel.linear_velocity = curvature*target_angular_velocity_;
+            vel.linear_velocity = std::fabs(curvature)*target_angular_velocity_;
             path_->reference_velocity.push_back(vel);
         }
         hermite_path_pub_->publish(path_.get());
