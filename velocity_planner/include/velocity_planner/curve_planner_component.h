@@ -44,6 +44,7 @@ extern "C" {
 #include <boost/optional.hpp>
 #include <hermite_path_planner/hermite_path_generator.h>
 #include <boost/algorithm/clamp.hpp>
+#include <velocity_planner/velocity_visualizer.h>
 
 namespace velocity_planner
 {
@@ -57,10 +58,12 @@ namespace velocity_planner
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
         int num_resolution_;
         double target_angular_velocity_;
         double max_linear_velocity_;
         hermite_path_planner::HermitePathGenerator generator_;
+        VelocityVisualizer viz_;
     };
 }
 

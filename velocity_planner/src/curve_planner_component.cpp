@@ -3,8 +3,10 @@
 namespace velocity_planner
 {
     CurvePlannerComponent::CurvePlannerComponent(const rclcpp::NodeOptions & options)
-    : Node("curve_planner", options),generator_(0.0)
+    : Node("curve_planner", options),generator_(0.0), viz_(get_name())
     {
+        marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>
+            ("~/marker", 1);
         hermite_path_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>
             ("~/hermite_path", 1);
         std::string hermite_path_topic;
@@ -40,6 +42,7 @@ namespace velocity_planner
             }
             path_->reference_velocity.push_back(vel);
         }
+        marker_pub_->publish(viz_.generateMarker(path_.get()));
         hermite_path_pub_->publish(path_.get());
     }
 }

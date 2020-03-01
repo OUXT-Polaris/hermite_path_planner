@@ -73,6 +73,7 @@ ament_target_dependencies(velocity_planner_node
 # Curve Planner
 add_library(curve_planner_component SHARED
   src/curve_planner_component.cpp
+  src/velocity_visualizer.cpp
 )
 target_compile_definitions(curve_planner_component
   PRIVATE "VELOCITY_PLANNER_CURVE_PLANNER_COMPONENT_BUILDING_DLL")
