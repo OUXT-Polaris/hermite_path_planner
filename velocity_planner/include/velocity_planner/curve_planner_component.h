@@ -43,6 +43,7 @@ extern "C" {
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <boost/optional.hpp>
 #include <hermite_path_planner/hermite_path_generator.h>
+#include <boost/algorithm/clamp.hpp>
 
 namespace velocity_planner
 {
@@ -58,6 +59,7 @@ namespace velocity_planner
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
         int num_resolution_;
         double target_angular_velocity_;
+        double max_linear_velocity_;
         hermite_path_planner::HermitePathGenerator generator_;
     };
 }

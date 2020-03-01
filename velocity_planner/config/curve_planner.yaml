@@ -1,4 +1,5 @@
 curve_planner:
   ros__parameters:
     target_angular_velocity : 0.2
+    target_angular_velocity : 0.3
     num_resolution : 100

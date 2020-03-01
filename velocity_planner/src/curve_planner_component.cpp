@@ -12,6 +12,8 @@ namespace velocity_planner
         get_parameter("hermite_path_topic",hermite_path_topic);
         declare_parameter("num_resolution",200);
         get_parameter("num_resolution",num_resolution_);
+        declare_parameter("max_linear_velocity",0.5);
+        get_parameter("max_linear_velocity",max_linear_velocity_);
         declare_parameter("target_angular_velocity",0.3);
         get_parameter("target_angular_velocity",target_angular_velocity_);
         hermite_path_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>
@@ -20,6 +22,7 @@ namespace velocity_planner
 
     void CurvePlannerComponent::hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
     {
+        constexpr double e = std::numeric_limits<double>::epsilon();
         path_ = *data;
         for(int i=0; i<num_resolution_; i++)
         {
@@ -27,7 +30,14 @@ namespace velocity_planner
             double curvature = generator_.getCurvature(path_->path,t);
             hermite_path_msgs::msg::ReferenceVelocity vel;
             vel.t = t;
-            vel.linear_velocity = std::fabs(curvature)*target_angular_velocity_;
+            if(std::fabs(curvature) < e)
+            {
+                vel.linear_velocity = target_angular_velocity_;
+            }
+            else
+            {
+                vel.linear_velocity = boost::algorithm::clamp(1/std::fabs(curvature)*target_angular_velocity_,0.0,max_linear_velocity_);
+            }
             path_->reference_velocity.push_back(vel);
         }
         hermite_path_pub_->publish(path_.get());
