@@ -142,6 +142,34 @@ ament_target_dependencies(obstacle_planner_node
   hermite_path_planner
   hermite_path_msgs)
 
+# Velocity Constraint Planner
+add_library(velocity_constraint_planner_component SHARED
+  src/velocity_constraint_planner_component.cpp
+)
+target_compile_definitions(velocity_constraint_planner_component
+  PRIVATE "VELOCITY_PLANNER_VELOCITY_CONSTRAINT_PLANNER_COMPONENT_BUILDING_DLL")
+ament_target_dependencies(velocity_constraint_planner_component
+  rclcpp 
+  rclcpp_components
+  message_filters
+  color_names
+  hermite_path_planner
+  hermite_path_msgs)
+rclcpp_components_register_nodes(velocity_constraint_planner_component
+  "velocity_planner::VelocityConstraintPlannerComponent")
+
+add_executable(velocity_constraint_planner_node
+  src/velocity_constraint_planner_node.cpp
+)
+target_link_libraries(velocity_constraint_planner_node velocity_constraint_planner_component)
+ament_target_dependencies(velocity_constraint_planner_node
+  rclcpp 
+  rclcpp_components
+  message_filters
+  color_names
+  hermite_path_planner
+  hermite_path_msgs)
+
 # Planner Concatenator
 add_library(planner_concatenator_component SHARED
   src/planner_concatenator_component.cpp
@@ -175,6 +203,7 @@ install(TARGETS
   obstacle_planner_node
   velocity_planner_node
   curve_planner_node
+  velocity_constraint_planner_node
   planner_concatenator_node
   DESTINATION lib/velocity_planner
 )
@@ -182,6 +211,7 @@ install(TARGETS
   velocity_planner_component
   curve_planner_component
   obstacle_planner_component
+  velocity_constraint_planner_component
   planner_concatenator_component
   
   ARCHIVE DESTINATION lib
@@ -191,6 +221,7 @@ ament_export_libraries(
   velocity_planner_component 
   curve_planner_component
   obstacle_planner_component
+  velocity_constraint_planner_component
   planner_concatenator_component)
 
 # launch/conifg file

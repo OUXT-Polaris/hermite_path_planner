@@ -17,8 +17,7 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path);
         visualization_msgs::msg::MarkerArray generateMarker(
             hermite_path_msgs::msg::HermitePathStamped path,
-            std_msgs::msg::ColorRGBA color_ref_velocity,
-            std_msgs::msg::ColorRGBA color_target_velocity);
+            std_msgs::msg::ColorRGBA color_ref_velocity);
     private:
         std::string node_name_;
         hermite_path_planner::HermitePathGenerator generator_;
