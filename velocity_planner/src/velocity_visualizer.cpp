@@ -1,4 +1,5 @@
 #include <velocity_planner/velocity_visualizer.h>
+#include <color_names/color_names.h>
 
 namespace velocity_planner
 {
@@ -11,11 +12,7 @@ namespace velocity_planner
     visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
         hermite_path_msgs::msg::HermitePathStamped path)
     {
-        std_msgs::msg::ColorRGBA default_ref_color;
-        default_ref_color.r = 0.6;
-        default_ref_color.g = 0.6;
-        default_ref_color.b = 0.1;
-        default_ref_color.a = 0.8;
+        std_msgs::msg::ColorRGBA default_ref_color = color_names::makeColorMsg("lime",0.8);
         std_msgs::msg::ColorRGBA default_target_color;
         default_target_color.r = 0.8;
         default_target_color.g = 0.1;

@@ -1,4 +1,5 @@
 #include <pure_pursuit_planner/pure_pursuit_planner_component.h>
+#include <color_names/color_names.h>
 
 namespace pure_pursuit_planner
 {
@@ -91,13 +92,10 @@ namespace pure_pursuit_planner
             target_marker.pose.orientation.y = 0.0f;
             target_marker.pose.orientation.z = 0.0f;
             target_marker.pose.orientation.w = 1.0f;
-            target_marker.scale.x = 1.0;
-            target_marker.scale.y = 1.0;
-            target_marker.scale.z = 1.0;
-            target_marker.color.r = 0.1;
-            target_marker.color.g = 1.0;
-            target_marker.color.b = 0.1;
-            target_marker.color.a = 0.8;
+            target_marker.scale.x = 0.3;
+            target_marker.scale.y = 0.3;
+            target_marker.scale.z = 0.3;
+            target_marker.color = color_names::makeColorMsg("yellow",1.0);
             marker.markers.push_back(target_marker);
         }
         // draw search circle
@@ -109,10 +107,7 @@ namespace pure_pursuit_planner
         circle_marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
         circle_marker.pose = pose.pose;
         circle_marker.scale.x = 0.1;
-        circle_marker.color.r = 1.0;
-        circle_marker.color.g = 1.0;
-        circle_marker.color.b = 1.0;
-        circle_marker.color.a = 0.5;
+        circle_marker.color = color_names::makeColorMsg("chocolate",1.0);
         constexpr int circle_marker_resolution = 200;
         for(int i=0;i<(circle_marker_resolution+1); i++)
         {

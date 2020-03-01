@@ -1,5 +1,5 @@
 #include <hermite_path_planner/hermite_path_generator.h>
-#include <iostream>
+#include <color_names/color_names.h>
 
 namespace hermite_path_planner
 {
@@ -231,11 +231,7 @@ namespace hermite_path_planner
 
     visualization_msgs::msg::Marker HermitePathGenerator::getBoundsPolygon(hermite_path_msgs::msg::HermitePathStamped path,int resolution,double z_offset)
     {
-        std_msgs::msg::ColorRGBA color;
-        color.r = 0.2;
-        color.g = 0.8;
-        color.b = 0.8;
-        color.a = 0.5;
+        std_msgs::msg::ColorRGBA color = color_names::makeColorMsg("skyblue", 0.8);
         visualization_msgs::msg::Marker marker;
         marker.header = path.header;
         marker.ns = "polygon";
@@ -312,17 +308,8 @@ namespace hermite_path_planner
         visualization_msgs::msg::MarkerArray marker;
 
         // Setup Color
-        std_msgs::msg::ColorRGBA color_center_line;
-        color_center_line.r = 1.0;
-        color_center_line.g = 0.0;
-        color_center_line.b = 0.0;
-        color_center_line.a = 1.0;
-
-        std_msgs::msg::ColorRGBA color_bounds;
-        color_bounds.r = 0.0;
-        color_bounds.g = 0.0;
-        color_bounds.b = 1.0;
-        color_bounds.a = 1.0;
+        std_msgs::msg::ColorRGBA color_center_line = color_names::makeColorMsg("red", 1.0);
+        //std_msgs::msg::ColorRGBA color_bounds = color_names::makeColorMsg("skyblue", 1.0);
         
         // Setup Center Line Marker
         visualization_msgs::msg::Marker center_line;

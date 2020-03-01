@@ -29,6 +29,7 @@ find_package(tf2_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Ceres REQUIRED)
 find_package(message_filters REQUIRED)
+find_package(color_names REQUIRED)
 
 include_directories(
   include
@@ -50,6 +51,7 @@ ament_target_dependencies(velocity_planner_component
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(velocity_planner_component
@@ -60,6 +62,7 @@ add_executable(velocity_planner_node
 )
 target_link_libraries(velocity_planner_node velocity_planner_component)
 ament_target_dependencies(velocity_planner_node
+  color_names
   message_filters
   rclcpp 
   rclcpp_components
@@ -84,6 +87,7 @@ ament_target_dependencies(curve_planner_component
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(curve_planner_component
@@ -100,6 +104,7 @@ ament_target_dependencies(curve_planner_node
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 
@@ -116,6 +121,7 @@ ament_target_dependencies(obstacle_planner_component
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(obstacle_planner_component
@@ -132,6 +138,7 @@ ament_target_dependencies(obstacle_planner_node
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 
@@ -145,6 +152,7 @@ ament_target_dependencies(planner_concatenator_component
   rclcpp 
   rclcpp_components
   message_filters
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(planner_concatenator_component
@@ -158,6 +166,7 @@ ament_target_dependencies(planner_concatenator_node
   rclcpp 
   rclcpp_components
   message_filters
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 

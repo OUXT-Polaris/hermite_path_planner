@@ -26,6 +26,7 @@ find_package(visualization_msgs REQUIRED)
 find_package(hermite_path_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(color_names REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -44,7 +45,8 @@ ament_target_dependencies(hermite_path_generator
   tf2_ros
   tf2_geometry_msgs
   quaternion_operation
-  hermite_path_msgs)
+  hermite_path_msgs
+  color_names)
 ament_export_interfaces(export_hermite_path_generator HAS_LIBRARY_TARGET)
 ament_export_libraries(hermite_path_generator)
 
@@ -60,6 +62,7 @@ ament_target_dependencies(hermite_path_planner_component
   geometry_msgs
   quaternion_operation
   visualization_msgs
+  color_names
   tf2_ros
   tf2_geometry_msgs
   hermite_path_msgs)
@@ -75,6 +78,7 @@ ament_target_dependencies(hermite_path_planner_node
   geometry_msgs 
   quaternion_operation 
   visualization_msgs
+  color_names
   tf2_ros
   tf2_geometry_msgs
   hermite_path_msgs)

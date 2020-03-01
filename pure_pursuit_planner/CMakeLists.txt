@@ -25,6 +25,7 @@ find_package(quaternion_operation REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(color_names REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -43,6 +44,7 @@ ament_target_dependencies(pure_pursuit_planner_component
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(pure_pursuit_planner_component
@@ -59,6 +61,7 @@ ament_target_dependencies(pure_pursuit_planner_node
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
+  color_names
   hermite_path_planner
   hermite_path_msgs)
 
