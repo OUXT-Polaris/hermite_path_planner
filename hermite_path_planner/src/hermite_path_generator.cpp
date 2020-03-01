@@ -8,6 +8,16 @@ namespace hermite_path_planner
         robot_width_ = robot_width;
     }
 
+    double HermitePathGenerator::getCurvature(hermite_path_msgs::msg::HermitePath path,double t)
+    {
+        double t2 = t*t;
+        double x_dot = 3*path.ax*t2 + 2*path.bx*t + path.cx;
+        double x_dot_dot = 6*path.ax + 2*path.bx;
+        double y_dot = 3*path.ay*t2 + 2*path.by*t + path.cy;
+        double y_dot_dot = 6*path.ay + 2*path.by;
+        return (x_dot*y_dot_dot - x_dot_dot*y_dot)/std::pow(x_dot*x_dot + y_dot*y_dot,1.5);
+    }
+
     boost::optional<double> HermitePathGenerator::getDistanceInFrenetCoordinate(
         hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p)
     {

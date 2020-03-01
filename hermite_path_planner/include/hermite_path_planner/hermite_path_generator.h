@@ -22,6 +22,7 @@ namespace hermite_path_planner
         boost::optional<double> checkFirstCollisionWithCircle(hermite_path_msgs::msg::HermitePath path,
             geometry_msgs::msg::Point center,double radius);
         double getLength(hermite_path_msgs::msg::HermitePath path,int resolution);
+        double getCurvature(hermite_path_msgs::msg::HermitePath path,double t);
         boost::optional<double> getDistanceInFrenetCoordinate(hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p);
     private:
         visualization_msgs::msg::Marker getBoundsPolygon(hermite_path_msgs::msg::HermitePathStamped path,int resolution,double z_offset);
