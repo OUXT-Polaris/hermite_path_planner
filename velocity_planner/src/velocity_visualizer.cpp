@@ -46,9 +46,16 @@ namespace velocity_planner
             std::size_t index = std::distance(path.reference_velocity.begin(), itr);
             box_marker.id = index;
             geometry_msgs::msg::Point point = generator_.getPointOnHermitePath(path.path,itr->t);
+            geometry_msgs::msg::Vector3 vec = generator_.getTangentVector(path.path,itr->t);
+            double theta = std::atan2(vec.y,vec.x);
+            geometry_msgs::msg::Vector3 orientation_vec;
+            orientation_vec.x = 0.0;
+            orientation_vec.y = 0.0;
+            orientation_vec.z = theta;
             box_marker.action = box_marker.ADD;
             box_marker.pose.position = point;
             box_marker.pose.position.z = box_marker.pose.position.z + itr->linear_velocity*0.5;
+            box_marker.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(orientation_vec);
             box_marker.scale.x = 0.1;
             box_marker.scale.y = 0.1;
             bool is_zero = (std::fabs(itr->linear_velocity) < DBL_EPSILON);
