@@ -3,4 +3,4 @@ planner_concatenator:
     num_input : 3
     input_topic0: "curve_planner/hermite_path"
     input_topic1: "obstacle_planner/hermite_path"
-    input_topic2: "velocity_constraint_planner/hermite_path"
+    input_topic2: "stop_planner/hermite_path"
