@@ -19,7 +19,6 @@
   <depend>tf2_ros</depend>
   <depend>quaternion_operation</depend>
   <depend>eigen</depend>
-  <depend>ceres</depend>
   <depend>message_filters</depend>
   <depend>color_names</depend>
 
