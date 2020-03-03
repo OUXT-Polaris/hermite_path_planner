@@ -9,6 +9,15 @@ namespace velocity_planner
         node_name_ = node_name;
     }
 
+    visualization_msgs::msg::MarkerArray VelocityVisualizer::generateDeleteMarker()
+    {
+        visualization_msgs::msg::MarkerArray ret;
+        visualization_msgs::msg::Marker marker;
+        marker.action = marker.DELETEALL;
+        ret.markers.push_back(marker);
+        return ret;
+    }
+
     visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
         hermite_path_msgs::msg::HermitePathStamped path)
     {
@@ -42,7 +51,15 @@ namespace velocity_planner
             box_marker.pose.position.z = box_marker.pose.position.z + itr->linear_velocity*0.5;
             box_marker.scale.x = 0.1;
             box_marker.scale.y = 0.1;
-            box_marker.scale.z = itr->linear_velocity;
+            bool is_zero = (std::fabs(itr->linear_velocity) < DBL_EPSILON);
+            if(is_zero)
+            {
+                box_marker.scale.z = 0.001;
+            }
+            else
+            {
+                box_marker.scale.z = itr->linear_velocity;
+            }
             box_marker.color = color_ref_velocity;
             marker.markers.push_back(box_marker);
         }

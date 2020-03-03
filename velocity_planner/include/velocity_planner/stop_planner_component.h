@@ -57,8 +57,12 @@ namespace velocity_planner
         rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
         hermite_path_planner::HermitePathGenerator generator_;
         VelocityVisualizer viz_;
+        double max_deceleration_;
+        double max_linear_velocity_;
+        double section_length_;
     };
 }
 

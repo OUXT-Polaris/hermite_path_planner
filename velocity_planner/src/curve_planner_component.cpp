@@ -1,4 +1,5 @@
 #include <velocity_planner/curve_planner_component.h>
+#include <color_names/color_names.h>
 
 namespace velocity_planner
 {
@@ -42,7 +43,8 @@ namespace velocity_planner
             }
             path_->reference_velocity.push_back(vel);
         }
-        marker_pub_->publish(viz_.generateMarker(path_.get()));
+        marker_pub_->publish(viz_.generateDeleteMarker());
+        marker_pub_->publish(viz_.generateMarker(path_.get(),color_names::makeColorMsg("lime",1.0)));
         hermite_path_pub_->publish(path_.get());
     }
 }
