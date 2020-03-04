@@ -3,10 +3,11 @@
 namespace velocity_planner
 {
     PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOptions & options)
-    : Node("planner_concatenator", options)
+    : Node("planner_concatenator", options), viz_(get_name())
     {
         hermite_path_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>
             ("~/hermite_path", 1);
+        marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker",1);
         declare_parameter("num_input",2);
         get_parameter("num_input",num_input_);
         assert(num_input_>=2 && num_input_<=8);
@@ -89,6 +90,36 @@ namespace velocity_planner
         }
     }
 
+    std::vector<hermite_path_msgs::msg::ReferenceVelocity>
+        PlannerConcatenatorComponent::filterReferenceVelocity(std::vector<hermite_path_msgs::msg::ReferenceVelocity> data)
+        {
+            std::vector<hermite_path_msgs::msg::ReferenceVelocity> ret;
+            std::multimap<double, double> dict;
+            std::list<double> keys;
+            for(auto itr = data.begin(); itr != data.end(); itr++)
+            {
+                dict.emplace(itr->t,itr->linear_velocity);
+                keys.emplace_back(itr->t);
+            }
+            keys.sort();
+            keys.unique();
+            for(auto key_itr = keys.begin(); key_itr != keys.end(); key_itr++)
+            {
+                std::list<double> vels;
+                auto p = dict.equal_range(*key_itr);
+                for (auto it = p.first; it != p.second; ++it)
+                {
+                    vels.emplace_back(it->second);
+                }
+                vels.sort();
+                hermite_path_msgs::msg::ReferenceVelocity ref_vel;
+                ref_vel.t = *key_itr;
+                ref_vel.linear_velocity = *vels.begin();
+                ret.push_back(ref_vel);
+            }
+            return ret;
+        }
+
     void PlannerConcatenatorComponent::callback2(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1)
     {
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
@@ -101,8 +132,10 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.reference_velocity = reference_vels;
+            path.reference_velocity = filterReferenceVelocity(reference_vels);
             hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path));
     }
 
     void PlannerConcatenatorComponent::callback3(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
@@ -120,8 +153,10 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.reference_velocity = reference_vels;
+            path.reference_velocity = filterReferenceVelocity(reference_vels);
             hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path));
         }
 
     void PlannerConcatenatorComponent::callback4(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
@@ -141,8 +176,10 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.reference_velocity = reference_vels;
+            path.reference_velocity = filterReferenceVelocity(reference_vels);
             hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path));
         }
 
     void PlannerConcatenatorComponent::callback5(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
@@ -165,8 +202,10 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.reference_velocity = reference_vels;
+            path.reference_velocity = filterReferenceVelocity(reference_vels);
             hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path));
         }
 
     void PlannerConcatenatorComponent::callback6(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
@@ -191,8 +230,10 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.reference_velocity = reference_vels;
+            path.reference_velocity = filterReferenceVelocity(reference_vels);
             hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path));
         }
 
     void PlannerConcatenatorComponent::callback7(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
@@ -221,8 +262,10 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.reference_velocity = reference_vels;
+            path.reference_velocity = filterReferenceVelocity(reference_vels);
             hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path));
         }
 
     void PlannerConcatenatorComponent::callback8(const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
@@ -253,7 +296,9 @@ namespace velocity_planner
             hermite_path_msgs::msg::HermitePathStamped path;
             path.header = in0->header;
             path.path = in0->path;
-            path.reference_velocity = reference_vels;
+            path.reference_velocity = filterReferenceVelocity(reference_vels);
             hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path));
         }
 }

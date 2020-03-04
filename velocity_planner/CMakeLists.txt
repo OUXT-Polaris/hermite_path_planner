@@ -38,7 +38,8 @@ include_directories(
 
 # Velocity Planner
 add_library(velocity_planner_component SHARED 
-  src/velocity_planner_component.cpp)
+  src/velocity_planner_component.cpp
+  src/velocity_graph.cpp)
 target_compile_definitions(velocity_planner_component
   PRIVATE "VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_BUILDING_DLL")
 target_link_libraries(velocity_planner_component ${CERES_LIBRARIES})
@@ -175,6 +176,7 @@ ament_target_dependencies(stop_planner_node
 # Planner Concatenator
 add_library(planner_concatenator_component SHARED
   src/planner_concatenator_component.cpp
+  src/velocity_visualizer.cpp
 )
 target_compile_definitions(planner_concatenator_component
   PRIVATE "VELOCITY_PLANNER_PLANNER_CONCATENATOR_COMPONENT_BUILDING_DLL")
@@ -183,6 +185,7 @@ ament_target_dependencies(planner_concatenator_component
   rclcpp_components
   message_filters
   color_names
+  quaternion_operation
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(planner_concatenator_component
@@ -197,6 +200,7 @@ ament_target_dependencies(planner_concatenator_node
   rclcpp_components
   message_filters
   color_names
+  quaternion_operation
   hermite_path_planner
   hermite_path_msgs)
 

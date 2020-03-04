@@ -21,7 +21,7 @@ namespace velocity_planner
     visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
         hermite_path_msgs::msg::HermitePathStamped path)
     {
-        std_msgs::msg::ColorRGBA default_ref_color = color_names::makeColorMsg("lime",0.8);
+        std_msgs::msg::ColorRGBA default_ref_color = color_names::makeColorMsg("lime",1.0);
         return generateMarker(path,default_ref_color);
     }
 

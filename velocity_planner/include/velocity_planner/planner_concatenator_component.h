@@ -43,6 +43,8 @@ extern "C" {
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/exact_time.h>
+#include <velocity_planner/velocity_visualizer.h>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace velocity_planner
 {
@@ -58,10 +60,14 @@ namespace velocity_planner
         VELOCITY_PLANNER_PLANNER_CONCATENATOR_COMPONENT_PUBLIC
         explicit PlannerConcatenatorComponent(const rclcpp::NodeOptions & options);
     private:
+        VelocityVisualizer viz_;
+        std::vector<hermite_path_msgs::msg::ReferenceVelocity>
+            filterReferenceVelocity(std::vector<hermite_path_msgs::msg::ReferenceVelocity> data);
         std::array<std::shared_ptr<HermitePathSubscriber>,8> sub_ptrs_;
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
         int num_input_;
         std::array<std::string,8> input_topics_;
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 
         std::shared_ptr<message_filters::TimeSynchronizer
             <HermitePathStamped, HermitePathStamped> > sync2_;
