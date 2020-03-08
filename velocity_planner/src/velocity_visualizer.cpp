@@ -18,6 +18,61 @@ namespace velocity_planner
         return ret;
     }
 
+    visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
+        hermite_path_msgs::msg::HermitePathStamped path)
+        {
+            visualization_msgs::msg::MarkerArray ret;
+            int path_length = path.reference_velocity.size();
+            for(int i=0; i<(path_length-1); i++)
+            {
+                visualization_msgs::msg::Marker polygon;
+                polygon.header = path.header;
+                polygon.ns = "polygon";
+                polygon.id = i;
+                polygon.type = polygon.TRIANGLE_LIST;
+                polygon.action = polygon.ADD;
+                polygon.scale.x = 1.0;
+                polygon.scale.y = 1.0;
+                polygon.scale.z = 1.0;
+                double t0 = path.reference_velocity[i].t;
+                double t1 = path.reference_velocity[i+1].t;
+                double v = (path.reference_velocity[i].linear_velocity + path.reference_velocity[i+1].linear_velocity)/2.0;
+                geometry_msgs::msg::Vector3 vec0 = generator_.getNormalVector(path.path,t0);
+                geometry_msgs::msg::Vector3 vec1 = generator_.getNormalVector(path.path,t1);
+                double theta0 = std::atan2(vec0.y,vec0.x);
+                double theta1 = std::atan2(vec1.y,vec1.x);
+                geometry_msgs::msg::Point p0 = generator_.getPointOnHermitePath(path.path,t0);
+                geometry_msgs::msg::Point p1 = generator_.getPointOnHermitePath(path.path,t1);
+                geometry_msgs::msg::Point p0l;
+                p0l.x = p0.x - 0.5*std::cos(theta0);
+                p0l.y = p0.y - 0.5*std::sin(theta0);
+                geometry_msgs::msg::Point p0r;
+                p0r.x = p0.x + 0.5*std::cos(theta0);
+                p0r.y = p0.y + 0.5*std::sin(theta0);
+                geometry_msgs::msg::Point p1l;
+                p1l.x = p1.x - 0.5*std::cos(theta1);
+                p1l.y = p1.y - 0.5*std::sin(theta1);
+                geometry_msgs::msg::Point p1r;
+                p1r.x = p1.x + 0.5*std::cos(theta1);
+                p1r.y = p1.y + 0.5*std::sin(theta1);
+                polygon.points.push_back(p0l);
+                polygon.points.push_back(p0r);
+                polygon.points.push_back(p1l);
+                polygon.points.push_back(p1l);
+                polygon.points.push_back(p0r);
+                polygon.points.push_back(p1r);
+                std_msgs::msg::ColorRGBA color;
+                double ratio = std::fabs(v)/0.5;
+                color.r = 1.0-ratio;
+                color.g = ratio;
+                color.b = 0.3;
+                color.a = 1.0;
+                polygon.color = color;
+                ret.markers.push_back(polygon);
+            }
+            return ret;
+        }
+
     visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
         hermite_path_msgs::msg::HermitePathStamped path)
     {

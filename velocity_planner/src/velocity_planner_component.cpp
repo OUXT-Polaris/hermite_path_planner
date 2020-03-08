@@ -91,7 +91,8 @@ namespace velocity_planner
             RCLCPP_INFO(get_logger(), "maximum acceleration is " + std::to_string(graph.getPlannedMaximumAcceleration()));
             RCLCPP_INFO(get_logger(), "minimum acceleration is " + std::to_string(graph.getPlannedMinimumAcceleration()));
             marker_pub_->publish(viz_.generateDeleteMarker());
-            marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
+            marker_pub_->publish(viz_.generatePolygonMarker(path));
+            //marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
         }
         else
         {
