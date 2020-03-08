@@ -63,11 +63,7 @@ namespace velocity_planner
                 polygon.points.push_back(p1r);
                 std_msgs::msg::ColorRGBA color;
                 double ratio = std::fabs(v)/0.5;
-                color.r = 1.0-ratio;
-                color.g = ratio;
-                color.b = 0.3;
-                color.a = 1.0;
-                polygon.color = color;
+                polygon.color = color_names::fromHsv(0.5*ratio,255.0,255.0,0.3);
                 ret.markers.push_back(polygon);
             }
             return ret;
