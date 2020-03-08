@@ -40,12 +40,14 @@ namespace velocity_planner
     private:
         std::vector<Node> makeNodes(hermite_path_msgs::msg::ReferenceVelocity vel);
         boost::optional<std::vector<Edge> > makeEdges(std::map<double,std::vector<Node> > nodes);
+        void buildVelocityGraph(std::map<double,std::vector<Node> > nodes,std::vector<Edge> edges);
         VelocityGraphData data_;
         double velocity_resoluation_;
         double maximum_accerelation_;
         double minimum_accerelation_;
         double path_length_;
         hermite_path_planner::HermitePathGenerator generator_;
+        bool planning_succeed_;
     };
 }
 

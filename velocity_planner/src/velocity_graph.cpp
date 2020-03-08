@@ -7,6 +7,7 @@ namespace velocity_planner
         double maximum_accerelation,
         double minimum_accerelation) : generator_(0.0)
     {
+        planning_succeed_ = false;
         minimum_accerelation_ = minimum_accerelation;
         maximum_accerelation_ = maximum_accerelation;
         velocity_resoluation_ = velocity_resoluation;
@@ -16,6 +17,16 @@ namespace velocity_planner
         {
             nodes[itr->t] = makeNodes(*itr);
         }
+        boost::optional<std::vector<Edge> > edges = makeEdges(nodes);
+        if(edges)
+        {
+            buildVelocityGraph(nodes,edges.get());
+        }
+    }
+
+    void VelocityGraph::buildVelocityGraph(std::map<double,std::vector<Node> > nodes,std::vector<Edge> edges)
+    {
+        data_.clear();
     }
 
     boost::optional<std::vector<Edge> > VelocityGraph::makeEdges(std::map<double,std::vector<Node> > nodes)
