@@ -1,4 +1,5 @@
 #include <velocity_planner/velocity_planner_component.h>
+#include <velocity_planner/velocity_graph.h>
 
 namespace velocity_planner
 {
@@ -30,43 +31,58 @@ namespace velocity_planner
         get_parameter("robot_width",robot_width);
         generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
 
-        using namespace std::chrono_literals;
-        timer_ = this->create_wall_timer(100ms, std::bind(&VelocityPlannerComponent::updatePath, this));
+        //using namespace std::chrono_literals;
+        //timer_ = this->create_wall_timer(100ms, std::bind(&VelocityPlannerComponent::checkCurrentPath, this));
     }
 
-    void VelocityPlannerComponent::callback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr curve_path,
-        const hermite_path_msgs::msg::HermitePathStamped::SharedPtr obstacle_path)
+    bool VelocityPlannerComponent::checkTopics()
+    {
+        if(path_ == boost::none)
         {
-
+            RCLCPP_INFO(get_logger(),"path was not calculated");
+            return false;
         }
+        if(current_twist_ == boost::none)
+        {
+            RCLCPP_INFO(get_logger(),"current_twist did not published");
+            return false;
+        }
+        if(current_pose_ == boost::none)
+        {
+            RCLCPP_INFO(get_logger(),"current_pose did not published");
+            return false;
+        }
+        return true;
+    }
+
+    void VelocityPlannerComponent::checkCurrentPath()
+    {
+        mtx_.lock();
+        if(!checkTopics())
+        {
+            mtx_.unlock();
+            return;
+        }
+        mtx_.unlock();
+    }
 
     void VelocityPlannerComponent::updatePath()
     {
         mtx_.lock();
-        if(path_ == boost::none)
+        if(!checkTopics())
         {
-            //RCLCPP_INFO(get_logger(),"path was not calculated");
             mtx_.unlock();
             return;
         }
-        if(current_twist_ == boost::none)
+        VelocityGraph graph(path_.get(),0.05,0.1,-0.1,0.5);
+        auto plan = graph.getPlan();
+        if(plan)
         {
-            //RCLCPP_INFO(get_logger(),"current_twist did not published");
-            mtx_.unlock();
-            return;
+            RCLCPP_INFO(get_logger(),"velocity planning succeed");
         }
-        if(current_pose_ == boost::none)
+        else
         {
-            //RCLCPP_INFO(get_logger(),"current_pose did not published");
-            mtx_.unlock();
-            return;
-        }
-        if(path_->reference_velocity.size() == 0)
-        {
-            hermite_path_msgs::msg::ReferenceVelocity vel;
-            vel.t = 1.0;
-            vel.linear_velocity = 0.0;
-            path_->reference_velocity.push_back(vel);
+            RCLCPP_INFO(get_logger(),"velocity planning failed");
         }
         mtx_.unlock();
     }

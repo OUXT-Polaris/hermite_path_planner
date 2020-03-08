@@ -75,6 +75,8 @@ namespace velocity_planner
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
         rclcpp::TimerBase::SharedPtr timer_;
         void updatePath();
+        void checkCurrentPath();
+        bool checkTopics();
         std::mutex mtx_;
         std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
         double maximum_accerelation_ = 0.3;

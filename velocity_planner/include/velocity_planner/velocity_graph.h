@@ -7,19 +7,24 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <map>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 
 namespace velocity_planner
 {
     struct Node
     {
         hermite_path_msgs::msg::ReferenceVelocity vel;
+        boost::uuids::uuid id;
     };
 
     struct Edge
     {
-        Node before_node;
-        Node after_node;
+        boost::uuids::uuid before_node_id;
+        boost::uuids::uuid after_node_id;
         double linear_accerelation;
+        double weight;
     };
 
     struct Graph
@@ -27,8 +32,16 @@ namespace velocity_planner
 
     };
 
+    struct Plan
+    {
+        std::deque<hermite_path_msgs::msg::ReferenceVelocity> plan;
+        double total_weights;
+    };
+
     typedef boost::adjacency_list<boost::listS,boost::vecS,
         boost::bidirectionalS,Node,Edge,Graph> VelocityGraphData;
+
+    //typedef boost::graph_traits<VelocityGraphData>::vertex_descriptor Vertex;
 
     class VelocityGraph
     {
@@ -36,18 +49,29 @@ namespace velocity_planner
         VelocityGraph(hermite_path_msgs::msg::HermitePathStamped data,
             double velocity_resoluation,
             double maximum_accerelation,
-            double minimum_accerelation);
+            double minimum_accerelation,
+            double maximum_velocity);
+        boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity> > getPlan();
     private:
+        void plan();
         std::vector<Node> makeNodes(hermite_path_msgs::msg::ReferenceVelocity vel);
+        std::vector<Node> makeStartNodes();
+        std::vector<Node> makeEndNode();
         boost::optional<std::vector<Edge> > makeEdges(std::map<double,std::vector<Node> > nodes);
         void buildVelocityGraph(std::map<double,std::vector<Node> > nodes,std::vector<Edge> edges);
         VelocityGraphData data_;
+        double maximum_velocity_;
         double velocity_resoluation_;
         double maximum_accerelation_;
         double minimum_accerelation_;
         double path_length_;
+        hermite_path_msgs::msg::HermitePathStamped path_;
         hermite_path_planner::HermitePathGenerator generator_;
         bool planning_succeed_;
+        std::vector<hermite_path_msgs::msg::ReferenceVelocity> result_;
+        std::vector<boost::uuids::uuid> start_node_ids_;
+        boost::uuids::uuid end_node_id_;
+        std::map<boost::uuids::uuid,VelocityGraphData::vertex_descriptor> vertex_dict_;
     };
 }
 
