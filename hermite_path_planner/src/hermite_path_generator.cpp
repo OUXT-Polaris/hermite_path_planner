@@ -168,8 +168,8 @@ namespace hermite_path_planner
     hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(geometry_msgs::msg::Pose start,geometry_msgs::msg::Pose goal)
     {
         hermite_path_msgs::msg::HermitePath path;
-        geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start,50.0);
-        geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal,50.0);
+        geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start,10.0);
+        geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal,30.0);
         path.ax = 2*start.position.x - 2*goal.position.x + start_vector.x + goal_vector.x;
         path.ay = 2*start.position.y - 2*goal.position.y + start_vector.y + goal_vector.y;
         path.bx = -3*start.position.x + 3*goal.position.x - 2*start_vector.x - goal_vector.x;

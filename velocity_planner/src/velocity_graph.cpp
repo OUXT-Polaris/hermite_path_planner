@@ -209,15 +209,29 @@ namespace velocity_planner
         std::vector<Node> ret;
         double v = 0.0;
         int count = 0;
-        while(v<vel.linear_velocity)
+        if(velocity_resoluation_<vel.linear_velocity)
         {
-            v = velocity_resoluation_*count;
-            Node n;
-            n.vel.t = vel.t;
-            n.vel.linear_velocity = v;
-            n.id = boost::uuids::random_generator()();
-            ret.push_back(n);
-            count++;
+            while(v<vel.linear_velocity)
+            {
+                v = velocity_resoluation_*count;
+                Node n;
+                n.vel.t = vel.t;
+                n.vel.linear_velocity = v;
+                n.id = boost::uuids::random_generator()();
+                ret.push_back(n);
+                count++;
+            }
+        }
+        else
+        {
+            Node n0;
+            n0.vel.t = vel.t;
+            n0.vel.linear_velocity = 0.0;
+            n0.id = boost::uuids::random_generator()();
+            Node n1;
+            n1.vel.t = vel.t;
+            n1.vel.linear_velocity = vel.linear_velocity;
+            n1.id = boost::uuids::random_generator()();
         }
         return ret;
     }

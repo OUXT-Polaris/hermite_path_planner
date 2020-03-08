@@ -78,7 +78,7 @@ namespace velocity_planner
             mtx_.unlock();
             return;
         }
-        VelocityGraph graph(path_.get(), 0.05 ,0.05,-0.05,0.5);
+        VelocityGraph graph(path_.get(), 0.05 ,0.1,-0.1,0.5);
         auto plan = graph.getPlan();
         if(plan)
         {
@@ -91,10 +91,11 @@ namespace velocity_planner
             RCLCPP_INFO(get_logger(), "maximum acceleration is " + std::to_string(graph.getPlannedMaximumAcceleration()));
             RCLCPP_INFO(get_logger(), "minimum acceleration is " + std::to_string(graph.getPlannedMinimumAcceleration()));
             marker_pub_->publish(viz_.generateDeleteMarker());
-            marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("yellowgreen",1.0)));
+            marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
         }
         else
         {
+            marker_pub_->publish(viz_.generateDeleteMarker());
             RCLCPP_INFO(get_logger(),"velocity planning failed");
             RCLCPP_WARN(get_logger(),graph.getReason());
         }

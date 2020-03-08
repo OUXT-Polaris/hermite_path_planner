@@ -69,6 +69,24 @@ namespace velocity_planner
             }
             box_marker.color = color_ref_velocity;
             marker.markers.push_back(box_marker);
+
+            visualization_msgs::msg::Marker text_marker;
+            text_marker.header = path.header;
+            text_marker.ns = "reference_velocity_text";
+            text_marker.type = text_marker.TEXT_VIEW_FACING;
+            text_marker.action = text_marker.ADD;
+            text_marker.id = index;
+            text_marker.pose.position = point;
+            text_marker.pose.position.z = text_marker.pose.position.z + itr->linear_velocity*0.5 + 0.5;
+            text_marker.scale.x = 0.2;
+            text_marker.scale.y = 0.2;
+            text_marker.scale.z = 0.2;
+            text_marker.color = color_ref_velocity;
+            char velocity_string[10];
+            std::sprintf(velocity_string,"%.2f",itr->linear_velocity);
+            std::string str(velocity_string,10);
+            text_marker.text = str + "(m/s)";
+            marker.markers.push_back(text_marker);
         }
         return marker;
     }
