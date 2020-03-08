@@ -1,4 +1,5 @@
 #include <velocity_planner/velocity_graph.h>
+#include <iostream>
 
 namespace velocity_planner
 {
@@ -41,6 +42,7 @@ namespace velocity_planner
 
     void VelocityGraph::plan()
     {
+        std::vector<VelocityGraphData::vertex_descriptor> parents(boost::num_vertices(data_));
         std::vector<double> weights(boost::num_vertices(data_));
         std::vector<Plan> plans;
         for(auto id_itr = start_node_ids_.begin(); id_itr != start_node_ids_.end(); id_itr++)
@@ -49,29 +51,32 @@ namespace velocity_planner
             VelocityGraphData::vertex_descriptor to = vertex_dict_[end_node_id_];
             boost::dijkstra_shortest_paths(data_, from,
                 boost::weight_map(boost::get(&Edge::weight, data_)).
+                predecessor_map(&parents[0]).
                 distance_map(&weights[0]));
-            if (weights[to] == to)
-            {
-                continue;
-            }
-            else
+            if(weights[to] != to)
             {
                 Plan p;
-                for (VelocityGraphData::vertex_descriptor v = to; v != from; v = weights[v])
+                for (auto v = to; ; v = parents[v])
                 {
                     hermite_path_msgs::msg::ReferenceVelocity vel;
                     vel = data_[v].vel;
                     p.plan.push_front(vel);
+                    if (v == from || plan_length_<(int)p.plan.size())
+                    {
+                        break;
+                    }
                 }
-                hermite_path_msgs::msg::ReferenceVelocity from_vel = data_[from].vel;
-                p.plan.push_front(from_vel);
-                p.total_weights = weights[to];
-                plans.push_back(p);
+                if(plan_length_ == (int)p.plan.size())
+                {
+                    p.total_weights = weights[to];
+                    plans.push_back(p);
+                }
             }
         }
         if(plans.size() == 0)
         {
             planning_succeed_ = false;
+            reason_ = "failed in all velocity plans";
         }
         else
         {
@@ -143,11 +148,12 @@ namespace velocity_planner
             t_values.push_back(it->first);
         }
         std::sort(t_values.begin(), t_values.end(), [](const auto &a, const auto &b){return a < b;});
+        plan_length_ = t_values.size();
         for(int i=0 ; i<((int)t_values.size()-1); i++)
         {
             bool connection_finded = false;
-            std::vector<Node> before_nodes = nodes[i];
-            std::vector<Node> after_nodes = nodes[i+1];
+            std::vector<Node> before_nodes = nodes[t_values[i]];
+            std::vector<Node> after_nodes = nodes[t_values[i+1]];
             double l = (t_values[i+1]-t_values[i])*path_length_;
             for(auto before_itr = before_nodes.begin(); before_itr != before_nodes.end(); before_itr++)
             {
@@ -157,7 +163,7 @@ namespace velocity_planner
                     double v1 = after_itr->vel.linear_velocity;
                     double a = (v1*v1-v0*v0)/(2*l);
                     if(a > minimum_accerelation_ && a < maximum_accerelation_ 
-                        && std::fabs(v0) < maximum_velocity_ && std::fabs(v1) < maximum_velocity_)
+                        && std::fabs(v0) <= maximum_velocity_ && std::fabs(v1) <= maximum_velocity_)
                     {
                         connection_finded = true;
                         Edge edge;
@@ -165,14 +171,16 @@ namespace velocity_planner
                         edge.after_node_id = after_itr->id;
                         edge.linear_accerelation = a;
                         edge.weight = std::min(
-                            std::fabs(v0)-maximum_velocity_,
-                            std::fabs(v1)-maximum_velocity_);
+                            std::fabs(std::fabs(v0)-maximum_velocity_),
+                            std::fabs(std::fabs(v1)-maximum_velocity_));
                         edges.push_back(edge);
                     }
                 }
             }
             if(!connection_finded)
             {
+                reason_ = "failed to build edge from t=" + std::to_string(t_values[i])
+                    + " to t=" + std::to_string(t_values[i+1]);
                 return boost::none;
             }
         }
@@ -184,12 +192,12 @@ namespace velocity_planner
         std::vector<Node> ret;
         double v = 0.0;
         int count = 0;
-        while(v>vel.linear_velocity)
+        while(v<vel.linear_velocity)
         {
             v = velocity_resoluation_*count;
             Node n;
             n.vel.t = vel.t;
-            n.vel.linear_velocity = vel.linear_velocity;
+            n.vel.linear_velocity = v;
             n.id = boost::uuids::random_generator()();
             ret.push_back(n);
             count++;

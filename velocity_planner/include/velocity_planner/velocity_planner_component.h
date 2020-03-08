@@ -50,6 +50,7 @@ extern "C" {
 #include <boost/optional.hpp>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+#include <velocity_planner/velocity_visualizer.h>
 
 namespace velocity_planner
 {
@@ -73,6 +74,7 @@ namespace velocity_planner
         boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
         void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+        rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
         rclcpp::TimerBase::SharedPtr timer_;
         void updatePath();
         void checkCurrentPath();
@@ -81,6 +83,7 @@ namespace velocity_planner
         std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
         double maximum_accerelation_ = 0.3;
         double minimum_deceleration_ = -0.1;
+        VelocityVisualizer viz_;
     };
 }
 

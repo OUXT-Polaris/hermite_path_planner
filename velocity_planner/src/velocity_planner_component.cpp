@@ -1,12 +1,14 @@
 #include <velocity_planner/velocity_planner_component.h>
 #include <velocity_planner/velocity_graph.h>
+#include <color_names/color_names.h>
 
 namespace velocity_planner
 {
     VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & options)
     : Node("velocity_planner", options),
         buffer_(get_clock()),
-        listener_(buffer_)
+        listener_(buffer_),
+        viz_(get_name())
     {
         std::string current_twist_topic;
         declare_parameter("current_twist_topic","current_twist");
@@ -25,6 +27,8 @@ namespace velocity_planner
         get_parameter("current_pose_topic",current_pose_topic);
         current_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>
             (current_pose_topic, 1, std::bind(&VelocityPlannerComponent::currentPoseCallback, this, std::placeholders::_1));
+        
+        hermite_path_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>("~/hermite_path",1);
         marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker",1);
 
         double robot_width;
@@ -74,15 +78,23 @@ namespace velocity_planner
             mtx_.unlock();
             return;
         }
-        VelocityGraph graph(path_.get(),0.05,0.1,-0.1,0.5);
+        VelocityGraph graph(path_.get(),0.1 ,0.1,-0.1,0.6);
         auto plan = graph.getPlan();
         if(plan)
         {
             RCLCPP_INFO(get_logger(),"velocity planning succeed");
+            hermite_path_msgs::msg::HermitePathStamped path;
+            path.path = path_->path;
+            path.header = path_->header;
+            path.reference_velocity = plan.get();
+            hermite_path_pub_->publish(path);
+            marker_pub_->publish(viz_.generateDeleteMarker());
+            marker_pub_->publish(viz_.generateMarker(path_.get(),color_names::makeColorMsg("magenta",1.0)));
         }
         else
         {
             RCLCPP_INFO(get_logger(),"velocity planning failed");
+            RCLCPP_WARN(get_logger(),graph.getReason());
         }
         mtx_.unlock();
     }
