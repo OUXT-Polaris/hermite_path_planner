@@ -48,11 +48,13 @@ namespace velocity_planner
     public:
         VelocityGraph(hermite_path_msgs::msg::HermitePathStamped data,
             double velocity_resoluation,
-            double maximum_accerelation,
-            double minimum_accerelation,
+            double maximum_acceleration,
+            double minimum_acceleration,
             double maximum_velocity);
         boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity> > getPlan();
         std::string getReason(){return reason_;};
+        double getPlannedMaximumAcceleration(){return planned_maximum_acceleration_;}
+        double getPlannedMinimumAcceleration(){return planned_minimum_acceleration_;}
     private:
         void plan();
         std::vector<Node> makeNodes(hermite_path_msgs::msg::ReferenceVelocity vel);
@@ -63,8 +65,8 @@ namespace velocity_planner
         VelocityGraphData data_;
         double maximum_velocity_;
         double velocity_resoluation_;
-        double maximum_accerelation_;
-        double minimum_accerelation_;
+        double maximum_acceleration_;
+        double minimum_acceleration_;
         double path_length_;
         hermite_path_msgs::msg::HermitePathStamped path_;
         hermite_path_planner::HermitePathGenerator generator_;
@@ -74,7 +76,10 @@ namespace velocity_planner
         std::vector<boost::uuids::uuid> start_node_ids_;
         boost::uuids::uuid end_node_id_;
         std::map<boost::uuids::uuid,VelocityGraphData::vertex_descriptor> vertex_dict_;
+        void calculateAcceleration();
         int plan_length_;
+        double planned_maximum_acceleration_;
+        double planned_minimum_acceleration_;
     };
 }
 

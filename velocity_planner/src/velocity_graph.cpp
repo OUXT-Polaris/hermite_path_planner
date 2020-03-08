@@ -11,8 +11,8 @@ namespace velocity_planner
     {
         path_ = data;
         planning_succeed_ = false;
-        minimum_accerelation_ = minimum_accerelation;
-        maximum_accerelation_ = maximum_accerelation;
+        minimum_acceleration_ = minimum_accerelation;
+        maximum_acceleration_ = maximum_accerelation;
         velocity_resoluation_ = velocity_resoluation;
         maximum_velocity_ = maximum_velocity;
         path_length_ = generator_.getLength(data.path,200);
@@ -88,7 +88,24 @@ namespace velocity_planner
             {
                 result_.push_back(*itr);
             }
+            calculateAcceleration();
         }
+    }
+
+    void VelocityGraph::calculateAcceleration()
+    {
+        std::vector<double> accels;
+        for(int i=0; i<((int)result_.size()-1); i++)
+        {
+            double v0 = result_[i].linear_velocity;
+            double v1 = result_[i+1].linear_velocity;
+            double a = (v1*v1-v0*v0)/(2*path_length_);
+            accels.push_back(a);
+        }
+        std::sort(accels.begin(), accels.end(), [](const auto &a, const auto &b){return a > b;});
+        planned_maximum_acceleration_ = accels[0];
+        std::sort(accels.begin(), accels.end(), [](const auto &a, const auto &b){return a < b;});
+        planned_minimum_acceleration_ = accels[0];
     }
 
     std::vector<Node> VelocityGraph::makeStartNodes()
@@ -162,7 +179,7 @@ namespace velocity_planner
                     double v0 = before_itr->vel.linear_velocity;
                     double v1 = after_itr->vel.linear_velocity;
                     double a = (v1*v1-v0*v0)/(2*l);
-                    if(a > minimum_accerelation_ && a < maximum_accerelation_ 
+                    if(a > minimum_acceleration_ && a < maximum_acceleration_ 
                         && std::fabs(v0) <= maximum_velocity_ && std::fabs(v1) <= maximum_velocity_)
                     {
                         connection_finded = true;
