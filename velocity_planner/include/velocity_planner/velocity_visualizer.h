@@ -20,7 +20,7 @@ namespace velocity_planner
             std_msgs::msg::ColorRGBA color_ref_velocity);
         visualization_msgs::msg::MarkerArray generateDeleteMarker();
         visualization_msgs::msg::MarkerArray generatePolygonMarker(
-            hermite_path_msgs::msg::HermitePathStamped path);
+            hermite_path_msgs::msg::HermitePathStamped path,double ratio=0.0);
     private:
         std::string node_name_;
         hermite_path_planner::HermitePathGenerator generator_;

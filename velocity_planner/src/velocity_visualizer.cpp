@@ -19,7 +19,7 @@ namespace velocity_planner
     }
 
     visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
-        hermite_path_msgs::msg::HermitePathStamped path)
+        hermite_path_msgs::msg::HermitePathStamped path,double ratio)
         {
             visualization_msgs::msg::MarkerArray ret;
             int path_length = path.reference_velocity.size();
@@ -36,7 +36,9 @@ namespace velocity_planner
                 polygon.scale.z = 1.0;
                 double t0 = path.reference_velocity[i].t;
                 double t1 = path.reference_velocity[i+1].t;
-                double v = (path.reference_velocity[i].linear_velocity + path.reference_velocity[i+1].linear_velocity)/2.0;
+                double v0 = path.reference_velocity[i].linear_velocity;
+                double v1 = path.reference_velocity[i+1].linear_velocity;
+                double v = (v0+v1)/2.0;
                 geometry_msgs::msg::Vector3 vec0 = generator_.getNormalVector(path.path,t0);
                 geometry_msgs::msg::Vector3 vec1 = generator_.getNormalVector(path.path,t1);
                 double theta0 = std::atan2(vec0.y,vec0.x);
@@ -46,15 +48,19 @@ namespace velocity_planner
                 geometry_msgs::msg::Point p0l;
                 p0l.x = p0.x - 0.5*std::cos(theta0);
                 p0l.y = p0.y - 0.5*std::sin(theta0);
+                p0l.z = v0*ratio;
                 geometry_msgs::msg::Point p0r;
                 p0r.x = p0.x + 0.5*std::cos(theta0);
                 p0r.y = p0.y + 0.5*std::sin(theta0);
+                p0r.z = v0*ratio;
                 geometry_msgs::msg::Point p1l;
                 p1l.x = p1.x - 0.5*std::cos(theta1);
                 p1l.y = p1.y - 0.5*std::sin(theta1);
+                p1l.z = v1*ratio;
                 geometry_msgs::msg::Point p1r;
                 p1r.x = p1.x + 0.5*std::cos(theta1);
                 p1r.y = p1.y + 0.5*std::sin(theta1);
+                p1r.z = v1*ratio;
                 polygon.points.push_back(p0l);
                 polygon.points.push_back(p0r);
                 polygon.points.push_back(p1l);
@@ -63,7 +69,7 @@ namespace velocity_planner
                 polygon.points.push_back(p1r);
                 std_msgs::msg::ColorRGBA color;
                 double ratio = std::fabs(v)/0.5;
-                polygon.color = color_names::fromHsv(0.5*ratio,255.0,255.0,0.3);
+                polygon.color = color_names::fromHsv(0.5*ratio,255.0,255.0,0.8);
                 ret.markers.push_back(polygon);
             }
             return ret;
