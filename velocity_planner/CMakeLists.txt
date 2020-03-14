@@ -232,7 +232,7 @@ ament_export_libraries(
   planner_concatenator_component)
 
 # launch/conifg file
-install(DIRECTORY launch config
+install(DIRECTORY config
   DESTINATION share/${PROJECT_NAME}
 )
 
