@@ -18,6 +18,35 @@ namespace velocity_planner
         return ret;
     }
 
+    double VelocityVisualizer::getVelocity(std::vector<hermite_path_msgs::msg::ReferenceVelocity> vel,double t,double l)
+    {
+        if(vel[0].t > t)
+        {
+            return vel[0].linear_velocity;
+        }
+        if(vel[vel.size()-1].t < t)
+        {
+            return vel[vel.size()-1].linear_velocity;
+        }
+        for(int i=0; i<(int)vel.size(); i++)
+        {
+            if(vel[i].t > t && vel[i+1].t)
+            {
+                double dist = (vel[i+1].t - vel[i].t)*l;
+                double a = (vel[i+1].linear_velocity*vel[i+1].linear_velocity - vel[i].linear_velocity*vel[i].linear_velocity)/(2*dist);
+                if(vel[i].linear_velocity*vel[i].linear_velocity > 2*dist*a)
+                {
+                    return std::sqrt(vel[i].linear_velocity*vel[i].linear_velocity + 2*dist*a);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+        return 0;
+    }
+
     visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
         hermite_path_msgs::msg::HermitePathStamped path,double ratio)
         {
@@ -69,7 +98,7 @@ namespace velocity_planner
                 polygon.points.push_back(p1r);
                 std_msgs::msg::ColorRGBA color;
                 double ratio = std::fabs(v)/0.5;
-                polygon.color = color_names::fromHsv(0.5*ratio,255.0,255.0,0.8);
+                polygon.color = color_names::fromHsv(0.5*ratio,1.0,1.0,1.0);
                 ret.markers.push_back(polygon);
             }
             return ret;

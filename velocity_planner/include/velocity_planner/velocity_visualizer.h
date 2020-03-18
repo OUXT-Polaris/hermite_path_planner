@@ -24,6 +24,7 @@ namespace velocity_planner
     private:
         std::string node_name_;
         hermite_path_planner::HermitePathGenerator generator_;
+        double getVelocity(std::vector<hermite_path_msgs::msg::ReferenceVelocity> vel,double t,double l);
     };
 }
 
