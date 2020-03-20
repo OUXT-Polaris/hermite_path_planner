@@ -74,11 +74,36 @@ namespace pure_pursuit_planner
         {
             pose = current_pose_.get();
         }
-        boost::optional<double> t = generator_->checkFirstCollisionWithCircle(path_->path,pose.pose.position,lookahead_distance_);
         visualization_msgs::msg::MarkerArray marker;
+        boost::optional<double> t = generator_->checkFirstCollisionWithCircle(path_->path,pose.pose.position,lookahead_distance_);
+        boost::optional<double> current_t = generator_->getDistanceInFrenetCoordinate(path_->path,pose.pose.position);
+        if(current_t)
+        {
+            visualization_msgs::msg::Marker current_marker;
+            geometry_msgs::msg::Point current_p = generator_->getPointOnHermitePath(path_->path,current_t.get());
+            current_marker.header.stamp = pose.header.stamp;
+            current_marker.header.frame_id = path_->header.frame_id;
+            current_marker.ns = "current_pose";
+            current_marker.id = 0;
+            current_marker.action = visualization_msgs::msg::Marker::ADD;
+            current_marker.type = visualization_msgs::msg::Marker::SPHERE;
+            current_marker.color = color_names::makeColorMsg("green",1.0);
+            current_marker.pose.position = current_p;
+            current_marker.pose.orientation.x = 0.0f;
+            current_marker.pose.orientation.y = 0.0f;
+            current_marker.pose.orientation.z = 0.0f;
+            current_marker.pose.orientation.w = 1.0f;
+            current_marker.scale.x = 0.3;
+            current_marker.scale.y = 0.3;
+            current_marker.scale.z = 0.3;
+            marker.markers.push_back(current_marker);
+        }
+        else
+        {
+            RCLCPP_ERROR(get_logger(), "failed to find nearest point in the current path");
+        }
         if(t)
         {
-            //RCLCPP_ERROR(get_logger(), std::to_string(t.get()));
             geometry_msgs::msg::Point target_position = generator_->getPointOnHermitePath(path_->path,t.get());
             // draw target marker
             visualization_msgs::msg::Marker target_marker;
@@ -98,6 +123,10 @@ namespace pure_pursuit_planner
             target_marker.color = color_names::makeColorMsg("yellow",1.0);
             marker.markers.push_back(target_marker);
         }
+        else
+        {
+            RCLCPP_ERROR(get_logger(), "failed to find target point");
+        }
         // draw search circle
         visualization_msgs::msg::Marker circle_marker;
         circle_marker.header = pose.header;
@@ -105,7 +134,6 @@ namespace pure_pursuit_planner
         circle_marker.id = 0;
         circle_marker.action = visualization_msgs::msg::Marker::ADD;
         circle_marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
-        circle_marker.pose = pose.pose;
         circle_marker.scale.x = 0.1;
         circle_marker.color = color_names::makeColorMsg("chocolate",1.0);
         constexpr int circle_marker_resolution = 200;

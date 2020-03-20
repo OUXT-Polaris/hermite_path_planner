@@ -21,80 +21,59 @@ namespace hermite_path_planner
     boost::optional<double> HermitePathGenerator::getDistanceInFrenetCoordinate(
         hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p)
     {
-        double coefficients[6];
-        coefficients[0] = path.cy*(p.x-path.dx) +path.cx*(p.y-path.dy);
-        coefficients[1] = 2*path.by*(p.x-path.dx) +2*path.bx*(p.y-path.dy);
-        coefficients[2] = 3*path.ay*(p.x-path.dx) -2*path.by*path.cx +3*path.ax*(p.y-path.dy) -2*path.bx*path.cy;
-        coefficients[3] = -3*path.ax*path.cy -2*path.by*path.bx -path.cx*path.ay 
-            - 3*path.ay*path.cx -2*path.bx*path.by -path.cy*path.ax;
-        coefficients[4] = -3*path.ay*path.bx -3*path.ax*path.by;
-        coefficients[5] = -6*path.ay*path.ax;
-        auto func = [](double coefficients[6],double t)
+        auto func = [](hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point point,double t)
         {
-            double t5 = std::pow(t,5);
-            double t4 = std::pow(t,4);
             double t3 = std::pow(t,3);
             double t2 = std::pow(t,2);
-            double a = t5*coefficients[5] + t4*coefficients[4] + 
-                t3*coefficients[3] + t2*coefficients[2] + 
-                t*coefficients[1] + coefficients[0];
-            return a;
+            double x_term = std::pow(point.x - path.ax*t3 - path.bx*t2 - path.cx*t - path.dx,2);
+            double y_term = std::pow(point.y - path.ay*t3 - path.by*t2 - path.cy*t - path.dy,2);
+            double ret = x_term + y_term;
+            return ret;
         };
-        
-        auto get_newton_step_size_func = [](double coefficients[6],double t)
+        auto get_newton_step_size_func = [](hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point point,double t)
         {
-            double t5 = std::pow(t,5);
-            double t4 = std::pow(t,4);
             double t3 = std::pow(t,3);
             double t2 = std::pow(t,2);
-            double a = t5*coefficients[5] + t4*coefficients[4] + 
-                t3*coefficients[3] + t2*coefficients[2] + 
-                t*coefficients[1] + coefficients[0];
-            double b = 5*t4*coefficients[5] + 4*t3*coefficients[4] + 
-                3*t2*coefficients[3] + 2*t*coefficients[2]+coefficients[1];
-            return -1*b/a;
-	    };
+            double x_term = std::pow(point.x - path.ax*t3 - path.bx*t2 - path.cx*t - path.dx,2);
+            double y_term = std::pow(point.y - path.ay*t3 - path.by*t2 - path.cy*t - path.dy,2);
+            double x_term_diff = 2*(point.x - path.ax*t3 - path.bx*t2 - path.cx*t - path.dx)*(-2*path.ax*t2 - path.bx*t - path.cx);
+            double y_term_diff = 2*(point.y - path.ay*t3 - path.by*t2 - path.cy*t - path.dy)*(-2*path.ay*t2 - path.by*t - path.cy);
+            double ret = (x_term + y_term) / (x_term_diff + y_term_diff);
+            return ret;
+        };
 
         constexpr int initial_resolution = 30;
         constexpr int max_iteration = 30;
-        constexpr double torelance = 0.001;
+        constexpr double torelance = 0.01;
 
-        bool initial_point_finded = false;
         double step_size = (double)1.0/(double)initial_resolution;
         double ret = 0.0;
-        std::array<double,initial_resolution> initial_value_candidates;
-        std::array<double,initial_resolution> errors;
+        std::vector<double> initial_value_candidates(initial_resolution);
+        std::vector<double> initial_errors(initial_resolution);
         for(int i=0; i<initial_resolution; i++)
         {
             initial_value_candidates[i] = (0.5+(double)i)*step_size;
-            errors[i] = func(coefficients,initial_value_candidates[i]);
+            initial_errors[i] = std::fabs(func(path,p,initial_value_candidates[i]));
         }
-        for(int i=0; i<initial_resolution-1; i++)
-        {
-            if((errors[i]*errors[i+1])<0)
-            {
-                initial_point_finded = true;
-                ret = (initial_value_candidates[i]+initial_value_candidates[i+1])/2;
-                break;
-            }
-        }
-        if(!initial_point_finded)
-        {
-            return boost::none;
-        }
+        std::vector<double>::iterator iter = std::min_element(initial_errors.begin(), initial_errors.end());
+        size_t index = std::distance(initial_errors.begin(), iter);
+        ret = initial_value_candidates[index];
+        std::vector<double> errors;
+        std::vector<double> t_values;
         for(int i=0; i<max_iteration; i++)
         {
-            double error = func(coefficients,ret);
+            double error = func(path,p,ret);
             if(std::fabs(error)<torelance)
             {
                 return ret;
             }
-            if(ret<0.0 || ret>1.0)
-            {
-                return boost::none;
-            }
-            ret = ret + get_newton_step_size_func(coefficients,ret);
+            t_values.push_back(ret);
+            errors.push_back(error);
+            ret = ret - get_newton_step_size_func(path,p,ret);
         }
+        std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
+        size_t value_index = std::distance(errors.begin(), min_iter);
+        ret = t_values[value_index];
         return ret;
     }
 
@@ -119,38 +98,21 @@ namespace hermite_path_planner
             + std::pow((path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y),2) - radius*radius;
         double term_x = 2 * (path.ax*t3 + path.bx*t2 + path.cx*t + path.dx - center.x) * (3*path.ax*t3 + 2*path.bx*t2 + path.cx);
         double term_y = 2 * (path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y) * (3*path.ay*t3 + 2*path.by*t2 + path.cy);
-        //std::cout << term_x << std::endl;
         return f/(term_x+term_y);
     }
 
     boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(hermite_path_msgs::msg::HermitePath path,
         geometry_msgs::msg::Point center,double radius)
     {
-        constexpr int initial_resolution = 30;
         constexpr int max_iteration = 30;
-        constexpr double torelance = 0.001;
-        double step_size = 1.0/(double)initial_resolution;
-        std::vector<geometry_msgs::msg::Point> points_on_path = getPointsOnHermitePath(path,initial_resolution);
-        std::array<double,initial_resolution> errors;
-        for(int i=0; i<initial_resolution; i++)
-        {
-            errors[i] = std::sqrt(std::pow(points_on_path[i].x-center.x,2)+std::pow(points_on_path[i].y-center.y,2))-radius;
-        }
-        double ret;
-        bool initial_point_finded = false;
-        for(int i=0; i<initial_resolution-1; i++)
-        {
-            if((errors[i]*errors[i+1])<0)
-            {
-                ret = step_size*(double)(2*i+1)/2.0;
-                initial_point_finded = true;
-                break;
-            }
-        }
-        if(!initial_point_finded)
+        constexpr double torelance = 0.01;
+        auto dist = getDistanceInFrenetCoordinate(path,center);
+        if(!dist)
         {
             return boost::none;
         }
+        double length = getLength(path,30);
+        double ret = dist.get() + radius/length;
         for(int i=0; i<max_iteration; i++)
         {
             geometry_msgs::msg::Point p = getPointOnHermitePath(path,ret);

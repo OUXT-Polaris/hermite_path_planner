@@ -6,7 +6,7 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <quaternion_operation/quaternion_operation.h>
-
+#include <iostream>
 #include <boost/optional.hpp>
 
 namespace hermite_path_planner
