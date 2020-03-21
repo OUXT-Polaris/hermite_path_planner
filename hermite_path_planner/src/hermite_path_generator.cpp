@@ -64,7 +64,7 @@ namespace hermite_path_planner
         }
         for(int i=0; i<(int)path.reference_velocity.size()-1; i++)
         {
-            if(path.reference_velocity[i+1].t > t && t > path.reference_velocity[i].t)
+            if(path.reference_velocity[i+1].t >= t && t >= path.reference_velocity[i].t)
             {
                 double diff_l = (path.reference_velocity[i+1].t - path.reference_velocity[i].t) * l;
                 double a = (std::pow(path.reference_velocity[i+1].linear_velocity,2) - std::pow(path.reference_velocity[i].linear_velocity,2)) / (2*diff_l);
@@ -161,8 +161,8 @@ namespace hermite_path_planner
         double t2 = t*t;
         double f = std::pow((path.ax*t3 + path.bx*t2 + path.cx*t + path.dx - center.x),2) 
             + std::pow((path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y),2) - radius*radius;
-        double term_x = 2 * (path.ax*t3 + path.bx*t2 + path.cx*t + path.dx - center.x) * (3*path.ax*t3 + 2*path.bx*t2 + path.cx);
-        double term_y = 2 * (path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y) * (3*path.ay*t3 + 2*path.by*t2 + path.cy);
+        double term_x = 2 * (path.ax*t3 + path.bx*t2 + path.cx*t + path.dx - center.x) * (3*path.ax*t2 + 2*path.bx*t + path.cx);
+        double term_y = 2 * (path.ay*t3 + path.by*t2 + path.cy*t + path.dy - center.y) * (3*path.ay*t2 + 2*path.by*t + path.cy);
         return f/(term_x+term_y);
     }
 

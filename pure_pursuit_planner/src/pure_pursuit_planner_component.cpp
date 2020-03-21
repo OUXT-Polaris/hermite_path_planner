@@ -81,6 +81,32 @@ namespace pure_pursuit_planner
         {
             RCLCPP_ERROR(get_logger(), "failed to find target point");
         }
+        if(current_t_)
+        {
+            geometry_msgs::msg::Point target_position = generator_->getPointOnHermitePath(path_->path,current_t_.get());
+            // draw target marker
+            visualization_msgs::msg::Marker current_marker;
+            current_marker.header = current_pose_transformed_->header;
+            current_marker.ns = "current";
+            current_marker.id = 0;
+            current_marker.action = visualization_msgs::msg::Marker::ADD;
+            current_marker.type = visualization_msgs::msg::Marker::SPHERE;
+            current_marker.pose.position = target_position;
+            current_marker.pose.orientation.x = 0.0f;
+            current_marker.pose.orientation.y = 0.0f;
+            current_marker.pose.orientation.z = 0.0f;
+            current_marker.pose.orientation.w = 1.0f;
+            current_marker.scale.x = 0.3;
+            current_marker.scale.y = 0.3;
+            current_marker.scale.z = 0.3;
+            current_marker.color = color_names::makeColorMsg("green",1.0);
+            marker.markers.push_back(current_marker);
+        }
+        else
+        {
+            RCLCPP_ERROR(get_logger(), "failed to current position in path");
+        }
+        
         // draw search circle
         visualization_msgs::msg::Marker circle_marker;
         circle_marker.header = current_pose_transformed_->header;
@@ -132,6 +158,10 @@ namespace pure_pursuit_planner
         if(twist)
         {
             twist_cmd = twist.get();
+        }
+        else
+        {
+            RCLCPP_ERROR(get_logger(), "failed to get twist cmd");
         }
         marker_pub_->publish(generateMarker());
         target_twist_pub_->publish(twist_cmd);
