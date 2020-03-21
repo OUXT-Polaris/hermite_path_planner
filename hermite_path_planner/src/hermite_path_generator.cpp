@@ -18,6 +18,71 @@ namespace hermite_path_planner
         return (x_dot*y_dot_dot - x_dot_dot*y_dot)/std::pow(x_dot*x_dot + y_dot*y_dot,1.5);
     }
 
+    double HermitePathGenerator::getReferenceVelocity(hermite_path_msgs::msg::HermitePathStamped path, double t)
+    {
+        if(path.reference_velocity.size() == 0)
+        {
+            return 0.0;
+        }
+        if(path.reference_velocity.size() == 1)
+        {
+            return path.reference_velocity[0].linear_velocity;
+        }
+        double l = getLength(path.path,200);
+        std::sort(path.reference_velocity.begin(), path.reference_velocity.end(), [](const auto &a, const auto &b){return a.t < b.t;});
+        if(path.reference_velocity.begin()->t > t)
+        {
+            double diff_l = (path.reference_velocity[1].t - path.reference_velocity[0].t) * l;
+            double a = (std::pow(path.reference_velocity[1].linear_velocity,2) - std::pow(path.reference_velocity[0].linear_velocity,2)) / (2*diff_l);
+            double diff_l_target = (path.reference_velocity[0].t - t) * l;
+            double v2 = std::pow(path.reference_velocity[1].linear_velocity,2) - 2*a*diff_l_target;
+            if(v2 <= 0.0)
+            {
+                return 0.0;
+            }
+            else
+            {
+                return std::sqrt(v2);
+            }
+        }
+        if(path.reference_velocity.end()->t > t)
+        {
+            size_t end_ref_vel_index = path.reference_velocity.size() - 1;
+            double diff_l = (path.reference_velocity[end_ref_vel_index].t - path.reference_velocity[end_ref_vel_index-1].t) * l;
+            double a = (std::pow(path.reference_velocity[end_ref_vel_index].linear_velocity,2) 
+                - std::pow(path.reference_velocity[end_ref_vel_index-1].linear_velocity,2)) / (2*diff_l);
+            double diff_l_target = (t - path.reference_velocity[end_ref_vel_index].t) * l;
+            double v2 = std::pow(path.reference_velocity[end_ref_vel_index].linear_velocity,2) + 2*a*diff_l_target;
+            if(v2 <= 0.0)
+            {
+                return 0.0;
+            }
+            else
+            {
+                return std::sqrt(v2);
+            }
+        }
+        for(int i=0; i<(int)path.reference_velocity.size()-1; i++)
+        {
+            if(path.reference_velocity[i+1].t > t && t > path.reference_velocity[i].t)
+            {
+                double diff_l = (path.reference_velocity[i+1].t - path.reference_velocity[i].t) * l;
+                double a = (std::pow(path.reference_velocity[i+1].linear_velocity,2) - std::pow(path.reference_velocity[i].linear_velocity,2)) / (2*diff_l);
+                double diff_l_target = (t - path.reference_velocity[i].t) * l;
+                double v2 = std::pow(path.reference_velocity[i].linear_velocity,2) + 2*a*diff_l_target;
+                if(v2 <= 0.0)
+                {
+                    return 0.0;
+                }
+                else
+                {
+                    return std::sqrt(v2);
+                }
+            }
+        }
+        return 0.0;
+    }
+
     boost::optional<double> HermitePathGenerator::getDistanceInFrenetCoordinate(
         hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p)
     {

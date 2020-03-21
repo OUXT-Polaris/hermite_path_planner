@@ -26,6 +26,7 @@ namespace hermite_path_planner
         boost::optional<double> getDistanceInFrenetCoordinate(hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p);
         geometry_msgs::msg::Vector3 getTangentVector(hermite_path_msgs::msg::HermitePath path,double t);
         geometry_msgs::msg::Vector3 getNormalVector(hermite_path_msgs::msg::HermitePath path,double t);
+        double getReferenceVelocity(hermite_path_msgs::msg::HermitePathStamped path, double t);
     private:
         visualization_msgs::msg::Marker getBoundsPolygon(hermite_path_msgs::msg::HermitePathStamped path,int resolution,double z_offset);
         geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose,double magnitude);
