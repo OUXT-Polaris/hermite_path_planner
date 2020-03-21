@@ -23,7 +23,7 @@ namespace hermite_path_planner
             geometry_msgs::msg::Point center,double radius);
         double getLength(hermite_path_msgs::msg::HermitePath path,int resolution);
         double getCurvature(hermite_path_msgs::msg::HermitePath path,double t);
-        boost::optional<double> getDistanceInFrenetCoordinate(hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p);
+        boost::optional<double> getLongitudinalDistanceInFrenetCoordinate(hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p);
         geometry_msgs::msg::Vector3 getTangentVector(hermite_path_msgs::msg::HermitePath path,double t);
         geometry_msgs::msg::Vector3 getNormalVector(hermite_path_msgs::msg::HermitePath path,double t);
         double getReferenceVelocity(hermite_path_msgs::msg::HermitePathStamped path, double t);

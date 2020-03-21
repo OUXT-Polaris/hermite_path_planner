@@ -57,7 +57,7 @@ namespace pure_pursuit_planner
         PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_PUBLIC
         explicit PurePursuitPlannerComponent(const rclcpp::NodeOptions & options);
     private:
-        boost::optional<geometry_msgs::msg::Twist> getCurrentTwist();
+        boost::optional<geometry_msgs::msg::Twist> getCurrentTwist(double target_t);
         void currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data);
         rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
@@ -65,6 +65,7 @@ namespace pure_pursuit_planner
         boost::optional<geometry_msgs::msg::Twist> current_twist_;
         void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
         boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
+        boost::optional<geometry_msgs::msg::PoseStamped> current_pose_transformed_;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr target_twist_pub_;
         std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
@@ -75,6 +76,8 @@ namespace pure_pursuit_planner
         tf2_ros::TransformListener listener_;
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
+        boost::optional<double> current_t_,target_t_;
+        visualization_msgs::msg::MarkerArray generateMarker();
     };
 }
 

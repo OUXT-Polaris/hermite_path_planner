@@ -83,7 +83,7 @@ namespace hermite_path_planner
         return 0.0;
     }
 
-    boost::optional<double> HermitePathGenerator::getDistanceInFrenetCoordinate(
+    boost::optional<double> HermitePathGenerator::getLongitudinalDistanceInFrenetCoordinate(
         hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point p)
     {
         auto func = [](hermite_path_msgs::msg::HermitePath path,geometry_msgs::msg::Point point,double t)
@@ -171,7 +171,7 @@ namespace hermite_path_planner
     {
         constexpr int max_iteration = 30;
         constexpr double torelance = 0.01;
-        auto dist = getDistanceInFrenetCoordinate(path,center);
+        auto dist = getLongitudinalDistanceInFrenetCoordinate(path,center);
         if(!dist)
         {
             return boost::none;

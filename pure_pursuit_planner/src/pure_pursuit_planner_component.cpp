@@ -53,36 +53,15 @@ namespace pure_pursuit_planner
         }
     }
 
-    void PurePursuitPlannerComponent::currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data)
+    visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker()
     {
-        current_pose_ = *data;
-        if(!path_)
-        {
-            return;
-        }
-        geometry_msgs::msg::PoseStamped pose;
-        if(path_->header.frame_id != current_pose_->header.frame_id)
-        {
-            tf2::TimePoint time_point = tf2::TimePoint(
-                std::chrono::seconds(current_pose_->header.stamp.sec) +
-                std::chrono::nanoseconds(current_pose_->header.stamp.nanosec));
-            geometry_msgs::msg::TransformStamped transform_stamped = 
-                buffer_.lookupTransform(current_pose_->header.frame_id, path_->header.frame_id,
-                    time_point, tf2::durationFromSec(1.0));
-            tf2::doTransform(*current_pose_, pose, transform_stamped);
-        }
-        else
-        {
-            pose = current_pose_.get();
-        }
         visualization_msgs::msg::MarkerArray marker;
-        boost::optional<double> t = generator_->checkFirstCollisionWithCircle(path_->path,pose.pose.position,lookahead_distance_);
-        if(t)
+        if(target_t_ && current_pose_transformed_)
         {
-            geometry_msgs::msg::Point target_position = generator_->getPointOnHermitePath(path_->path,t.get());
+            geometry_msgs::msg::Point target_position = generator_->getPointOnHermitePath(path_->path,target_t_.get());
             // draw target marker
             visualization_msgs::msg::Marker target_marker;
-            target_marker.header = pose.header;
+            target_marker.header = current_pose_transformed_->header;
             target_marker.ns = "target";
             target_marker.id = 0;
             target_marker.action = visualization_msgs::msg::Marker::ADD;
@@ -104,7 +83,7 @@ namespace pure_pursuit_planner
         }
         // draw search circle
         visualization_msgs::msg::Marker circle_marker;
-        circle_marker.header = pose.header;
+        circle_marker.header = current_pose_transformed_->header;
         circle_marker.ns = "circle";
         circle_marker.id = 0;
         circle_marker.action = visualization_msgs::msg::Marker::ADD;
@@ -116,33 +95,69 @@ namespace pure_pursuit_planner
         {
             double theta = 2*M_PI/(double)circle_marker_resolution * i;
             geometry_msgs::msg::Point p;
-            p.x = pose.pose.position.x + lookahead_distance_ * std::cos(theta);
-            p.y = pose.pose.position.y + lookahead_distance_ * std::sin(theta);
+            p.x = current_pose_transformed_->pose.position.x + lookahead_distance_ * std::cos(theta);
+            p.y = current_pose_transformed_->pose.position.y + lookahead_distance_ * std::sin(theta);
             circle_marker.points.push_back(p);
         }
         marker.markers.push_back(circle_marker);
-        marker_pub_->publish(marker);
+        return marker;
     }
 
-    boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurrentTwist()
+    void PurePursuitPlannerComponent::currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data)
     {
-        if(!current_pose_)
+        geometry_msgs::msg::Twist twist_cmd;
+        current_pose_ = *data;
+        if(!path_)
+        {
+            target_twist_pub_->publish(twist_cmd);
+            return;
+        }
+        if(path_->header.frame_id != current_pose_->header.frame_id)
+        {
+            tf2::TimePoint time_point = tf2::TimePoint(
+                std::chrono::seconds(current_pose_->header.stamp.sec) +
+                std::chrono::nanoseconds(current_pose_->header.stamp.nanosec));
+            geometry_msgs::msg::TransformStamped transform_stamped = 
+                buffer_.lookupTransform(current_pose_->header.frame_id, path_->header.frame_id,
+                    time_point, tf2::durationFromSec(1.0));
+            tf2::doTransform(*current_pose_, current_pose_transformed_.get(), transform_stamped);
+        }
+        else
+        {
+            current_pose_transformed_ = current_pose_.get();
+        }
+        target_t_ = generator_->checkFirstCollisionWithCircle(path_->path,current_pose_transformed_->pose.position,lookahead_distance_);
+        current_t_ = generator_->getLongitudinalDistanceInFrenetCoordinate(path_->path,current_pose_->pose.position);
+        auto twist = getCurrentTwist(target_t_.get());
+        if(twist)
+        {
+            twist_cmd = twist.get();
+        }
+        marker_pub_->publish(generateMarker());
+        target_twist_pub_->publish(twist_cmd);
+    }
+
+    boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurrentTwist(double target_t)
+    {
+        if(!current_pose_ || !path_ || !current_t_)
         {
             return boost::none;
         }
         geometry_msgs::msg::Twist ret;
-        boost::optional<double> t = generator_->checkFirstCollisionWithCircle(path_->path,current_pose_->pose.position,lookahead_distance_);
-        if(!t)
-        {
-            return boost::none;
-        }
-        geometry_msgs::msg::Point target_position = generator_->getPointOnHermitePath(path_->path,t.get());
+        geometry_msgs::msg::Point target_position = generator_->getPointOnHermitePath(path_->path,target_t);
         geometry_msgs::msg::Vector3 rpy = quaternion_operation::convertQuaternionToEulerAngle(current_pose_->pose.orientation);
         double theta = rpy.z;
         double alpha = std::atan2(target_position.y - current_pose_->pose.position.y, target_position.x - current_pose_->pose.position.x) - theta;
         double r = std::sqrt(std::pow(target_position.x - current_pose_->pose.position.x, 2) + std::pow(target_position.y - current_pose_->pose.position.y, 2)) / (2*std::sin(alpha));
         double length = r * alpha;
-        //double omega = 
+        double linear_velocity = generator_->getReferenceVelocity(path_.get(),current_t_.get());
+        double omega = 2 * linear_velocity  * std::sin(alpha) / length;
+        ret.linear.x = linear_velocity;
+        ret.linear.y = 0.0;
+        ret.linear.z = 0.0;
+        ret.angular.x = 0.0;
+        ret.angular.y = 0.0;
+        ret.angular.z = omega;
         return ret;
     }
 
