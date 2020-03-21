@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(hermite_path_msgs REQUIRED)
 find_package(hermite_path_planner REQUIRED)
@@ -118,6 +119,7 @@ target_compile_definitions(obstacle_planner_component
 ament_target_dependencies(obstacle_planner_component
   rclcpp 
   rclcpp_components
+  sensor_msgs
   quaternion_operation
   tf2_geometry_msgs
   tf2_ros
@@ -136,6 +138,7 @@ ament_target_dependencies(obstacle_planner_node
   rclcpp 
   rclcpp_components
   quaternion_operation
+  sensor_msgs
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
