@@ -41,6 +41,7 @@ namespace velocity_planner
             {
                 vel.linear_velocity = boost::algorithm::clamp(1/std::fabs(curvature)*target_angular_velocity_,0.0,max_linear_velocity_);
             }
+            vel.from_node = get_name();
             path_->reference_velocity.push_back(vel);
         }
         marker_pub_->publish(viz_.generateDeleteMarker());

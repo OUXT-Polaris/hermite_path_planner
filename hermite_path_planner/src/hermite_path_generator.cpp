@@ -109,7 +109,7 @@ namespace hermite_path_planner
 
         constexpr int initial_resolution = 30;
         constexpr int max_iteration = 30;
-        constexpr double torelance = 0.01;
+        constexpr double torelance = 0.001;
 
         double step_size = (double)1.0/(double)initial_resolution;
         double ret = 0.0;

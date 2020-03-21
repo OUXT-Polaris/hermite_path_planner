@@ -112,6 +112,9 @@ namespace velocity_planner
             const HermitePathStamped::ConstSharedPtr in2, const HermitePathStamped::ConstSharedPtr in3,
             const HermitePathStamped::ConstSharedPtr in4, const HermitePathStamped::ConstSharedPtr in5,
             const HermitePathStamped::ConstSharedPtr in6, const HermitePathStamped::ConstSharedPtr in7);
+        hermite_path_msgs::msg::HermitePathStamped path_;
+        void updateCallback(const HermitePathStamped::SharedPtr data);
+        rclcpp::Subscription<HermitePathStamped>::SharedPtr update_sub_;
     };
 }
 

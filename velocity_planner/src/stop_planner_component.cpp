@@ -42,6 +42,7 @@ namespace velocity_planner
             {
                 break;
             }
+            ref.from_node = get_name();
             path_.get().reference_velocity.push_back(ref);
             i++;
         }
