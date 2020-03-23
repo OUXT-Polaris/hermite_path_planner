@@ -41,6 +41,7 @@ extern "C" {
 
 #include <rclcpp/rclcpp.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
+#include <geometry_msgs_data_buffer/pose_stamped_data_buffer.h>
 #include <boost/optional.hpp>
 
 namespace velocity_planner

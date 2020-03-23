@@ -24,6 +24,8 @@ find_package(hermite_path_msgs REQUIRED)
 find_package(pure_pursuit_planner REQUIRED)
 find_package(velocity_planner REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(geometry_msgs_data_buffer REQUIRED)
+find_package(data_buffer REQUIRED)
 
 include_directories(include
   ${rclcpp_INCLUDE_DIRS}
@@ -32,7 +34,14 @@ include_directories(include
 
 add_executable(hermite_path_planner_bringup_node src/hermite_path_planner_bringup.cpp)
 ament_target_dependencies(hermite_path_planner_bringup_node
-  rclcpp hermite_path_msgs hermite_path_planner pure_pursuit_planner velocity_planner quaternion_operation)
+  rclcpp
+  geometry_msgs_data_buffer
+  data_buffer
+  hermite_path_msgs
+  hermite_path_planner
+  pure_pursuit_planner
+  velocity_planner
+  quaternion_operation)
 
 install(TARGETS
   hermite_path_planner_bringup_node

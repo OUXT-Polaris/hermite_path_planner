@@ -29,6 +29,8 @@ find_package(tf2_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(color_names REQUIRED)
+find_package(geometry_msgs_data_buffer REQUIRED)
+find_package(data_buffer REQUIRED)
 
 include_directories(
   include
@@ -123,6 +125,8 @@ ament_target_dependencies(obstacle_planner_component
   tf2_ros
   visualization_msgs
   color_names
+  geometry_msgs_data_buffer
+  data_buffer
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(obstacle_planner_component
@@ -140,6 +144,8 @@ ament_target_dependencies(obstacle_planner_node
   tf2_ros
   visualization_msgs
   color_names
+  geometry_msgs_data_buffer
+  data_buffer
   hermite_path_planner
   hermite_path_msgs)
 
