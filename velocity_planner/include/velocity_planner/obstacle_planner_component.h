@@ -41,8 +41,12 @@ extern "C" {
 
 #include <rclcpp/rclcpp.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
-#include <geometry_msgs_data_buffer/pose_stamped_data_buffer.h>
 #include <boost/optional.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/transform_listener.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
+#include <velocity_planner/velocity_visualizer.h>
 
 namespace velocity_planner
 {
@@ -56,6 +60,15 @@ namespace velocity_planner
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
+        rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
+        void scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data);
+        tf2_ros::Buffer buffer_;
+        tf2_ros::TransformListener listener_;
+        geometry_msgs::msg::PointStamped TransformToMapFrame(geometry_msgs::msg::PointStamped point);
+        double robot_width_;
+        VelocityVisualizer viz_;
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obstacle_marker_pub_;
     };
 }
 

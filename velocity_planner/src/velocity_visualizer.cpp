@@ -18,6 +18,53 @@ namespace velocity_planner
         return ret;
     }
 
+    visualization_msgs::msg::MarkerArray VelocityVisualizer::generateObstacleMarker(
+        double t,
+        hermite_path_msgs::msg::HermitePathStamped path,
+        std_msgs::msg::ColorRGBA color,
+        double width)
+        {
+            visualization_msgs::msg::MarkerArray ret;
+            visualization_msgs::msg::Marker polygon;
+            polygon.header = path.header;
+            polygon.ns = "polygon";
+            polygon.id = 0;
+            polygon.type = polygon.TRIANGLE_LIST;
+            polygon.action = polygon.ADD;
+            polygon.scale.x = 1.0;
+            polygon.scale.y = 1.0;
+            polygon.scale.z = 1.0;
+            geometry_msgs::msg::Vector3 normal = generator_.getNormalVector(path.path,t);
+            double magnitude = std::sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
+            geometry_msgs::msg::Point point = generator_.getPointOnHermitePath(path.path,t);
+            geometry_msgs::msg::Point p0l;
+            p0l.x = point.x + width/2.0 * normal.x/magnitude;
+            p0l.y = point.y + width/2.0 * normal.y/magnitude;
+            p0l.z = 1.0;
+            geometry_msgs::msg::Point p1l;
+            p1l.x = point.x + width/2.0 * normal.x/magnitude;
+            p1l.y = point.y + width/2.0 * normal.y/magnitude;
+            p1l.z = -1.0;
+            geometry_msgs::msg::Point p0r;
+            p0r.x = point.x - width/2.0 * normal.x/magnitude;
+            p0r.y = point.y - width/2.0 * normal.y/magnitude;
+            p0r.z = 1.0;
+            geometry_msgs::msg::Point p1r;
+            p1r.x = point.x - width/2.0 * normal.x/magnitude;
+            p1r.y = point.y - width/2.0 * normal.y/magnitude;
+            p1r.z = -1.0;
+            ret.markers.push_back(polygon);
+            polygon.points.push_back(p0l);
+            polygon.points.push_back(p0r);
+            polygon.points.push_back(p1l);
+            polygon.points.push_back(p1l);
+            polygon.points.push_back(p0r);
+            polygon.points.push_back(p1r);
+            polygon.color = color;
+            ret.markers.push_back(polygon);
+            return ret;
+        }
+
     double VelocityVisualizer::getVelocity(std::vector<hermite_path_msgs::msg::ReferenceVelocity> vel,double t,double l)
     {
         if(vel[0].t > t)
