@@ -17,12 +17,21 @@ namespace velocity_planner
             (repalan_velocity_topic, 1);
         hermite_path_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>
             (hermite_path_topic, 1, std::bind(&ObstaclePlannerComponent::hermitePathCallback, this, std::placeholders::_1));
+        std::string obstacle_scan_topic;
+        declare_parameter("obstacle_scan_topic","/obstacle_scan");
+        get_parameter("obstacle_scan_topic",obstacle_scan_topic);
+        scan_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>
+            (obstacle_scan_topic, 1, std::bind(&ObstaclePlannerComponent::scanCallback, this, std::placeholders::_1));
     }
 
     void ObstaclePlannerComponent::hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
     {
         path_ = *data;
-        //path_->from_node = get_name();
         hermite_path_pub_->publish(path_.get());
+    }
+
+    void ObstaclePlannerComponent::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data)
+    {
+
     }
 }

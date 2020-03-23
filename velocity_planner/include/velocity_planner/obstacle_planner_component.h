@@ -42,6 +42,7 @@ extern "C" {
 #include <rclcpp/rclcpp.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <boost/optional.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace velocity_planner
 {
@@ -56,6 +57,8 @@ namespace velocity_planner
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr replan_path_pub_;
+        rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
+        void scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data);
     };
 }
 
