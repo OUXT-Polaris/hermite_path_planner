@@ -40,19 +40,19 @@ namespace velocity_planner
             geometry_msgs::msg::Point p0l;
             p0l.x = point.x + width/2.0 * normal.x/magnitude;
             p0l.y = point.y + width/2.0 * normal.y/magnitude;
-            p0l.z = 1.0;
+            p0l.z = 1.5;
             geometry_msgs::msg::Point p1l;
             p1l.x = point.x + width/2.0 * normal.x/magnitude;
             p1l.y = point.y + width/2.0 * normal.y/magnitude;
-            p1l.z = -1.0;
+            p1l.z = 0.1;
             geometry_msgs::msg::Point p0r;
             p0r.x = point.x - width/2.0 * normal.x/magnitude;
             p0r.y = point.y - width/2.0 * normal.y/magnitude;
-            p0r.z = 1.0;
+            p0r.z = 1.5;
             geometry_msgs::msg::Point p1r;
             p1r.x = point.x - width/2.0 * normal.x/magnitude;
             p1r.y = point.y - width/2.0 * normal.y/magnitude;
-            p1r.z = -1.0;
+            p1r.z = 0.1;
             ret.markers.push_back(polygon);
             polygon.points.push_back(p0l);
             polygon.points.push_back(p0r);
@@ -62,6 +62,17 @@ namespace velocity_planner
             polygon.points.push_back(p1r);
             polygon.color = color;
             ret.markers.push_back(polygon);
+            /*
+            visualization_msgs::msg::Marker text;
+            text.header = path.header;
+            text.ns = "text";
+            text.id = 0;
+            text.type = text.TEXT_VIEW_FACING;
+            text.action = text.ADD;
+            text.scale.x = 1.0;
+            text.scale.y = 1.0;
+            text.scale.z = 1.0;
+            */
             return ret;
         }
 
