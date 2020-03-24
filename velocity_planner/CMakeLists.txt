@@ -25,7 +25,9 @@ find_package(hermite_path_msgs REQUIRED)
 find_package(hermite_path_planner REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(tf2_sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(message_filters REQUIRED)
@@ -123,8 +125,10 @@ ament_target_dependencies(obstacle_planner_component
   quaternion_operation
   tf2_geometry_msgs
   tf2_ros
+  sensor_msgs
   visualization_msgs
   color_names
+  tf2_sensor_msgs
   hermite_path_planner
   hermite_path_msgs)
 rclcpp_components_register_nodes(obstacle_planner_component
@@ -141,6 +145,7 @@ ament_target_dependencies(obstacle_planner_node
   sensor_msgs
   tf2_geometry_msgs
   tf2_ros
+  sensor_msgs
   visualization_msgs
   color_names
   hermite_path_planner
