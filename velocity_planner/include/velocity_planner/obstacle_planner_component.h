@@ -60,15 +60,23 @@ namespace velocity_planner
         void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
         rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
+        rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr update_pub_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
         void scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data);
         tf2_ros::Buffer buffer_;
         tf2_ros::TransformListener listener_;
         geometry_msgs::msg::PointStamped TransformToMapFrame(geometry_msgs::msg::PointStamped point);
+        geometry_msgs::msg::PoseStamped TransformToMapFrame(geometry_msgs::msg::PoseStamped pose);
         double robot_width_;
         VelocityVisualizer viz_;
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obstacle_marker_pub_;
+        rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
+        void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
+        boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
+        boost::optional<sensor_msgs::msg::LaserScan> scan_;
+        boost::optional<hermite_path_msgs::msg::HermitePathStamped> addObstacleConstraints();
+        double stop_margin_;
     };
 }
 
