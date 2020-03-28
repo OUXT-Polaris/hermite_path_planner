@@ -30,11 +30,10 @@ jobs:
                   sudo apt install -y python-rosdep python3-vcstool
                   sudo rosdep init
                   rosdep update
-                  cd ~/ros2_ws/src
-                  rosdep install -r -y --from-paths . --ignore-src
                   cd ~/ros2_ws
                   vcs import src < hermite_path_planner/dependency.repos
                   cd ~/ros2_ws/src
+                  rosdep install -r -y --from-paths . --ignore-src
             - name: Build packages
               run: |
                   source /opt/ros/eloquent/setup.bash

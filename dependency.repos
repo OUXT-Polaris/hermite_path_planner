@@ -3,3 +3,14 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/quaternion_operation.git
     version: ros2
+  color_names:
+    type: git
+    url: https://github.com/OUXT-Polaris/color_names.git
+  data_buffer:
+    type: git
+    url: https://github.com/OUXT-Polaris/data_buffer.git
+    version: ros2
+  geometry_msgs_data_buffer:
+    type: git
+    url: https://github.com/OUXT-Polaris/geometry_msgs_data_buffer.git
+    version: ros2
