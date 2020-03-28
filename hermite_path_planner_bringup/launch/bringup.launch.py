@@ -25,6 +25,12 @@ def generate_launch_description():
             get_package_share_directory('velocity_planner'),
             'config','stop_planner.yaml')
     )
+    obstacle_planner_param_file = LaunchConfiguration(
+        'obstacle_planner_param_file',
+        default=os.path.join(
+            get_package_share_directory('velocity_planner'),
+            'config','obstacle_planner.yaml')
+    )
     return LaunchDescription([
         DeclareLaunchArgument(
             'planner_concatenator_param_file',
@@ -40,12 +46,18 @@ def generate_launch_description():
             default_value=stop_planner_parm_file,
             description='stop planner parameters'
         ),
+        DeclareLaunchArgument(
+            'obstacle_planner_param_file',
+            default_value=obstacle_planner_param_file,
+            description='obstacle planner parameters'
+        ),
         Node(
             package='hermite_path_planner_bringup',
             node_executable='hermite_path_planner_bringup_node',
             parameters=[
                 planner_concatenator_param_file,
                 curve_planner_param_file,
+                obstacle_planner_param_file,
                 stop_planner_parm_file],
             output='screen'),
     ])

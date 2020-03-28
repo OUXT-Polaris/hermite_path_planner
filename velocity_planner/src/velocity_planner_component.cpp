@@ -78,7 +78,7 @@ namespace velocity_planner
             mtx_.unlock();
             return;
         }
-        VelocityGraph graph(path_.get(), 0.05 ,0.1,-0.1,0.5);
+        VelocityGraph graph(path_.get(), 0.05 ,0.1,-0.3,0.5);
         auto plan = graph.getPlan();
         if(plan)
         {

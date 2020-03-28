@@ -96,18 +96,19 @@ namespace velocity_planner
         PlannerConcatenatorComponent::filterReferenceVelocity(std::vector<hermite_path_msgs::msg::ReferenceVelocity> data)
         {
             std::vector<hermite_path_msgs::msg::ReferenceVelocity> ret;
-            std::multimap<double, double> dict;
+            std::multimap<double, std::pair<std::string,double> > dict;
             std::list<double> keys;
             for(auto itr = data.begin(); itr != data.end(); itr++)
             {
-                dict.emplace(itr->t,itr->linear_velocity);
+                auto vel_from_pair = std::make_pair(itr->from_node,itr->linear_velocity);
+                dict.emplace(itr->t,vel_from_pair);
                 keys.emplace_back(itr->t);
             }
             keys.sort();
             keys.unique();
             for(auto key_itr = keys.begin(); key_itr != keys.end(); key_itr++)
             {
-                std::list<double> vels;
+                std::list<std::pair<std::string,double> > vels;
                 auto p = dict.equal_range(*key_itr);
                 for (auto it = p.first; it != p.second; ++it)
                 {
@@ -116,7 +117,9 @@ namespace velocity_planner
                 vels.sort();
                 hermite_path_msgs::msg::ReferenceVelocity ref_vel;
                 ref_vel.t = *key_itr;
-                ref_vel.linear_velocity = *vels.begin();
+                std::pair<std::string,double> vel = *vels.begin();
+                ref_vel.linear_velocity = vel.second;
+                ref_vel.from_node = vel.first;
                 ret.push_back(ref_vel);
             }
             return ret;

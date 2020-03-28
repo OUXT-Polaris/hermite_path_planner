@@ -228,10 +228,15 @@ namespace velocity_planner
             n0.vel.t = vel.t;
             n0.vel.linear_velocity = 0.0;
             n0.id = boost::uuids::random_generator()();
-            Node n1;
-            n1.vel.t = vel.t;
-            n1.vel.linear_velocity = vel.linear_velocity;
-            n1.id = boost::uuids::random_generator()();
+            ret.push_back(n0);
+            if(std::fabs(vel.linear_velocity) > 0.01)
+            {
+                Node n1;
+                n1.vel.t = vel.t;
+                n1.vel.linear_velocity = vel.linear_velocity;
+                n1.id = boost::uuids::random_generator()();
+                ret.push_back(n1);
+            }
         }
         return ret;
     }

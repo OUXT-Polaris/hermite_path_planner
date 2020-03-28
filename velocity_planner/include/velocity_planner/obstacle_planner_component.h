@@ -77,6 +77,10 @@ namespace velocity_planner
         boost::optional<sensor_msgs::msg::LaserScan> scan_;
         boost::optional<hermite_path_msgs::msg::HermitePathStamped> addObstacleConstraints();
         double stop_margin_;
+        double section_length_;
+        double max_linear_velocity_;
+        double max_deceleration_;
+        boost::optional<double> target_obstacle_t_;
     };
 }
 

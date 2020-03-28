@@ -30,6 +30,12 @@ namespace velocity_planner
         get_parameter("robot_width",robot_width_);
         declare_parameter("stop_margin",1.5);
         get_parameter("stop_margin",stop_margin_);
+        declare_parameter("section_length",0.5);
+        get_parameter("section_length",section_length_);
+        declare_parameter("max_linear_velocity",0.5);
+        get_parameter("max_linear_velocity",max_linear_velocity_);
+        declare_parameter("max_deceleration",0.5);
+        get_parameter("max_deceleration",max_deceleration_);
         scan_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>
             (obstacle_scan_topic, 1, std::bind(&ObstaclePlannerComponent::scanCallback, this, std::placeholders::_1));
         std::string current_pose_topic;
@@ -47,6 +53,7 @@ namespace velocity_planner
     void ObstaclePlannerComponent::hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
     {
         path_ = *data;
+        target_obstacle_t_ = boost::none;
         path_ = addObstacleConstraints();
         if(path_)
         {
@@ -108,10 +115,6 @@ namespace velocity_planner
                 time_point, tf2::durationFromSec(1.0));
         tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
         auto current_t = generator.getLongitudinalDistanceInFrenetCoordinate(path_->path,pose_transformed.pose.position);
-        if(!current_t)
-        {
-            return boost::none;
-        }
         std::set<double> t_values;
         for(int i=0; i<(int)scan_->ranges.size(); i++)
         {
@@ -141,12 +144,56 @@ namespace velocity_planner
             double t = *t_values.begin();
             double length = generator.getLength(path_.get().path,200);
             double target_t = t - (stop_margin_/length);
+            if(!target_obstacle_t_)
+            {
+                target_obstacle_t_ = target_t;
+            }
+            else
+            {
+                if(target_obstacle_t_.get() < target_t)
+                {
+                    return boost::none;
+                }
+            }
             hermite_path_msgs::msg::HermitePathStamped path = path_.get();
             path.reference_velocity.clear();
             hermite_path_msgs::msg::ReferenceVelocity v;
-            v.linear_velocity = 0.0;
-            v.t = target_t;
-            path.reference_velocity.push_back(v);
+
+            int i = 0;
+            while(true)
+            {
+                double t = (length*target_t - ((double)i*section_length_))/length;
+                hermite_path_msgs::msg::ReferenceVelocity ref;
+                ref.t = t;
+                ref.linear_velocity = std::sqrt(2*max_deceleration_*(target_t-t));
+                if(ref.linear_velocity > max_linear_velocity_)
+                {
+                    break;
+                }
+                if(ref.t <= 0.0)
+                {
+                    break;
+                }
+                ref.from_node = get_name();
+                path.reference_velocity.push_back(ref);
+                i++;
+            }
+            i = 0;
+            while(true)
+            {
+                double t = (length*target_t + ((double)i*section_length_))/length;
+                if(t > 1.0)
+                {
+                    break;
+                }
+                hermite_path_msgs::msg::ReferenceVelocity ref;
+                ref.t = t;
+                ref.linear_velocity = 0;
+                ref.from_node = get_name();
+                path.reference_velocity.push_back(ref);
+                i++;
+            }
+
             obstacle_marker_pub_->publish(viz_.generateDeleteMarker());
             obstacle_marker_pub_->publish(viz_.generateObstacleMarker(t,path_.get(),color_names::makeColorMsg("red",0.8)));
             return path;
@@ -162,10 +209,15 @@ namespace velocity_planner
     void ObstaclePlannerComponent::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data)
     {
         scan_ = *data;
-        path_ = addObstacleConstraints();
-        if(path_ && path_.get().reference_velocity.size() != 0)
+        auto obstacle_path = addObstacleConstraints();
+        if(obstacle_path)
         {
-            update_pub_->publish(path_.get());
+            if(obstacle_path.get().reference_velocity.size() != 0)
+            {
+                marker_pub_->publish(viz_.generateDeleteMarker());
+                marker_pub_->publish(viz_.generateMarker(obstacle_path.get(),color_names::makeColorMsg("lime",1.0)));
+                update_pub_->publish(obstacle_path.get());
+            }
         }
     }
 }
