@@ -22,16 +22,17 @@ jobs:
             - uses: actions/checkout@v2-beta
             - name: Copy repository
               run: |
-                  mkdir -p ~/ros2_ws/src/consai2r2
-                  cp -rf . ~/ros2_ws/src/consai2r2
+                  mkdir -p ~/ros2_ws/src/hermite_path_planner
+                  cp -rf . ~/ros2_ws/src/hermite_path_planner
             - name: Install dependencies
               run: |
                   source /opt/ros/eloquent/setup.bash
-                  sudo apt install -y python-rosdep
+                  sudo apt install -y python-rosdep python3-vcstool
                   sudo rosdep init
                   rosdep update
                   cd ~/ros2_ws/src
                   rosdep install -r -y --from-paths . --ignore-src
+                  vcs import src < hermite_path_planner/dependency.repos
             - name: Build packages
               run: |
                   source /opt/ros/eloquent/setup.bash
