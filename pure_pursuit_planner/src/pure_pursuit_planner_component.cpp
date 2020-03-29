@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 #include <color_names/color_names.h>
 #include <string>
 #include <memory>
@@ -212,5 +213,4 @@ void PurePursuitPlannerComponent::hermitePathCallback(
 }
 }  // namespace pure_pursuit_planner
 
-#include <rclcpp_components/register_node_macro.hpp>
 RCLCPP_COMPONENTS_REGISTER_NODE(pure_pursuit_planner::PurePursuitPlannerComponent)

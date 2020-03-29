@@ -20,8 +20,8 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
-#include <iostream>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <iostream>
 #include <vector>
 
 namespace hermite_path_planner

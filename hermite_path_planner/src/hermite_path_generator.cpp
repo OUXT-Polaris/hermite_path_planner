@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <color_names/color_names.h>
 #include <hermite_path_planner/hermite_path_generator.hpp>
+#include <color_names/color_names.h>
 #include <vector>
 #include <algorithm>
 
