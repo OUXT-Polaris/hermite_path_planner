@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <hermite_path_planner/hermite_path_planner_component.h>
-#include <pure_pursuit_planner/pure_pursuit_planner_component.h>
-#include <velocity_planner/curve_planner_component.h>
-#include <velocity_planner/obstacle_planner_component.h>
-#include <velocity_planner/planner_concatenator_component.h>
-#include <velocity_planner/stop_planner_component.h>
-#include <velocity_planner/velocity_planner_component.h>
+#include <hermite_path_planner/hermite_path_planner_component.hpp>
+#include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
+#include <velocity_planner/curve_planner_component.hpp>
+#include <velocity_planner/obstacle_planner_component.hpp>
+#include <velocity_planner/planner_concatenator_component.hpp>
+#include <velocity_planner/stop_planner_component.hpp>
+#include <velocity_planner/velocity_planner_component.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char * argv[])

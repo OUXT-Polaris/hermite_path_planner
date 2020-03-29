@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <hermite_path_planner/hermite_path_planner_component.h>
+#include <hermite_path_planner/hermite_path_planner_component.hpp>
 
 namespace hermite_path_planner
 {

@@ -56,12 +56,12 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include <hermite_path_planner/hermite_path_generator.h>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_listener.h>
-#include <velocity_planner/velocity_visualizer.h>
+#include <velocity_planner/velocity_visualizer.hpp>
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/twist.hpp>

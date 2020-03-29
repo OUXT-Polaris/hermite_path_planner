@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <velocity_planner/obstacle_planner_component.h>
+#include <velocity_planner/obstacle_planner_component.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char * argv[])

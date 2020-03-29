@@ -15,7 +15,7 @@
 #ifndef VELOCITY_PLANNER_VELOCITY_VISUALIZER_H_INCLUDED
 #define VELOCITY_PLANNER_VELOCITY_VISUALIZER_H_INCLUDED
 
-#include <hermite_path_planner/hermite_path_generator.h>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>

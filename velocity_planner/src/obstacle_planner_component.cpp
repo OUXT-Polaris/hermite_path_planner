@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <color_names/color_names.h>
-#include <hermite_path_planner/hermite_path_generator.h>
-#include <velocity_planner/obstacle_planner_component.h>
+#include <hermite_path_planner/hermite_path_generator.hpp>
+#include <velocity_planner/obstacle_planner_component.hpp>
 
 namespace velocity_planner
 {

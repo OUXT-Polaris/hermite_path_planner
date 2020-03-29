@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-#include <velocity_planner/velocity_planner_component.h>
+#include <velocity_planner/velocity_planner_component.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char * argv[])

@@ -66,7 +66,7 @@ extern "C" {
 #include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
-#include <hermite_path_planner/hermite_path_generator.h>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <boost/optional.hpp>
 
 namespace hermite_path_planner

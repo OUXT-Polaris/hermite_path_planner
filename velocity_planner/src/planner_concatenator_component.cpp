@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <velocity_planner/planner_concatenator_component.h>
+#include <velocity_planner/planner_concatenator_component.hpp>
 
 namespace velocity_planner
 {

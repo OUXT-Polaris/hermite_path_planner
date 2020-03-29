@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <color_names/color_names.h>
-#include <hermite_path_planner/hermite_path_generator.h>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 
 namespace hermite_path_planner
 {

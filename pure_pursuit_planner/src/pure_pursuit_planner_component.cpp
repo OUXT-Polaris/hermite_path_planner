@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include <color_names/color_names.h>
-#include <pure_pursuit_planner/pure_pursuit_planner_component.h>
+#include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
 
 namespace pure_pursuit_planner
 {

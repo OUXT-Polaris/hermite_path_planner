@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-#include <velocity_planner/velocity_graph.h>
+#include <velocity_planner/velocity_graph.hpp>
 #include <iostream>
 
 namespace velocity_planner

@@ -14,8 +14,8 @@
 
 
 #include <color_names/color_names.h>
-#include <velocity_planner/velocity_graph.h>
-#include <velocity_planner/velocity_planner_component.h>
+#include <velocity_planner/velocity_graph.hpp>
+#include <velocity_planner/velocity_planner_component.hpp>
 
 namespace velocity_planner
 {

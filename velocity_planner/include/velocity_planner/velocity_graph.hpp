@@ -15,7 +15,7 @@
 #ifndef VELOCITY_PLANNER_VELOCITY_GRAPH_H_INCLUDED
 #define VELOCITY_PLANNER_VELOCITY_GRAPH_H_INCLUDED
 
-#include <hermite_path_planner/hermite_path_generator.h>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/uuid/uuid.hpp>

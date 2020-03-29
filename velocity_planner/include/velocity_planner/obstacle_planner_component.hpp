@@ -58,7 +58,7 @@ extern "C" {
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_listener.h>
-#include <velocity_planner/velocity_visualizer.h>
+#include <velocity_planner/velocity_visualizer.hpp>
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>

@@ -61,7 +61,7 @@ extern "C" {
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/exact_time.h>
 #include <message_filters/time_synchronizer.h>
-#include <velocity_planner/velocity_visualizer.h>
+#include <velocity_planner/velocity_visualizer.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 

@@ -56,8 +56,8 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include <hermite_path_planner/hermite_path_generator.h>
-#include <velocity_planner/velocity_visualizer.h>
+#include <hermite_path_planner/hermite_path_generator.hpp>
+#include <velocity_planner/velocity_visualizer.hpp>
 #include <boost/algorithm/clamp.hpp>
 #include <boost/optional.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>

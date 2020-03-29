@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <color_names/color_names.h>
-#include <velocity_planner/velocity_visualizer.h>
+#include <velocity_planner/velocity_visualizer.hpp>
 
 namespace velocity_planner
 {
