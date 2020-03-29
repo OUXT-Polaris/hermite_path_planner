@@ -1,4 +1,3 @@
- 
 # Copyright (c) 2020 OUXT Polaris
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,35 +15,33 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
 from launch_ros.actions import Node
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import ThisLaunchFileDir
-from launch.actions import ExecuteProcess,DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+
 
 def generate_launch_description():
     planner_concatenator_param_file = LaunchConfiguration(
         'planner_concatenator_param_dir',
         default=os.path.join(
             get_package_share_directory('velocity_planner'),
-            'config','planner_concatenator.yaml'))
+            'config', 'planner_concatenator.yaml'))
     curve_planner_param_file = LaunchConfiguration(
         'curve_planner_param_file',
         default=os.path.join(
             get_package_share_directory('velocity_planner'),
-            'config','curve_planner.yaml'))
+            'config', 'curve_planner.yaml'))
     stop_planner_parm_file = LaunchConfiguration(
         'stop_planner_param_file',
         default=os.path.join(
             get_package_share_directory('velocity_planner'),
-            'config','stop_planner.yaml')
+            'config', 'stop_planner.yaml')
     )
     obstacle_planner_param_file = LaunchConfiguration(
         'obstacle_planner_param_file',
         default=os.path.join(
             get_package_share_directory('velocity_planner'),
-            'config','obstacle_planner.yaml')
+            'config', 'obstacle_planner.yaml')
     )
     return LaunchDescription([
         DeclareLaunchArgument(

@@ -1,4 +1,3 @@
- 
 # Copyright (c) 2020 OUXT Polaris
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import ThisLaunchFileDir,LaunchConfiguration
+
 
 def generate_launch_description():
     description = LaunchDescription([
