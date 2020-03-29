@@ -21,72 +21,78 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
   }
   if (num_input_ == 2) {
     sync2_ =
-      std::make_shared<message_filters::TimeSynchronizer<HermitePathStamped, HermitePathStamped> >(
-        *sub_ptrs_[0], *sub_ptrs_[1], 10);
+      std::make_shared<message_filters::TimeSynchronizer<HermitePathStamped, HermitePathStamped>>(
+      *sub_ptrs_[0], *sub_ptrs_[1], 10);
     sync2_->registerCallback(std::bind(
-      &PlannerConcatenatorComponent::callback2, this, std::placeholders::_1,
-      std::placeholders::_2));
+        &PlannerConcatenatorComponent::callback2, this, std::placeholders::_1,
+        std::placeholders::_2));
   }
   if (num_input_ == 3) {
     sync3_ = std::make_shared<message_filters::TimeSynchronizer<
-      HermitePathStamped, HermitePathStamped, HermitePathStamped> >(
+          HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], 10);
     sync3_->registerCallback(std::bind(
-      &PlannerConcatenatorComponent::callback3, this, std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+        &PlannerConcatenatorComponent::callback3, this, std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3));
   }
   if (num_input_ == 4) {
     sync4_ = std::make_shared<message_filters::TimeSynchronizer<
-      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped> >(
+          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], 10);
     sync4_->registerCallback(std::bind(
-      &PlannerConcatenatorComponent::callback4, this, std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3, std::placeholders::_4));
+        &PlannerConcatenatorComponent::callback4, this, std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4));
   }
   if (num_input_ == 5) {
     sync5_ = std::make_shared<message_filters::TimeSynchronizer<
-      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-      HermitePathStamped> >(
+          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+          HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], 10);
     sync5_->registerCallback(std::bind(
-      &PlannerConcatenatorComponent::callback5, this, std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+        &PlannerConcatenatorComponent::callback5, this, std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
   }
   if (num_input_ == 6) {
     sync6_ = std::make_shared<message_filters::TimeSynchronizer<
-      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-      HermitePathStamped, HermitePathStamped> >(
+          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+          HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5], 10);
     sync6_->registerCallback(std::bind(
-      &PlannerConcatenatorComponent::callback6, this, std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
+        &PlannerConcatenatorComponent::callback6, this, std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5,
+        std::placeholders::_6));
   }
   if (num_input_ == 7) {
     sync7_ = std::make_shared<message_filters::TimeSynchronizer<
-      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-      HermitePathStamped, HermitePathStamped, HermitePathStamped> >(
+          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+          HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5],
       *sub_ptrs_[6], 10);
     sync7_->registerCallback(std::bind(
-      &PlannerConcatenatorComponent::callback7, this, std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
-      std::placeholders::_7));
+        &PlannerConcatenatorComponent::callback7, this, std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
+        std::placeholders::_7));
   }
   if (num_input_ == 8) {
     sync8_ = std::make_shared<message_filters::TimeSynchronizer<
-      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped> >(
+          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5],
       *sub_ptrs_[6], *sub_ptrs_[7], 10);
     sync8_->registerCallback(std::bind(
-      &PlannerConcatenatorComponent::callback8, this, std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
-      std::placeholders::_7, std::placeholders::_8));
+        &PlannerConcatenatorComponent::callback8, this, std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
+        std::placeholders::_7, std::placeholders::_8));
   }
   update_sub_ = create_subscription<hermite_path_msgs::msg::HermitePathStamped>(
     "~/update", 1,
     std::bind(&PlannerConcatenatorComponent::updateCallback, this, std::placeholders::_1));
-  ;
 }
 
 std::vector<hermite_path_msgs::msg::ReferenceVelocity>
@@ -94,7 +100,7 @@ PlannerConcatenatorComponent::filterReferenceVelocity(
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> data)
 {
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> ret;
-  std::multimap<double, std::pair<std::string, double> > dict;
+  std::multimap<double, std::pair<std::string, double>> dict;
   std::list<double> keys;
   for (auto itr = data.begin(); itr != data.end(); itr++) {
     auto vel_from_pair = std::make_pair(itr->from_node, itr->linear_velocity);
@@ -104,7 +110,7 @@ PlannerConcatenatorComponent::filterReferenceVelocity(
   keys.sort();
   keys.unique();
   for (auto key_itr = keys.begin(); key_itr != keys.end(); key_itr++) {
-    std::list<std::pair<std::string, double> > vels;
+    std::list<std::pair<std::string, double>> vels;
     auto p = dict.equal_range(*key_itr);
     for (auto it = p.first; it != p.second; ++it) {
       vels.emplace_back(it->second);
@@ -337,7 +343,8 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
   for (auto itr = path_.reference_velocity.begin(); itr != path_.reference_velocity.end(); itr++) {
     bool is_update_target = false;
     for (auto target_itr = update_targets.begin(); target_itr != update_targets.end();
-         target_itr++) {
+      target_itr++)
+    {
       if (*target_itr == itr->from_node) {
         is_update_target = true;
       }
@@ -347,7 +354,7 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
     }
   }
   vel.insert(vel.end(), data->reference_velocity.begin(), data->reference_velocity.end());
-  std::sort(vel.begin(), vel.end(), [](const auto & a, const auto & b) { return a.t < b.t; });
+  std::sort(vel.begin(), vel.end(), [](const auto & a, const auto & b) {return a.t < b.t;});
   path_.reference_velocity = vel;
   hermite_path_pub_->publish(path_);
   marker_pub_->publish(viz_.generateDeleteMarker());

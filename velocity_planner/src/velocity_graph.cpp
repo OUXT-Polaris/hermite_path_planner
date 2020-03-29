@@ -15,20 +15,20 @@ VelocityGraph::VelocityGraph(
   velocity_resoluation_ = velocity_resoluation;
   maximum_velocity_ = maximum_velocity;
   path_length_ = generator_.getLength(data.path, 200);
-  std::map<double, std::vector<Node> > nodes;
+  std::map<double, std::vector<Node>> nodes;
   nodes[0.0] = makeStartNodes();
   for (auto itr = data.reference_velocity.begin(); itr != data.reference_velocity.end(); itr++) {
     nodes[itr->t] = makeNodes(*itr);
   }
   nodes[1.0] = makeEndNode();
-  boost::optional<std::vector<Edge> > edges = makeEdges(nodes);
+  boost::optional<std::vector<Edge>> edges = makeEdges(nodes);
   if (edges) {
     buildVelocityGraph(nodes, edges.get());
     plan();
   }
 }
 
-boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity> > VelocityGraph::getPlan()
+boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity>> VelocityGraph::getPlan()
 {
   if (!planning_succeed_) {
     return boost::none;
@@ -47,8 +47,8 @@ void VelocityGraph::plan()
     boost::dijkstra_shortest_paths(
       data_, from,
       boost::weight_map(boost::get(&Edge::weight, data_))
-        .predecessor_map(&parents[0])
-        .distance_map(&weights[0]));
+      .predecessor_map(&parents[0])
+      .distance_map(&weights[0]));
     if (weights[to] != to) {
       Plan p;
       for (auto v = to;; v = parents[v]) {
@@ -72,8 +72,8 @@ void VelocityGraph::plan()
     planning_succeed_ = true;
     result_.clear();
     std::sort(plans.begin(), plans.end(), [](const auto & a, const auto & b) {
-      return a.total_weights < b.total_weights;
-    });
+        return a.total_weights < b.total_weights;
+      });
     Plan p = plans[0];
     for (auto itr = p.plan.begin(); itr != p.plan.end(); itr++) {
       result_.push_back(*itr);
@@ -91,9 +91,9 @@ void VelocityGraph::calculateAcceleration()
     double a = (v1 * v1 - v0 * v0) / (2 * path_length_);
     accels.push_back(a);
   }
-  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) { return a > b; });
+  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) {return a > b;});
   planned_maximum_acceleration_ = accels[0];
-  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) { return a < b; });
+  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) {return a < b;});
   planned_minimum_acceleration_ = accels[0];
 }
 
@@ -122,7 +122,7 @@ std::vector<Node> VelocityGraph::makeEndNode()
 }
 
 void VelocityGraph::buildVelocityGraph(
-  std::map<double, std::vector<Node> > nodes, std::vector<Edge> edges)
+  std::map<double, std::vector<Node>> nodes, std::vector<Edge> edges)
 {
   vertex_dict_.clear();
   data_.clear();
@@ -142,15 +142,15 @@ void VelocityGraph::buildVelocityGraph(
   }
 }
 
-boost::optional<std::vector<Edge> > VelocityGraph::makeEdges(
-  std::map<double, std::vector<Node> > nodes)
+boost::optional<std::vector<Edge>> VelocityGraph::makeEdges(
+  std::map<double, std::vector<Node>> nodes)
 {
   std::vector<Edge> edges;
   std::vector<double> t_values;
   for (auto it = nodes.begin(); it != nodes.end(); it++) {
     t_values.push_back(it->first);
   }
-  std::sort(t_values.begin(), t_values.end(), [](const auto & a, const auto & b) { return a < b; });
+  std::sort(t_values.begin(), t_values.end(), [](const auto & a, const auto & b) {return a < b;});
   plan_length_ = t_values.size();
   for (int i = 0; i < ((int)t_values.size() - 1); i++) {
     bool connection_finded = false;
@@ -164,7 +164,8 @@ boost::optional<std::vector<Edge> > VelocityGraph::makeEdges(
         double a = (v1 * v1 - v0 * v0) / (2 * l);
         if (
           a > minimum_acceleration_ && a < maximum_acceleration_ &&
-          std::fabs(v0) <= maximum_velocity_ && std::fabs(v1) <= maximum_velocity_) {
+          std::fabs(v0) <= maximum_velocity_ && std::fabs(v1) <= maximum_velocity_)
+        {
           connection_finded = true;
           Edge edge;
           edge.before_node_id = before_itr->id;
@@ -179,7 +180,7 @@ boost::optional<std::vector<Edge> > VelocityGraph::makeEdges(
     }
     if (!connection_finded) {
       reason_ = "failed to build edge from t=" + std::to_string(t_values[i]) +
-                " to t=" + std::to_string(t_values[i + 1]);
+        " to t=" + std::to_string(t_values[i + 1]);
       return boost::none;
     }
   }

@@ -48,18 +48,18 @@ public:
   VelocityGraph(
     hermite_path_msgs::msg::HermitePathStamped data, double velocity_resoluation,
     double maximum_acceleration, double minimum_acceleration, double maximum_velocity);
-  boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity> > getPlan();
-  std::string getReason() { return reason_; };
-  double getPlannedMaximumAcceleration() { return planned_maximum_acceleration_; }
-  double getPlannedMinimumAcceleration() { return planned_minimum_acceleration_; }
+  boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity>> getPlan();
+  std::string getReason() {return reason_;}
+  double getPlannedMaximumAcceleration() {return planned_maximum_acceleration_;}
+  double getPlannedMinimumAcceleration() {return planned_minimum_acceleration_;}
 
 private:
   void plan();
   std::vector<Node> makeNodes(hermite_path_msgs::msg::ReferenceVelocity vel);
   std::vector<Node> makeStartNodes();
   std::vector<Node> makeEndNode();
-  boost::optional<std::vector<Edge> > makeEdges(std::map<double, std::vector<Node> > nodes);
-  void buildVelocityGraph(std::map<double, std::vector<Node> > nodes, std::vector<Edge> edges);
+  boost::optional<std::vector<Edge>> makeEdges(std::map<double, std::vector<Node>> nodes);
+  void buildVelocityGraph(std::map<double, std::vector<Node>> nodes, std::vector<Edge> edges);
   VelocityGraphData data_;
   double maximum_velocity_;
   double velocity_resoluation_;

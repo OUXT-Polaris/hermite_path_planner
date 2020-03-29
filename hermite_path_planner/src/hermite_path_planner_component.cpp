@@ -56,14 +56,12 @@ void HermitePathPlannerComponent::GoalPoseCallback(
   path.header.frame_id = planning_frame_id_;
   hermite_path_pub_->publish(path);
   marker_pub_->publish(generator_->generateMarker(path, 200));
-  return;
 }
 
 void HermitePathPlannerComponent::CurrentPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
   current_pose_ = *msg;
-  return;
 }
 }  // namespace hermite_path_planner
 

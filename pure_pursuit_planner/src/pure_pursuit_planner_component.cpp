@@ -170,13 +170,13 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     quaternion_operation::convertQuaternionToEulerAngle(current_pose_->pose.orientation);
   double theta = rpy.z;
   double alpha = std::atan2(
-                   target_position.y - current_pose_->pose.position.y,
-                   target_position.x - current_pose_->pose.position.x) -
-                 theta;
+    target_position.y - current_pose_->pose.position.y,
+    target_position.x - current_pose_->pose.position.x) -
+    theta;
   double r = std::sqrt(
-               std::pow(target_position.x - current_pose_->pose.position.x, 2) +
-               std::pow(target_position.y - current_pose_->pose.position.y, 2)) /
-             (2 * std::sin(alpha));
+    std::pow(target_position.x - current_pose_->pose.position.x, 2) +
+    std::pow(target_position.y - current_pose_->pose.position.y, 2)) /
+    (2 * std::sin(alpha));
   double length = r * alpha;
   double linear_velocity = generator_->getReferenceVelocity(path_.get(), current_t_.get());
   double omega = 2 * linear_velocity * std::sin(alpha) / length;
