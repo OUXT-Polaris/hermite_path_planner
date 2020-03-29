@@ -15,6 +15,7 @@
 
 #include <velocity_planner/stop_planner_component.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <memory>
 
 int main(int argc, char * argv[])
 {

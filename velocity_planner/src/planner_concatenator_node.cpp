@@ -14,6 +14,7 @@
 
 #include <velocity_planner/planner_concatenator_component.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <memory>
 
 int main(int argc, char * argv[])
 {

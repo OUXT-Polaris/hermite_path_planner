@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <hermite_path_planner/hermite_path_planner_component.hpp>
+#include <memory>
 
 namespace hermite_path_planner
 {

@@ -15,6 +15,9 @@
 
 #include <velocity_planner/velocity_graph.hpp>
 #include <iostream>
+#include <algorithm>
+#include <map>
+#include <vector>
 
 namespace velocity_planner
 {
@@ -70,11 +73,11 @@ void VelocityGraph::plan()
         hermite_path_msgs::msg::ReferenceVelocity vel;
         vel = data_[v].vel;
         p.plan.push_front(vel);
-        if (v == from || plan_length_ < (int)p.plan.size()) {
+        if (v == from || plan_length_ < static_cast<int>(p.plan.size())) {
           break;
         }
       }
-      if (plan_length_ == (int)p.plan.size()) {
+      if (plan_length_ == static_cast<int>(p.plan.size())) {
         p.total_weights = weights[to];
         plans.push_back(p);
       }
@@ -100,7 +103,7 @@ void VelocityGraph::plan()
 void VelocityGraph::calculateAcceleration()
 {
   std::vector<double> accels;
-  for (int i = 0; i < ((int)result_.size() - 1); i++) {
+  for (int i = 0; i < (static_cast<int>(result_.size()) - 1); i++) {
     double v0 = result_[i].linear_velocity;
     double v1 = result_[i + 1].linear_velocity;
     double a = (v1 * v1 - v0 * v0) / (2 * path_length_);
@@ -167,7 +170,7 @@ boost::optional<std::vector<Edge>> VelocityGraph::makeEdges(
   }
   std::sort(t_values.begin(), t_values.end(), [](const auto & a, const auto & b) {return a < b;});
   plan_length_ = t_values.size();
-  for (int i = 0; i < ((int)t_values.size() - 1); i++) {
+  for (int i = 0; i < (static_cast<int>(t_values.size()) - 1); i++) {
     bool connection_finded = false;
     std::vector<Node> before_nodes = nodes[t_values[i]];
     std::vector<Node> after_nodes = nodes[t_values[i + 1]];

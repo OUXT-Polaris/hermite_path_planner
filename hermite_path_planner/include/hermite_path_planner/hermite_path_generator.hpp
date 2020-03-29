@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HERMITE_PATH_PLANNER_HERMITE_PATH_GENERATOR_H_INCLUDED
-#define HERMITE_PATH_PLANNER_HERMITE_PATH_GENERATOR_H_INCLUDED
+#ifndef HERMITE_PATH_PLANNER__HERMITE_PATH_GENERATOR_HPP_
+#define HERMITE_PATH_PLANNER__HERMITE_PATH_GENERATOR_HPP_
 
 #include <quaternion_operation/quaternion_operation.h>
 #include <boost/optional.hpp>
@@ -22,13 +22,14 @@
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <iostream>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <vector>
 
 namespace hermite_path_planner
 {
 class HermitePathGenerator
 {
 public:
-  HermitePathGenerator(double robot_width);
+  explicit HermitePathGenerator(double robot_width);
   hermite_path_msgs::msg::HermitePath generateHermitePath(
     geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal);
   geometry_msgs::msg::Point getPointOnHermitePath(
@@ -62,4 +63,4 @@ private:
 };
 }  // namespace hermite_path_planner
 
-#endif  //HERMITE_PATH_PLANNER_HERMITE_PATH_GENERATOR_H_INCLUDED
+#endif  // HERMITE_PATH_PLANNER__HERMITE_PATH_GENERATOR_HPP_

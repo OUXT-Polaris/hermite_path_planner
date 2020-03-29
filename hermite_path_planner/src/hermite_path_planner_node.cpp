@@ -14,6 +14,7 @@
 
 #include <hermite_path_planner/hermite_path_planner_component.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <memory>
 
 int main(int argc, char * argv[])
 {

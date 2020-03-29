@@ -13,6 +13,14 @@
 // limitations under the License.
 
 #include <velocity_planner/planner_concatenator_component.hpp>
+#include <memory>
+#include <algorithm>
+#include <set>
+#include <vector>
+#include <list>
+#include <map>
+#include <string>
+#include <utility>
 
 namespace velocity_planner
 {

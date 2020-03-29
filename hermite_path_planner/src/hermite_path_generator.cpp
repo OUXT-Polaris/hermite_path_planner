@@ -14,6 +14,8 @@
 
 #include <color_names/color_names.h>
 #include <hermite_path_planner/hermite_path_generator.hpp>
+#include <vector>
+#include <algorithm>
 
 namespace hermite_path_planner
 {
@@ -72,7 +74,7 @@ double HermitePathGenerator::getReferenceVelocity(
       return std::sqrt(v2);
     }
   }
-  for (int i = 0; i < (int)path.reference_velocity.size() - 1; i++) {
+  for (int i = 0; i < static_cast<int>(path.reference_velocity.size()) - 1; i++) {
     if (path.reference_velocity[i + 1].t >= t && t >= path.reference_velocity[i].t) {
       double diff_l = (path.reference_velocity[i + 1].t - path.reference_velocity[i].t) * l;
       double a = (std::pow(path.reference_velocity[i + 1].linear_velocity, 2) -
@@ -120,12 +122,12 @@ boost::optional<double> HermitePathGenerator::getLongitudinalDistanceInFrenetCoo
   constexpr int max_iteration = 30;
   constexpr double torelance = 0.001;
 
-  double step_size = (double)1.0 / (double)initial_resolution;
+  double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
   double ret = 0.0;
   std::vector<double> initial_value_candidates(initial_resolution);
   std::vector<double> initial_errors(initial_resolution);
   for (int i = 0; i < initial_resolution; i++) {
-    initial_value_candidates[i] = (0.5 + (double)i) * step_size;
+    initial_value_candidates[i] = (0.5 + static_cast<double>(i)) * step_size;
     initial_errors[i] = std::fabs(func(path, p, initial_value_candidates[i]));
   }
   std::vector<double>::iterator iter =
@@ -221,9 +223,9 @@ std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getPointsOnHermiteP
   hermite_path_msgs::msg::HermitePath path, int resolution)
 {
   std::vector<geometry_msgs::msg::Point> p;
-  double step_size = 1.0 / (double)resolution;
+  double step_size = 1.0 / static_cast<double>(resolution);
   for (int i = 0; i < (resolution + 1); i++) {
-    double t = step_size * (double)i;
+    double t = step_size * static_cast<double>(i);
     p.push_back(getPointOnHermitePath(path, t));
   }
   return p;
@@ -233,9 +235,9 @@ std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getLeftBounds(
   hermite_path_msgs::msg::HermitePath path, int resolution)
 {
   std::vector<geometry_msgs::msg::Point> points;
-  double step_size = 1.0 / (double)resolution;
+  double step_size = 1.0 / static_cast<double>(resolution);
   for (int i = 0; i < (resolution + 1); i++) {
-    double t = step_size * (double)i;
+    double t = step_size * static_cast<double>(i);
     geometry_msgs::msg::Vector3 vec = getNormalVector(path, t);
     double theta = std::atan2(vec.y, vec.x);
     geometry_msgs::msg::Point p = getPointOnHermitePath(path, t);
@@ -251,9 +253,9 @@ std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getRightBounds(
   hermite_path_msgs::msg::HermitePath path, int resolution)
 {
   std::vector<geometry_msgs::msg::Point> points;
-  double step_size = 1.0 / (double)resolution;
+  double step_size = 1.0 / static_cast<double>(resolution);
   for (int i = 0; i < (resolution + 1); i++) {
-    double t = step_size * (double)i;
+    double t = step_size * static_cast<double>(i);
     geometry_msgs::msg::Vector3 vec = getNormalVector(path, t);
     double theta = std::atan2(vec.y, vec.x);
     geometry_msgs::msg::Point p = getPointOnHermitePath(path, t);
@@ -351,7 +353,7 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
 
   // Setup Color
   std_msgs::msg::ColorRGBA color_center_line = color_names::makeColorMsg("red", 1.0);
-  //std_msgs::msg::ColorRGBA color_bounds = color_names::makeColorMsg("skyblue", 1.0);
+  // std_msgs::msg::ColorRGBA color_bounds = color_names::makeColorMsg("skyblue", 1.0);
 
   // Setup Center Line Marker
   visualization_msgs::msg::Marker center_line;
@@ -367,7 +369,7 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
     std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
   marker.markers.push_back(center_line);
 
-  //Setup Left Bounds Marker
+  // Setup Left Bounds Marker
   marker.markers.push_back(getBoundsPolygon(path, resolution, -0.3));
   return marker;
 }

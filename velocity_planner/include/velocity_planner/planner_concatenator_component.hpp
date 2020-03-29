@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef VELOCITY_PLANNER_PLANNER_CONCATENATOR_COMPONENT_H_INCLUDED
-#define VELOCITY_PLANNER_PLANNER_CONCATENATOR_COMPONENT_H_INCLUDED
+#ifndef VELOCITY_PLANNER__PLANNER_CONCATENATOR_COMPONENT_HPP_
+#define VELOCITY_PLANNER__PLANNER_CONCATENATOR_COMPONENT_HPP_
 
 #if __cplusplus
 extern "C" {
@@ -64,6 +64,9 @@ extern "C" {
 #include <velocity_planner/velocity_visualizer.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <string>
+#include <memory>
+#include <vector>
 
 namespace velocity_planner
 {
@@ -152,4 +155,4 @@ private:
 };
 }  // namespace velocity_planner
 
-#endif  //VELOCITY_PLANNER_PLANNER_CONCATENATOR_COMPONENT_H_INCLUDED
+#endif  // VELOCITY_PLANNER__PLANNER_CONCATENATOR_COMPONENT_HPP_

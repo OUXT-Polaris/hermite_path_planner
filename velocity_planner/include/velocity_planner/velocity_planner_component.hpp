@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_H_INCLUDED
-#define VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_H_INCLUDED
+#ifndef VELOCITY_PLANNER__VELOCITY_PLANNER_COMPONENT_HPP_
+#define VELOCITY_PLANNER__VELOCITY_PLANNER_COMPONENT_HPP_
 
 #if __cplusplus
 extern "C" {
@@ -68,6 +68,7 @@ extern "C" {
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <memory>
 
 namespace velocity_planner
 {
@@ -106,4 +107,4 @@ private:
 };
 }  // namespace velocity_planner
 
-#endif  //VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_H_INCLUDED
+#endif  //  VELOCITY_PLANNER__VELOCITY_PLANNER_COMPONENT_HPP_

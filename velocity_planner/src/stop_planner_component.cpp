@@ -14,6 +14,8 @@
 
 #include <color_names/color_names.h>
 #include <velocity_planner/stop_planner_component.hpp>
+#include <memory>
+#include <string>
 
 namespace velocity_planner
 {
@@ -44,7 +46,7 @@ void StopPlannerComponent::hermitePathCallback(
   double length = generator_.getLength(path_.get().path, 200);
   int i = 0;
   while (true) {
-    double t = (length - ((double)i * section_length_)) / length;
+    double t = (length - (static_cast<double>(i) * section_length_)) / length;
     hermite_path_msgs::msg::ReferenceVelocity ref;
     ref.t = t;
     ref.linear_velocity = std::sqrt(2 * max_deceleration_ * (1 - t));

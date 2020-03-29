@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef VELOCITY_PLANNER_VELOCITY_GRAPH_H_INCLUDED
-#define VELOCITY_PLANNER_VELOCITY_GRAPH_H_INCLUDED
+#ifndef VELOCITY_PLANNER__VELOCITY_GRAPH_HPP_
+#define VELOCITY_PLANNER__VELOCITY_GRAPH_HPP_
 
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -24,6 +24,9 @@
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <hermite_path_msgs/msg/reference_velocity.hpp>
 #include <map>
+#include <string>
+#include <vector>
+#include <deque>
 
 namespace velocity_planner
 {
@@ -53,8 +56,6 @@ struct Plan
 
 typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, Node, Edge, Graph>
   VelocityGraphData;
-
-//typedef boost::graph_traits<VelocityGraphData>::vertex_descriptor Vertex;
 
 class VelocityGraph
 {
@@ -95,4 +96,4 @@ private:
 };
 }  // namespace velocity_planner
 
-#endif  //VELOCITY_PLANNER_VELOCITY_GRAPH_H_INCLUDED
+#endif  // VELOCITY_PLANNER__VELOCITY_GRAPH_HPP_

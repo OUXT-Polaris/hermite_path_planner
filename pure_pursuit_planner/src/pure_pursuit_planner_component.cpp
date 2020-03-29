@@ -11,8 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <color_names/color_names.h>
+
 #include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
+#include <color_names/color_names.h>
+#include <string>
+#include <memory>
 
 namespace pure_pursuit_planner
 {
@@ -126,7 +129,7 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
   circle_marker.color = color_names::makeColorMsg("chocolate", 1.0);
   constexpr int circle_marker_resolution = 200;
   for (int i = 0; i < (circle_marker_resolution + 1); i++) {
-    double theta = 2 * M_PI / (double)circle_marker_resolution * i;
+    double theta = 2 * M_PI / static_cast<double>(circle_marker_resolution) * i;
     geometry_msgs::msg::Point p;
     p.x = current_pose_transformed_->pose.position.x + lookahead_distance_ * std::cos(theta);
     p.y = current_pose_transformed_->pose.position.y + lookahead_distance_ * std::sin(theta);

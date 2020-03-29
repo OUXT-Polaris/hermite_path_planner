@@ -14,6 +14,8 @@
 
 #include <color_names/color_names.h>
 #include <velocity_planner/velocity_visualizer.hpp>
+#include <vector>
+#include <string>
 
 namespace velocity_planner
 {
@@ -97,7 +99,7 @@ double VelocityVisualizer::getVelocity(
   if (vel[vel.size() - 1].t < t) {
     return vel[vel.size() - 1].linear_velocity;
   }
-  for (int i = 0; i < (int)vel.size(); i++) {
+  for (int i = 0; i < static_cast<int>(vel.size()); i++) {
     if (vel[i].t > t && vel[i + 1].t) {
       double dist = (vel[i + 1].t - vel[i].t) * l;
       double a = (vel[i + 1].linear_velocity * vel[i + 1].linear_velocity -
@@ -226,7 +228,7 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
     text_marker.scale.z = 0.2;
     text_marker.color = color_ref_velocity;
     char velocity_string[10];
-    std::sprintf(velocity_string, "%.2f", itr->linear_velocity);
+    std::snprintf(velocity_string, sizeof(velocity_string), "%.2f", itr->linear_velocity);
     std::string str(velocity_string, 10);
     text_marker.text = str + "(m/s)";
     marker.markers.push_back(text_marker);

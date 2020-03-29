@@ -14,6 +14,9 @@
 
 #include <color_names/color_names.h>
 #include <velocity_planner/curve_planner_component.hpp>
+#include <memory>
+#include <limits>
+#include <string>
 
 namespace velocity_planner
 {
@@ -43,7 +46,7 @@ void CurvePlannerComponent::hermitePathCallback(
   constexpr double e = std::numeric_limits<double>::epsilon();
   path_ = *data;
   for (int i = 0; i < num_resolution_; i++) {
-    double t = (0.5 + (double)i) / num_resolution_;
+    double t = (0.5 + static_cast<double>(i)) / num_resolution_;
     double curvature = generator_.getCurvature(path_->path, t);
     hermite_path_msgs::msg::ReferenceVelocity vel;
     vel.t = t;

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HERMITE_PATH_PLANNER_HERMITE_PATH_PLANNER_COMPONENT_H_INCLUDED
-#define HERMITE_PATH_PLANNER_HERMITE_PATH_PLANNER_COMPONENT_H_INCLUDED
+#ifndef HERMITE_PATH_PLANNER__HERMITE_PATH_PLANNER_COMPONENT_HPP_
+#define HERMITE_PATH_PLANNER__HERMITE_PATH_PLANNER_COMPONENT_HPP_
 
 #if __cplusplus
 extern "C" {
@@ -65,9 +65,10 @@ extern "C" {
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
-
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <boost/optional.hpp>
+#include <memory>
+#include <string>
 
 namespace hermite_path_planner
 {
@@ -95,4 +96,4 @@ private:
 };
 }  // namespace hermite_path_planner
 
-#endif  //HERMITE_PATH_PLANNER_HERMITE_PATH_PLANNER_COMPONENT_H_INCLUDED
+#endif  // HERMITE_PATH_PLANNER__HERMITE_PATH_PLANNER_COMPONENT_HPP_

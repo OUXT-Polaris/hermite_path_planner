@@ -15,6 +15,9 @@
 #include <color_names/color_names.h>
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <velocity_planner/obstacle_planner_component.hpp>
+#include <memory>
+#include <set>
+#include <string>
 
 namespace velocity_planner
 {
@@ -127,9 +130,9 @@ ObstaclePlannerComponent::addObstacleConstraints()
   auto current_t = generator.getLongitudinalDistanceInFrenetCoordinate(
     path_->path, pose_transformed.pose.position);
   std::set<double> t_values;
-  for (int i = 0; i < (int)scan_->ranges.size(); i++) {
+  for (int i = 0; i < static_cast<int>(scan_->ranges.size()); i++) {
     if (scan_->range_max >= scan_->ranges[i] && scan_->ranges[i] >= scan_->range_min) {
-      double theta = scan_->angle_min + scan_->angle_increment * (double)i;
+      double theta = scan_->angle_min + scan_->angle_increment * static_cast<double>(i);
       geometry_msgs::msg::PointStamped p;
       p.point.x = scan_->ranges[i] * std::cos(theta);
       p.point.y = scan_->ranges[i] * std::sin(theta);
@@ -165,7 +168,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
 
     int i = 0;
     while (true) {
-      double t = (length * target_t - ((double)i * section_length_)) / length;
+      double t = (length * target_t - (static_cast<double>(i) * section_length_)) / length;
       hermite_path_msgs::msg::ReferenceVelocity ref;
       ref.t = t;
       ref.linear_velocity = std::sqrt(2 * max_deceleration_ * (target_t - t));
@@ -181,7 +184,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
     }
     i = 0;
     while (true) {
-      double t = (length * target_t + ((double)i * section_length_)) / length;
+      double t = (length * target_t + (static_cast<double>(i) * section_length_)) / length;
       if (t > 1.0) {
         break;
       }

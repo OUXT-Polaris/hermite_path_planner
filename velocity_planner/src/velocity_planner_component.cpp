@@ -16,6 +16,8 @@
 #include <color_names/color_names.h>
 #include <velocity_planner/velocity_graph.hpp>
 #include <velocity_planner/velocity_planner_component.hpp>
+#include <memory>
+#include <string>
 
 namespace velocity_planner
 {
@@ -50,9 +52,6 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
   double robot_width;
   get_parameter("robot_width", robot_width);
   generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
-
-  //using namespace std::chrono_literals;
-  //timer_ = this->create_wall_timer(100ms, std::bind(&VelocityPlannerComponent::checkCurrentPath, this));
 }
 
 bool VelocityPlannerComponent::checkTopics()
@@ -106,7 +105,7 @@ void VelocityPlannerComponent::updatePath()
       "minimum acceleration is " + std::to_string(graph.getPlannedMinimumAcceleration()));
     marker_pub_->publish(viz_.generateDeleteMarker());
     marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0));
-    //marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
+    // marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
   } else {
     marker_pub_->publish(viz_.generateDeleteMarker());
     RCLCPP_INFO(get_logger(), "velocity planning failed");

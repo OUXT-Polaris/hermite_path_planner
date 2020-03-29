@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_H_INCLUDED
-#define PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_H_INCLUDED
+#ifndef PURE_PURSUIT_PLANNER__PURE_PURSUIT_PLANNER_COMPONENT_HPP_
+#define PURE_PURSUIT_PLANNER__PURE_PURSUIT_PLANNER_COMPONENT_HPP_
 
 #if __cplusplus
 extern "C" {
@@ -68,6 +68,7 @@ extern "C" {
 #include <geometry_msgs/msg/twist.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <memory>
 
 namespace pure_pursuit_planner
 {
@@ -102,4 +103,4 @@ private:
 };
 }  // namespace pure_pursuit_planner
 
-#endif  //PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_H_INCLUDED
+#endif  // PURE_PURSUIT_PLANNER__PURE_PURSUIT_PLANNER_COMPONENT_HPP_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef VELOCITY_PLANNER_STOP_PLANNER_H_INCLUDED
-#define VELOCITY_PLANNER_STOP_PLANNER_H_INCLUDED
+#ifndef VELOCITY_PLANNER__STOP_PLANNER_COMPONENT_HPP_
+#define VELOCITY_PLANNER__STOP_PLANNER_COMPONENT_HPP_
 
 #if __cplusplus
 extern "C" {
@@ -84,4 +84,4 @@ private:
 };
 }  // namespace velocity_planner
 
-#endif  //VELOCITY_PLANNER_STOP_PLANNER_H_INCLUDED
+#endif  // VELOCITY_PLANNER__STOP_PLANNER_COMPONENT_HPP_
