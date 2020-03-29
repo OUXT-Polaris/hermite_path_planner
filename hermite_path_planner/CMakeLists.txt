@@ -50,14 +50,14 @@ ament_target_dependencies(hermite_path_generator
 ament_export_interfaces(export_hermite_path_generator HAS_LIBRARY_TARGET)
 ament_export_libraries(hermite_path_generator)
 
-add_library(hermite_path_planner_component SHARED 
+add_library(hermite_path_planner_component SHARED
   src/hermite_path_planner_component.cpp
   src/hermite_path_generator.cpp)
-target_compile_definitions(hermite_path_planner_component 
+target_compile_definitions(hermite_path_planner_component
   PRIVATE "HERMITE_PATH_PLANNER_HERMITE_PATH_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(hermite_path_planner_component
-  rclcpp 
-  rclcpp_components 
+  rclcpp
+  rclcpp_components
   std_msgs
   geometry_msgs
   quaternion_operation
@@ -72,11 +72,11 @@ rclcpp_components_register_nodes(hermite_path_planner_component
 add_executable(hermite_path_planner_node
   src/hermite_path_planner_node.cpp)
 ament_target_dependencies(hermite_path_planner_node
-  rclcpp 
-  rclcpp_components 
+  rclcpp
+  rclcpp_components
   std_msgs
-  geometry_msgs 
-  quaternion_operation 
+  geometry_msgs
+  quaternion_operation
   visualization_msgs
   color_names
   tf2_ros
@@ -85,7 +85,7 @@ ament_target_dependencies(hermite_path_planner_node
 target_link_libraries(hermite_path_planner_node hermite_path_planner_component)
 
 install(TARGETS
-  hermite_path_planner_node 
+  hermite_path_planner_node
   DESTINATION lib/hermite_path_planner
 )
 install(TARGETS hermite_path_planner_component hermite_path_generator

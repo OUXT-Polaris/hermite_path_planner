@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(hermite_path_msgs REQUIRED)
 find_package(hermite_path_planner REQUIRED)
@@ -39,7 +40,7 @@ include_directories(
 )
 
 # Velocity Planner
-add_library(velocity_planner_component SHARED 
+add_library(velocity_planner_component SHARED
   src/velocity_planner_component.cpp
   src/velocity_visualizer.cpp
   src/velocity_graph.cpp)
@@ -47,7 +48,7 @@ target_compile_definitions(velocity_planner_component
   PRIVATE "VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_BUILDING_DLL")
 target_link_libraries(velocity_planner_component ${CERES_LIBRARIES})
 ament_target_dependencies(velocity_planner_component
-  rclcpp 
+  rclcpp
   rclcpp_components
   quaternion_operation
   tf2_geometry_msgs
@@ -66,7 +67,7 @@ target_link_libraries(velocity_planner_node velocity_planner_component)
 ament_target_dependencies(velocity_planner_node
   color_names
   message_filters
-  rclcpp 
+  rclcpp
   rclcpp_components
   quaternion_operation
   tf2_geometry_msgs
@@ -83,7 +84,7 @@ add_library(curve_planner_component SHARED
 target_compile_definitions(curve_planner_component
   PRIVATE "VELOCITY_PLANNER_CURVE_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(curve_planner_component
-  rclcpp 
+  rclcpp
   rclcpp_components
   quaternion_operation
   tf2_geometry_msgs
@@ -100,7 +101,7 @@ add_executable(curve_planner_node
 )
 target_link_libraries(curve_planner_node curve_planner_component)
 ament_target_dependencies(curve_planner_node
-  rclcpp 
+  rclcpp
   rclcpp_components
   quaternion_operation
   tf2_geometry_msgs
@@ -118,8 +119,9 @@ add_library(obstacle_planner_component SHARED
 target_compile_definitions(obstacle_planner_component
   PRIVATE "VELOCITY_PLANNER_OBSTACLE_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(obstacle_planner_component
-  rclcpp 
+  rclcpp
   rclcpp_components
+  sensor_msgs
   quaternion_operation
   tf2_geometry_msgs
   tf2_ros
@@ -137,9 +139,10 @@ add_executable(obstacle_planner_node
 )
 target_link_libraries(obstacle_planner_node obstacle_planner_component)
 ament_target_dependencies(obstacle_planner_node
-  rclcpp 
+  rclcpp
   rclcpp_components
   quaternion_operation
+  sensor_msgs
   tf2_geometry_msgs
   tf2_ros
   sensor_msgs
@@ -156,7 +159,7 @@ add_library(stop_planner_component SHARED
 target_compile_definitions(stop_planner_component
   PRIVATE "VELOCITY_PLANNER_STOP_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(stop_planner_component
-  rclcpp 
+  rclcpp
   rclcpp_components
   message_filters
   color_names
@@ -171,7 +174,7 @@ add_executable(stop_planner_node
 )
 target_link_libraries(stop_planner_node stop_planner_component)
 ament_target_dependencies(stop_planner_node
-  rclcpp 
+  rclcpp
   rclcpp_components
   message_filters
   color_names
@@ -187,7 +190,7 @@ add_library(planner_concatenator_component SHARED
 target_compile_definitions(planner_concatenator_component
   PRIVATE "VELOCITY_PLANNER_PLANNER_CONCATENATOR_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(planner_concatenator_component
-  rclcpp 
+  rclcpp
   rclcpp_components
   message_filters
   color_names
@@ -202,7 +205,7 @@ add_executable(planner_concatenator_node
 )
 target_link_libraries(planner_concatenator_node planner_concatenator_component)
 ament_target_dependencies(planner_concatenator_node
-  rclcpp 
+  rclcpp
   rclcpp_components
   message_filters
   color_names
@@ -219,18 +222,17 @@ install(TARGETS
   planner_concatenator_node
   DESTINATION lib/velocity_planner
 )
-install(TARGETS 
+install(TARGETS
   velocity_planner_component
   curve_planner_component
   obstacle_planner_component
   stop_planner_component
   planner_concatenator_component
-  
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 ament_export_libraries(
-  velocity_planner_component 
+  velocity_planner_component
   curve_planner_component
   obstacle_planner_component
   stop_planner_component

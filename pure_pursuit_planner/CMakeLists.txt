@@ -33,12 +33,12 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
-add_library(pure_pursuit_planner_component SHARED 
+add_library(pure_pursuit_planner_component SHARED
   src/pure_pursuit_planner_component.cpp)
 target_compile_definitions(pure_pursuit_planner_component
   PRIVATE "PURE_PURSUIT_PLANNER_PURE_PURSUIT_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(pure_pursuit_planner_component
-  rclcpp 
+  rclcpp
   rclcpp_components
   quaternion_operation
   tf2_geometry_msgs
@@ -55,7 +55,7 @@ add_executable(pure_pursuit_planner_node
 )
 target_link_libraries(pure_pursuit_planner_node pure_pursuit_planner_component)
 ament_target_dependencies(pure_pursuit_planner_node
-  rclcpp 
+  rclcpp
   rclcpp_components
   quaternion_operation
   tf2_geometry_msgs
