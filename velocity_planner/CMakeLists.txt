@@ -40,7 +40,7 @@ include_directories(
 )
 
 # Velocity Planner
-add_library(velocity_planner_component SHARED 
+add_library(velocity_planner_component SHARED
   src/velocity_planner_component.cpp
   src/velocity_visualizer.cpp
   src/velocity_graph.cpp)
