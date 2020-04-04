@@ -203,7 +203,8 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
 }
 
 hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
-  geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal,double start_vector_magnitude,double end_vector_magnitude)
+  geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal, double start_vector_magnitude,
+  double end_vector_magnitude)
 {
   hermite_path_msgs::msg::HermitePath path;
   geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start, start_vector_magnitude);

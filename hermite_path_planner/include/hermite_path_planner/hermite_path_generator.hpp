@@ -31,7 +31,8 @@ class HermitePathGenerator
 public:
   explicit HermitePathGenerator(double robot_width);
   hermite_path_msgs::msg::HermitePath generateHermitePath(
-    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal,double start_vector_magnitude=10.0,double end_vector_magnitude=30.0);
+    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal,
+    double start_vector_magnitude = 10.0, double end_vector_magnitude = 30.0);
   geometry_msgs::msg::Point getPointOnHermitePath(
     hermite_path_msgs::msg::HermitePath path, double t);
   std::vector<geometry_msgs::msg::Point> getPointsOnHermitePath(
