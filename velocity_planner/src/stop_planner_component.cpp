@@ -48,6 +48,9 @@ void StopPlannerComponent::hermitePathCallback(
   while (true) {
     double t = (length - (static_cast<double>(i) * section_length_)) / length;
     hermite_path_msgs::msg::ReferenceVelocity ref;
+    if (i == 0) {
+      ref.stop_flag = true;
+    }
     ref.t = t;
     ref.linear_velocity = std::sqrt(2 * max_deceleration_ * (1 - t));
     if (ref.linear_velocity > max_linear_velocity_) {

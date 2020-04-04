@@ -88,7 +88,7 @@ void VelocityPlannerComponent::updatePath()
     mtx_.unlock();
     return;
   }
-  VelocityGraph graph(path_.get(), 0.05, 0.1, -0.3, 0.5);
+  VelocityGraph graph(path_.get(), 0.05, 0.1, -0.1, 0.5);
   auto plan = graph.getPlan();
   if (plan) {
     RCLCPP_INFO(get_logger(), "velocity planning succeed");
@@ -104,7 +104,7 @@ void VelocityPlannerComponent::updatePath()
       get_logger(),
       "minimum acceleration is " + std::to_string(graph.getPlannedMinimumAcceleration()));
     marker_pub_->publish(viz_.generateDeleteMarker());
-    marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0));
+    marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, 3.0));
     // marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
   } else {
     marker_pub_->publish(viz_.generateDeleteMarker());

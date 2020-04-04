@@ -171,6 +171,9 @@ ObstaclePlannerComponent::addObstacleConstraints()
       double t = (length * target_t - (static_cast<double>(i) * section_length_)) / length;
       hermite_path_msgs::msg::ReferenceVelocity ref;
       ref.t = t;
+      if (i == 0) {
+        ref.stop_flag = true;
+      }
       ref.linear_velocity = std::sqrt(2 * max_deceleration_ * (target_t - t));
       if (ref.linear_velocity > max_linear_velocity_) {
         break;

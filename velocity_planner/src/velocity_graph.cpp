@@ -34,11 +34,20 @@ VelocityGraph::VelocityGraph(
   maximum_velocity_ = maximum_velocity;
   path_length_ = generator_.getLength(data.path, 200);
   std::map<double, std::vector<Node>> nodes;
+  bool stop_flag_founded = false;
   nodes[0.0] = makeStartNodes();
   for (auto itr = data.reference_velocity.begin(); itr != data.reference_velocity.end(); itr++) {
-    nodes[itr->t] = makeNodes(*itr);
+    if (itr->stop_flag) {
+      nodes[itr->t] = makeEndNode(itr->t);
+      stop_flag_founded = true;
+      break;
+    } else {
+      nodes[itr->t] = makeNodes(*itr);
+    }
   }
-  nodes[1.0] = makeEndNode();
+  if (!stop_flag_founded) {
+    nodes[1.0] = makeEndNode(1.0);
+  }
   boost::optional<std::vector<Edge>> edges = makeEdges(nodes);
   if (edges) {
     buildVelocityGraph(nodes, edges.get());
@@ -127,11 +136,11 @@ std::vector<Node> VelocityGraph::makeStartNodes()
   return ret;
 }
 
-std::vector<Node> VelocityGraph::makeEndNode()
+std::vector<Node> VelocityGraph::makeEndNode(double t)
 {
   std::vector<Node> ret;
   Node end_node;
-  end_node.vel.t = 1.0;
+  end_node.vel.t = t;
   end_node.vel.linear_velocity = 0.0;
   end_node.id = boost::uuids::random_generator()();
   end_node_id_ = end_node.id;
