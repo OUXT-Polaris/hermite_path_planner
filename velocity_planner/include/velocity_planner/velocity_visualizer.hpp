@@ -35,7 +35,7 @@ public:
     hermite_path_msgs::msg::HermitePathStamped path, std_msgs::msg::ColorRGBA color_ref_velocity);
   visualization_msgs::msg::MarkerArray generateDeleteMarker();
   visualization_msgs::msg::MarkerArray generatePolygonMarker(
-    hermite_path_msgs::msg::HermitePathStamped path, double ratio = 0.0);
+    hermite_path_msgs::msg::HermitePathStamped path, double ratio = 0.0, double width = 1.0);
   visualization_msgs::msg::MarkerArray generateObstacleMarker(
     double t, hermite_path_msgs::msg::HermitePathStamped path, std_msgs::msg::ColorRGBA color,
     double width = 5.0);

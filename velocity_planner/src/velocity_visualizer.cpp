@@ -116,7 +116,7 @@ double VelocityVisualizer::getVelocity(
 }
 
 visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
-  hermite_path_msgs::msg::HermitePathStamped path, double ratio)
+  hermite_path_msgs::msg::HermitePathStamped path, double ratio, double width)
 {
   visualization_msgs::msg::MarkerArray ret;
   int path_length = path.reference_velocity.size();
@@ -142,20 +142,20 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
     geometry_msgs::msg::Point p0 = generator_.getPointOnHermitePath(path.path, t0);
     geometry_msgs::msg::Point p1 = generator_.getPointOnHermitePath(path.path, t1);
     geometry_msgs::msg::Point p0l;
-    p0l.x = p0.x - 0.5 * std::cos(theta0);
-    p0l.y = p0.y - 0.5 * std::sin(theta0);
+    p0l.x = p0.x - width * 0.5 * std::cos(theta0);
+    p0l.y = p0.y - width * 0.5 * std::sin(theta0);
     p0l.z = v0 * ratio;
     geometry_msgs::msg::Point p0r;
-    p0r.x = p0.x + 0.5 * std::cos(theta0);
-    p0r.y = p0.y + 0.5 * std::sin(theta0);
+    p0r.x = p0.x + width * 0.5 * std::cos(theta0);
+    p0r.y = p0.y + width * 0.5 * std::sin(theta0);
     p0r.z = v0 * ratio;
     geometry_msgs::msg::Point p1l;
-    p1l.x = p1.x - 0.5 * std::cos(theta1);
-    p1l.y = p1.y - 0.5 * std::sin(theta1);
+    p1l.x = p1.x - width * 0.5 * std::cos(theta1);
+    p1l.y = p1.y - width * 0.5 * std::sin(theta1);
     p1l.z = v1 * ratio;
     geometry_msgs::msg::Point p1r;
-    p1r.x = p1.x + 0.5 * std::cos(theta1);
-    p1r.y = p1.y + 0.5 * std::sin(theta1);
+    p1r.x = p1.x + width * 0.5 * std::cos(theta1);
+    p1r.y = p1.y + width * 0.5 * std::sin(theta1);
     p1r.z = v1 * ratio;
     polygon.points.push_back(p0l);
     polygon.points.push_back(p0r);

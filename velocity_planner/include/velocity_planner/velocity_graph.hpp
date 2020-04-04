@@ -72,7 +72,7 @@ private:
   void plan();
   std::vector<Node> makeNodes(hermite_path_msgs::msg::ReferenceVelocity vel);
   std::vector<Node> makeStartNodes();
-  std::vector<Node> makeEndNode();
+  std::vector<Node> makeEndNode(double t);
   boost::optional<std::vector<Edge>> makeEdges(std::map<double, std::vector<Node>> nodes);
   void buildVelocityGraph(std::map<double, std::vector<Node>> nodes, std::vector<Edge> edges);
   VelocityGraphData data_;
