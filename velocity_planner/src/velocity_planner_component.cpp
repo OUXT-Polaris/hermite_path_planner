@@ -117,7 +117,6 @@ void VelocityPlannerComponent::updatePath()
 void VelocityPlannerComponent::hermitePathCallback(
   const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
 {
-
   path_ = *data;
   updatePath();
 }
