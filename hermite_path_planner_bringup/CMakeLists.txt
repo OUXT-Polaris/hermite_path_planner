@@ -26,6 +26,7 @@ find_package(velocity_planner REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(geometry_msgs_data_buffer REQUIRED)
 find_package(data_buffer REQUIRED)
+find_package(local_waypoint_server REQUIRED)
 
 include_directories(include
   ${rclcpp_INCLUDE_DIRS}
@@ -41,7 +42,8 @@ ament_target_dependencies(hermite_path_planner_bringup_node
   hermite_path_planner
   pure_pursuit_planner
   velocity_planner
-  quaternion_operation)
+  quaternion_operation
+  local_waypoint_server)
 
 install(TARGETS
   hermite_path_planner_bringup_node

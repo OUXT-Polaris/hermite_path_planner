@@ -15,16 +15,17 @@
 #ifndef LOCAL_WAYPOINT_SERVER__OBSTACLE_AVOID_ACTION_HPP_
 #define LOCAL_WAYPOINT_SERVER__OBSTACLE_AVOID_ACTION_HPP_
 
-#include <behaviortree_cpp_v3/action_node.h>
-#include <behaviortree_cpp_v3/behavior_tree.h>
 #include <string>
+#include <memory>
+#include "behavior_tree_action_builder/action_node.hpp"
+#include "behavior_tree_action_builder/register_nodes.hpp"
 
 namespace local_waypoint_server
 {
-class ObstacleAvoidAction : public BT::SyncActionNode
+class ObstacleAvoidAction : public behavior_tree_action_builder::ActionNode
 {
 public:
-  explicit ObstacleAvoidAction(const std::string & name);
+  explicit ObstacleAvoidAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
 };
 }

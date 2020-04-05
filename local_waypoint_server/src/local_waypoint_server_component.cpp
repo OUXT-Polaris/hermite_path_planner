@@ -21,6 +21,8 @@ namespace local_waypoint_server
 LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOptions & options)
 : Node("local_waypoint_server", options)
 {
+  declare_parameter("xml_path", "");
+  get_parameter("xml_path", xml_path_);
   BT::BehaviorTreeFactory factory;
 }
 }

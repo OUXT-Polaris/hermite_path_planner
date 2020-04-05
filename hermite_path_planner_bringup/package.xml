@@ -14,6 +14,7 @@
   <depend>hermite_path_msgs</depend>
   <depend>pure_pursuit_planner</depend>
   <depend>velocity_planner</depend>
+  <depend>local_waypoint_server</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs_data_buffer</depend>
   <depend>data_buffer</depend>

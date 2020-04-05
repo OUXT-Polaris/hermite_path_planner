@@ -17,12 +17,17 @@
 
 namespace local_waypoint_server
 {
-ObstacleAvoidAction::ObstacleAvoidAction(const std::string & name)
-: BT::SyncActionNode(name, {})
+ObstacleAvoidAction::ObstacleAvoidAction(
+  const std::string & name,
+  const BT::NodeConfiguration & config)
+: behavior_tree_action_builder::ActionNode(name, config)
 {
 }
 
 BT::NodeStatus ObstacleAvoidAction::tick()
 {
+  return BT::NodeStatus::FAILURE;
 }
 }  // namespace local_waypoint_server
+
+REGISTER_NODES(local_waypoint_server, ObstacleAvoidAction)

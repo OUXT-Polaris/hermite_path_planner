@@ -19,6 +19,7 @@
 #include <velocity_planner/planner_concatenator_component.hpp>
 #include <velocity_planner/stop_planner_component.hpp>
 #include <velocity_planner/velocity_planner_component.hpp>
+#include <local_waypoint_server/local_waypoint_server_component.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <memory>
 
@@ -37,6 +38,7 @@ int main(int argc, char * argv[])
   auto stop_planner = std::make_shared<velocity_planner::StopPlannerComponent>(options);
   auto planner_concatenator =
     std::make_shared<velocity_planner::PlannerConcatenatorComponent>(options);
+  auto local_waypoint_server = std::make_shared<local_waypoint_server::LocalWaypointServerComponent>(options);
   exec.add_node(hermite_path_planner);
   exec.add_node(pure_pursuit_planner);
   exec.add_node(curve_planner);
@@ -44,6 +46,7 @@ int main(int argc, char * argv[])
   exec.add_node(velocity_planner);
   exec.add_node(stop_planner);
   exec.add_node(planner_concatenator);
+  exec.add_node(local_waypoint_server);
   exec.spin();
   rclcpp::shutdown();
   return 0;
