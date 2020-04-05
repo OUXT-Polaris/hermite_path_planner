@@ -13,12 +13,13 @@
 // limitations under the License.
 
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
+#include "behaviortree_cpp_v3/bt_factory.h"
 
 namespace local_waypoint_server
 {
 LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOptions & options)
 : Node("local_waypoint_server", options)
 {
-  std::cout << "hi" << std::endl;
+  BT::BehaviorTreeFactory factory;
 }
 }

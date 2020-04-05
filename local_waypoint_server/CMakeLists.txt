@@ -20,18 +20,30 @@ find_package(ament_cmake REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(behaviortree_cpp_v3 REQUIRED)
 
 include_directories(
   include
 )
 
+add_library(local_waypoint_server_action SHARED
+  src/obstacle_avoid_action.cpp
+)
+ament_target_dependencies(local_waypoint_server_action
+  rclcpp
+  rclcpp_components
+  behaviortree_cpp_v3
+  geometry_msgs)
+
 add_library(local_waypoint_server_component SHARED
   src/local_waypoint_server_component.cpp)
 target_compile_definitions(local_waypoint_server_component
   PRIVATE "LOCAL_WAYPOINT_SERVER_LOCAL_WAYPOINT_SERVER_COMPONENT_BUILDING_DLL")
+target_link_libraries(local_waypoint_server_component local_waypoint_server_action)
 ament_target_dependencies(local_waypoint_server_component
   rclcpp
   rclcpp_components
+  behaviortree_cpp_v3
   geometry_msgs)
 rclcpp_components_register_nodes(local_waypoint_server_component
   "local_waypoint_server::LocalWaypointServerComponent")
@@ -43,6 +55,7 @@ target_link_libraries(local_waypoint_server_node local_waypoint_server_component
 ament_target_dependencies(local_waypoint_server_node
   rclcpp
   rclcpp_components
+  behaviortree_cpp_v3
   geometry_msgs)
 
 install(TARGETS
@@ -54,6 +67,11 @@ install(TARGETS local_waypoint_server_component
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin)
 ament_export_libraries(local_waypoint_server_component)
+
+# install config
+install(DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
+)
 
 # Install header files
 install(
