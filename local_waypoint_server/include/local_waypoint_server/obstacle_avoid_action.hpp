@@ -2,13 +2,14 @@
 #define LOCAL_WAYPOINT_SERVER__OBSTACLE_AVOID_ACTION_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
+#include <behaviortree_cpp_v3/behavior_tree.h>
 
 namespace local_waypoint_server
 {
-class ObstacleAvoid : public BT::SyncActionNode
+class ObstacleAvoidAction : public BT::SyncActionNode
 {
 public:
-  ObstacleAvoid(const std::string & name);
+  ObstacleAvoidAction(const std::string & name);
   BT::NodeStatus tick() override;
 };
 }

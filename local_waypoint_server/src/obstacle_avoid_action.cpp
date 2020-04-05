@@ -2,12 +2,12 @@
 
 namespace local_waypoint_server
 {
-ObstacleAvoid::ObstacleAvoid(const std::string & name)
+ObstacleAvoidAction::ObstacleAvoidAction(const std::string & name)
 : BT::SyncActionNode(name, {})
 {
 }
 
-BT::NodeStatus ObstacleAvoid::tick()
+BT::NodeStatus ObstacleAvoidAction::tick()
 {
 
 }

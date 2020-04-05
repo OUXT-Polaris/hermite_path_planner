@@ -21,6 +21,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(behavior_tree_action_builder REQUIRED)
 
 include_directories(
   include
@@ -33,7 +34,8 @@ ament_target_dependencies(local_waypoint_server_action
   rclcpp
   rclcpp_components
   behaviortree_cpp_v3
-  geometry_msgs)
+  geometry_msgs
+  behavior_tree_action_builder)
 
 add_library(local_waypoint_server_component SHARED
   src/local_waypoint_server_component.cpp)

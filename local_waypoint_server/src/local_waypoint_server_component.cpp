@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
+#include <local_waypoint_server/obstacle_avoid_action.hpp>
 #include "behaviortree_cpp_v3/bt_factory.h"
 
 namespace local_waypoint_server
