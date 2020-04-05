@@ -38,7 +38,8 @@ int main(int argc, char * argv[])
   auto stop_planner = std::make_shared<velocity_planner::StopPlannerComponent>(options);
   auto planner_concatenator =
     std::make_shared<velocity_planner::PlannerConcatenatorComponent>(options);
-  auto local_waypoint_server = std::make_shared<local_waypoint_server::LocalWaypointServerComponent>(options);
+  auto local_waypoint_server =
+    std::make_shared<local_waypoint_server::LocalWaypointServerComponent>(options);
   exec.add_node(hermite_path_planner);
   exec.add_node(pure_pursuit_planner);
   exec.add_node(curve_planner);
