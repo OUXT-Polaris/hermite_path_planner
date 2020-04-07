@@ -14,6 +14,7 @@
 
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
 #include <local_waypoint_server/actions/obstacle_avoid_action.hpp>
+#include <local_waypoint_server/actions/follow_path_action.hpp>
 #include "behaviortree_cpp_v3/bt_factory.h"
 
 namespace local_waypoint_server
@@ -24,6 +25,7 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   declare_parameter("behavior_tree_xml_path", "");
   get_parameter("behavior_tree_xml_path", xml_path_);
   BT::BehaviorTreeFactory factory;
+  factory.registerNodeType<FollowPathAction>("FollowPathAction");
   factory.registerNodeType<ObstacleAvoidAction>("ObstacleAvoidAction");
   try {
     auto tree = factory.createTreeFromFile(xml_path_);

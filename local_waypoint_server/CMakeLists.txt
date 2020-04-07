@@ -28,7 +28,8 @@ include_directories(
 
 add_library(local_waypoint_server_component SHARED
   src/local_waypoint_server_component.cpp
-  src/actions/obstacle_avoid_action.cpp)
+  src/actions/obstacle_avoid_action.cpp
+  src/actions/follow_path_action.cpp)
 target_compile_definitions(local_waypoint_server_component
   PRIVATE "LOCAL_WAYPOINT_SERVER_LOCAL_WAYPOINT_SERVER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(local_waypoint_server_component

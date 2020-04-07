@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <local_waypoint_server/follow_path_action.hpp>
+#include <local_waypoint_server/actions/follow_path_action.hpp>
 #include <string>
 
 namespace local_waypoint_server
