@@ -29,6 +29,6 @@ public:
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts();
 };
-}
+}  // local_waypoint_server
 
 #endif  // LOCAL_WAYPOINT_SERVER__ACTIONS__OBSTACLE_AVOID_ACTION_HPP_

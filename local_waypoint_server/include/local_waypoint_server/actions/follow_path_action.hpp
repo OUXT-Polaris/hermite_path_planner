@@ -14,4 +14,20 @@
 
 #ifndef LOCAL_WAYPOINT_SERVER__ACTIONS__FOLLOW_PATH_ACTION_HPP_
 #define LOCAL_WAYPOINT_SERVER__ACTIONS__FOLLOW_PATH_ACTION_HPP_
+
+#include <behaviortree_cpp_v3/action_node.h>
+#include <behaviortree_cpp_v3/bt_factory.h>
+#include <string>
+#include <memory>
+
+namespace local_waypoint_server
+{
+class FollowPathAction : public BT::SyncActionNode
+{
+  explicit FollowPathAction(const std::string & name, const BT::NodeConfiguration & config);
+  BT::NodeStatus tick() override;
+  static BT::PortsList providedPorts();
+};
+}  // local_waypoint_server
+
 #endif  // LOCAL_WAYPOINT_SERVER__ACTIONS__FOLLOW_PATH_ACTION_HPP_

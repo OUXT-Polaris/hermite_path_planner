@@ -13,3 +13,25 @@
 // limitations under the License.
 
 #include <local_waypoint_server/follow_path_action.hpp>
+#include <string>
+
+namespace local_waypoint_server
+{
+FollowPathAction::FollowPathAction(
+  const std::string & name,
+  const BT::NodeConfiguration & config)
+: BT::SyncActionNode(name, config)
+{
+}
+
+BT::NodeStatus FollowPathAction::tick()
+{
+  return BT::NodeStatus::FAILURE;
+}
+
+BT::PortsList FollowPathAction::providedPorts()
+{
+  return {};
+}
+
+}  // namespace local_waypoint_server
