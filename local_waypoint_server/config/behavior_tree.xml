@@ -1,12 +1,7 @@
 <root main_tree_to_execute = "LocalWaypointsServerTree">
     <BehaviorTree ID="LocalWaypointsServerTree">
     <Sequence name="root_sequence">
-    <!--
-        <SaySomething   name="action_hello" message="Hello"/>
-        <OpenGripper    name="open_gripper"/>
-        <ApproachObject name="approach_object"/>
-        <CloseGripper   name="close_gripper"/>
-    -->
+        <ObstacleAvoidAction name="obstacle_avoid"/>
     </Sequence>
     </BehaviorTree>
 </root>

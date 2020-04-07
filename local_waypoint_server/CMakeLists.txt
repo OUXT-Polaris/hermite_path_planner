@@ -21,27 +21,16 @@ find_package(geometry_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
-find_package(behavior_tree_action_builder REQUIRED)
 
 include_directories(
   include
 )
 
-add_library(local_waypoint_server_action SHARED
-  src/obstacle_avoid_action.cpp
-)
-ament_target_dependencies(local_waypoint_server_action
-  rclcpp
-  rclcpp_components
-  behaviortree_cpp_v3
-  geometry_msgs
-  behavior_tree_action_builder)
-
 add_library(local_waypoint_server_component SHARED
-  src/local_waypoint_server_component.cpp)
+  src/local_waypoint_server_component.cpp
+  src/actions/obstacle_avoid_action.cpp)
 target_compile_definitions(local_waypoint_server_component
   PRIVATE "LOCAL_WAYPOINT_SERVER_LOCAL_WAYPOINT_SERVER_COMPONENT_BUILDING_DLL")
-target_link_libraries(local_waypoint_server_component local_waypoint_server_action)
 ament_target_dependencies(local_waypoint_server_component
   rclcpp
   rclcpp_components
@@ -65,9 +54,10 @@ install(TARGETS
   DESTINATION lib/local_waypoint_server
 )
 install(TARGETS local_waypoint_server_component
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin)
+EXPORT export_obstacle_avoid_action
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 ament_export_libraries(local_waypoint_server_component)
 
 # install config

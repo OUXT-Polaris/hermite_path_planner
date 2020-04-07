@@ -12,22 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <local_waypoint_server/obstacle_avoid_action.hpp>
-#include <string>
-
-namespace local_waypoint_server
-{
-ObstacleAvoidAction::ObstacleAvoidAction(
-  const std::string & name,
-  const BT::NodeConfiguration & config)
-: behavior_tree_action_builder::ActionNode(name, config)
-{
-}
-
-BT::NodeStatus ObstacleAvoidAction::tick()
-{
-  return BT::NodeStatus::FAILURE;
-}
-}  // namespace local_waypoint_server
-
-REGISTER_NODES(local_waypoint_server, ObstacleAvoidAction)
+#include <local_waypoint_server/follow_path_action.hpp>

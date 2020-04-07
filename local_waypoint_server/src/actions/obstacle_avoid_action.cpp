@@ -12,23 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <local_waypoint_server/local_waypoint_server_component.hpp>
 #include <local_waypoint_server/actions/obstacle_avoid_action.hpp>
-#include "behaviortree_cpp_v3/bt_factory.h"
+#include <string>
 
 namespace local_waypoint_server
 {
-LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOptions & options)
-: Node("local_waypoint_server", options)
+ObstacleAvoidAction::ObstacleAvoidAction(
+  const std::string & name,
+  const BT::NodeConfiguration & config)
+: BT::SyncActionNode(name, config)
 {
-  declare_parameter("behavior_tree_xml_path", "");
-  get_parameter("behavior_tree_xml_path", xml_path_);
-  BT::BehaviorTreeFactory factory;
-  factory.registerNodeType<ObstacleAvoidAction>("ObstacleAvoidAction");
-  try {
-    auto tree = factory.createTreeFromFile(xml_path_);
-  } catch (const std::exception & e) {
-    RCLCPP_ERROR(get_logger(), e.what());
-  }
+}
+
+BT::NodeStatus ObstacleAvoidAction::tick()
+{
+  return BT::NodeStatus::FAILURE;
+}
+
+BT::PortsList ObstacleAvoidAction::providedPorts()
+{
+  return {};
 }
 }  // namespace local_waypoint_server
+
+// REGISTER_NODES(local_waypoint_server, ObstacleAvoidAction)
