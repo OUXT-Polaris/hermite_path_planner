@@ -3,5 +3,5 @@ obstacle_planner:
     max_deceleration : 0.3
     max_linear_velocity : 0.5
     section_length : 0.3
-    stop_margin : 3.0
+    stop_margin : 5.0
     robot_width : 2.0

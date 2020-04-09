@@ -43,9 +43,6 @@ def generate_launch_description():
             get_package_share_directory('velocity_planner'),
             'config', 'obstacle_planner.yaml')
     )
-    behavior_tree_xml_path = os.path.join(
-            get_package_share_directory('local_waypoint_server'),
-            'config', 'behavior_tree.xml')
     return LaunchDescription([
         DeclareLaunchArgument(
             'planner_concatenator_param_file',
@@ -73,7 +70,6 @@ def generate_launch_description():
                 planner_concatenator_param_file,
                 curve_planner_param_file,
                 obstacle_planner_param_file,
-                stop_planner_parm_file,
-                {"behavior_tree_xml_path": behavior_tree_xml_path}],
+                stop_planner_parm_file],
             output='screen'),
     ])

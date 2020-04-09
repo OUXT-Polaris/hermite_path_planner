@@ -20,23 +20,18 @@ find_package(ament_cmake REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
-find_package(behaviortree_cpp_v3 REQUIRED)
 
 include_directories(
   include
 )
 
 add_library(local_waypoint_server_component SHARED
-  src/local_waypoint_server_component.cpp
-  src/actions/stopping_at_obstacle_action.cpp
-  src/actions/stopped_at_obstacle_action.cpp
-  src/actions/follow_path_action.cpp)
+  src/local_waypoint_server_component.cpp)
 target_compile_definitions(local_waypoint_server_component
   PRIVATE "LOCAL_WAYPOINT_SERVER_LOCAL_WAYPOINT_SERVER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(local_waypoint_server_component
   rclcpp
   rclcpp_components
-  behaviortree_cpp_v3
   geometry_msgs)
 rclcpp_components_register_nodes(local_waypoint_server_component
   "local_waypoint_server::LocalWaypointServerComponent")
@@ -48,7 +43,6 @@ target_link_libraries(local_waypoint_server_node local_waypoint_server_component
 ament_target_dependencies(local_waypoint_server_node
   rclcpp
   rclcpp_components
-  behaviortree_cpp_v3
   geometry_msgs)
 
 install(TARGETS
@@ -61,11 +55,6 @@ EXPORT export_obstacle_avoid_action
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 ament_export_libraries(local_waypoint_server_component)
-
-# install config
-install(DIRECTORY config
-  DESTINATION share/${PROJECT_NAME}
-)
 
 # Install header files
 install(

@@ -13,30 +13,11 @@
 // limitations under the License.
 
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
-#include <local_waypoint_server/actions/stopped_at_obstacle_action.hpp>
-#include <local_waypoint_server/actions/stopping_at_obstacle_action.hpp>
-#include <local_waypoint_server/actions/follow_path_action.hpp>
-#include <behaviortree_cpp_v3/bt_factory.h>
-#include <behaviortree_cpp_v3/loggers/bt_zmq_publisher.h>
 
 namespace local_waypoint_server
 {
 LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOptions & options)
 : Node("local_waypoint_server", options)
 {
-  declare_parameter("behavior_tree_xml_path", "");
-  get_parameter("behavior_tree_xml_path", xml_path_);
-  BT::BehaviorTreeFactory factory;
-  factory.registerNodeType<FollowPathAction>("FollowPathAction");
-  factory.registerNodeType<StoppingAtObstacleAction>("StoppingAtObstacleAction");
-  factory.registerNodeType<StoppedAtObstacleAction>("StoppedAtObstacleAction");
-  // BT::Tree tree;
-  try {
-    auto tree = factory.createTreeFromFile(xml_path_);
-    printTreeRecursively(tree.root_node);
-  } catch (const std::exception & e) {
-    RCLCPP_ERROR(get_logger(), e.what());
-  }
-  // BT::PublisherZMQ publisher_zmq(tree);
 }
 }  // namespace local_waypoint_server
