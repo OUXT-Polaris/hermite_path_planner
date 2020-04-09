@@ -12,27 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <local_waypoint_server/actions/obstacle_avoid_action.hpp>
+#include <local_waypoint_server/actions/stopping_at_obstacle_action.hpp>
 #include <string>
 
 namespace local_waypoint_server
 {
-ObstacleAvoidAction::ObstacleAvoidAction(
+StoppingAtObstacleAction::StoppingAtObstacleAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : BT::SyncActionNode(name, config)
 {
 }
 
-BT::NodeStatus ObstacleAvoidAction::tick()
+BT::NodeStatus StoppingAtObstacleAction::tick()
 {
   return BT::NodeStatus::FAILURE;
 }
 
-BT::PortsList ObstacleAvoidAction::providedPorts()
+BT::PortsList StoppingAtObstacleAction::providedPorts()
 {
   return {};
 }
 }  // namespace local_waypoint_server
-
-// REGISTER_NODES(local_waypoint_server, ObstacleAvoidAction)

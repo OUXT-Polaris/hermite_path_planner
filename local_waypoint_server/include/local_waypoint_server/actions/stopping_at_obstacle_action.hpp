@@ -12,26 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <local_waypoint_server/actions/follow_path_action.hpp>
+#ifndef LOCAL_WAYPOINT_SERVER__ACTIONS__STOPPING_AT_OBSTACLE_ACTION_HPP_
+#define LOCAL_WAYPOINT_SERVER__ACTIONS__STOPPING_AT_OBSTACLE_ACTION_HPP_
+
+#include <behaviortree_cpp_v3/action_node.h>
+#include <behaviortree_cpp_v3/bt_factory.h>
 #include <string>
+#include <memory>
 
 namespace local_waypoint_server
 {
-FollowPathAction::FollowPathAction(
-  const std::string & name,
-  const BT::NodeConfiguration & config)
-: BT::SyncActionNode(name, config)
+class StoppingAtObstacleAction : public BT::SyncActionNode
 {
-}
+public:
+  explicit StoppingAtObstacleAction(const std::string & name, const BT::NodeConfiguration & config);
+  BT::NodeStatus tick() override;
+  static BT::PortsList providedPorts();
+};
+}  // local_waypoint_server
 
-BT::NodeStatus FollowPathAction::tick()
-{
-  return BT::NodeStatus::RUNNING;
-}
-
-BT::PortsList FollowPathAction::providedPorts()
-{
-  return {};
-}
-
-}  // namespace local_waypoint_server
+#endif  // LOCAL_WAYPOINT_SERVER__ACTIONS__STOPPING_AT_OBSTACLE_ACTION_HPP_

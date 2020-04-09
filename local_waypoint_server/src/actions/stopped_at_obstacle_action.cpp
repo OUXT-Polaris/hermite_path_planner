@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LOCAL_WAYPOINT_SERVER__ACTIONS__OBSTACLE_AVOID_ACTION_HPP_
-#define LOCAL_WAYPOINT_SERVER__ACTIONS__OBSTACLE_AVOID_ACTION_HPP_
-
-#include <behaviortree_cpp_v3/action_node.h>
-#include <behaviortree_cpp_v3/bt_factory.h>
+#include <local_waypoint_server/actions/stopped_at_obstacle_action.hpp>
 #include <string>
-#include <memory>
 
 namespace local_waypoint_server
 {
-class ObstacleAvoidAction : public BT::SyncActionNode
+StoppedAtObstacleAction::StoppedAtObstacleAction(
+  const std::string & name,
+  const BT::NodeConfiguration & config)
+: BT::SyncActionNode(name, config)
 {
-public:
-  explicit ObstacleAvoidAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
-  static BT::PortsList providedPorts();
-};
-}  // local_waypoint_server
+}
 
-#endif  // LOCAL_WAYPOINT_SERVER__ACTIONS__OBSTACLE_AVOID_ACTION_HPP_
+BT::NodeStatus StoppedAtObstacleAction::tick()
+{
+  return BT::NodeStatus::FAILURE;
+}
+
+BT::PortsList StoppedAtObstacleAction::providedPorts()
+{
+  return {};
+}
+}  // namespace local_waypoint_server
