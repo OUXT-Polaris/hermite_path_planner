@@ -162,6 +162,9 @@ void PurePursuitPlannerComponent::currentPoseCallback(
   }
   target_t_ = generator_->checkFirstCollisionWithCircle(
     path_->path, current_pose_transformed_->pose.position, lookahead_distance_);
+  if(target_t_){
+
+  }
   current_t_ = generator_->getLongitudinalDistanceInFrenetCoordinate(
     path_->path, current_pose_->pose.position);
   auto twist = getCurrentTwist(target_t_.get());
