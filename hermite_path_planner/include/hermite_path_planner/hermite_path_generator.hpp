@@ -36,7 +36,7 @@ public:
   geometry_msgs::msg::Point getPointOnHermitePath(
     hermite_path_msgs::msg::HermitePath path, double t);
   std::vector<geometry_msgs::msg::Point> getPointsOnHermitePath(
-    hermite_path_msgs::msg::HermitePath path, int resolution,double max_t=1.0);
+    hermite_path_msgs::msg::HermitePath path, int resolution, double max_t = 1.0);
   visualization_msgs::msg::MarkerArray generateMarker(
     hermite_path_msgs::msg::HermitePathStamped path, int resolution);
   boost::optional<double> checkFirstCollisionWithCircle(

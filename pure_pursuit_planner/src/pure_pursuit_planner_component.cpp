@@ -72,9 +72,11 @@ void PurePursuitPlannerComponent::currentTwistCallback(
 visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker()
 {
   visualization_msgs::msg::MarkerArray marker;
-  if (target_t_ && current_pose_transformed_) {
+  if (target_position_ && current_pose_transformed_) {
+    /*
     geometry_msgs::msg::Point target_position =
       generator_->getPointOnHermitePath(path_->path, target_t_.get());
+    */
     // draw target marker
     visualization_msgs::msg::Marker target_marker;
     target_marker.header = current_pose_transformed_->header;
@@ -82,7 +84,7 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
     target_marker.id = 0;
     target_marker.action = visualization_msgs::msg::Marker::ADD;
     target_marker.type = visualization_msgs::msg::Marker::SPHERE;
-    target_marker.pose.position = target_position;
+    target_marker.pose.position = target_position_.get();
     target_marker.pose.orientation.x = 0.0f;
     target_marker.pose.orientation.y = 0.0f;
     target_marker.pose.orientation.z = 0.0f;
@@ -96,7 +98,7 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
     RCLCPP_ERROR(get_logger(), "failed to find target point");
   }
   if (current_t_) {
-    geometry_msgs::msg::Point target_position =
+    geometry_msgs::msg::Point current_position =
       generator_->getPointOnHermitePath(path_->path, current_t_.get());
     // draw target marker
     visualization_msgs::msg::Marker current_marker;
@@ -105,7 +107,7 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
     current_marker.id = 0;
     current_marker.action = visualization_msgs::msg::Marker::ADD;
     current_marker.type = visualization_msgs::msg::Marker::SPHERE;
-    current_marker.pose.position = target_position;
+    current_marker.pose.position = current_position;
     current_marker.pose.orientation.x = 0.0f;
     current_marker.pose.orientation.y = 0.0f;
     current_marker.pose.orientation.z = 0.0f;
@@ -162,11 +164,27 @@ void PurePursuitPlannerComponent::currentPoseCallback(
   }
   target_t_ = generator_->checkFirstCollisionWithCircle(
     path_->path, current_pose_transformed_->pose.position, lookahead_distance_);
-  if(target_t_){
-
-  }
   current_t_ = generator_->getLongitudinalDistanceInFrenetCoordinate(
     path_->path, current_pose_->pose.position);
+  if (!target_t_ && !current_t_) {
+    twist_cmd.linear.x = 0;
+    twist_cmd.linear.y = 0;
+    twist_cmd.linear.z = 0;
+    twist_cmd.angular.x = 0;
+    twist_cmd.angular.y = 0;
+    twist_cmd.angular.z = 0;
+    target_twist_pub_->publish(twist_cmd);
+    return;
+  }
+  // overwrite invalid result
+  if(target_t_ && current_t_){
+    if(target_t_.get() < current_t_.get()){
+      target_t_ = boost::none;
+    }
+  }
+  if (!target_t_ && current_t_){
+    target_t_ = 1.0;
+  }
   auto twist = getCurrentTwist(target_t_.get());
   if (twist) {
     twist_cmd = twist.get();
@@ -180,12 +198,77 @@ void PurePursuitPlannerComponent::currentPoseCallback(
 boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurrentTwist(
   double target_t)
 {
-  if (!current_pose_ || !path_ || !current_t_) {
+  if (!current_pose_) {
     return boost::none;
   }
+  if (!path_) {
+    return boost::none;
+  }
+  if (!current_t_) {
+    return boost::none;
+  }
+  geometry_msgs::msg::Point target_position;
   geometry_msgs::msg::Twist ret;
-  geometry_msgs::msg::Point target_position =
-    generator_->getPointOnHermitePath(path_->path, target_t);
+  if (0.0 < target_t && target_t < 1.0) {
+    target_position = generator_->getPointOnHermitePath(path_->path, target_t);
+  } else if (target_t < 0.0) {
+    geometry_msgs::msg::Vector3 vec = generator_->getTangentVector(path_->path, 0.0);
+    geometry_msgs::msg::Point p = generator_->getPointOnHermitePath(path_->path, 0.0);
+    double x = p.x - current_pose_->pose.position.x;
+    double y = p.y - current_pose_->pose.position.y;
+    double a = vec.x * vec.x + vec.y * vec.y;
+    double b = 2 * x * vec.x + 2 * y * vec.y;
+    double c = x * x + y * y - lookahead_distance_ * lookahead_distance_;
+    if (b * b - 4 * a * c < 0.0) {
+      target_position_ = boost::none;
+      return boost::none;
+    }
+    double s0 = (-b - std::sqrt(b * b - 4 * a * c)) / (2 * a);
+    double s1 = (-b + std::sqrt(b * b - 4 * a * c)) / (2 * a);
+    if (s0 < 0.0) {
+      if (s1 > 0.0) {
+        target_position.x = p.x + s1 * vec.x;
+        target_position.y = p.y + s1 * vec.y;
+        target_position.z = p.z + s1 * vec.z;
+      } else {
+        target_position_ = boost::none;
+        return boost::none;
+      }
+    } else {
+      target_position.x = p.x + s0 * vec.x;
+      target_position.y = p.y + s0 * vec.y;
+      target_position.z = p.z + s0 * vec.z;
+    }
+  } else {
+    geometry_msgs::msg::Vector3 vec = generator_->getTangentVector(path_->path, 1.0);
+    geometry_msgs::msg::Point p = generator_->getPointOnHermitePath(path_->path, 1.0);
+    double x = p.x - current_pose_->pose.position.x;
+    double y = p.y - current_pose_->pose.position.y;
+    double a = vec.x * vec.x + vec.y * vec.y;
+    double b = 2 * x * vec.x + 2 * y * vec.y;
+    double c = x * x + y * y - lookahead_distance_ * lookahead_distance_;
+    if (b * b - 4 * a * c < 0.0) {
+      target_position_ = boost::none;
+      return boost::none;
+    }
+    double s0 = (-b - std::sqrt(b * b - 4 * a * c)) / (2 * a);
+    double s1 = (-b + std::sqrt(b * b - 4 * a * c)) / (2 * a);
+    if (s0 < 0.0) {
+      if (s1 > 0.0) {
+        target_position.x = p.x + s1 * vec.x;
+        target_position.y = p.y + s1 * vec.y;
+        target_position.z = p.z + s1 * vec.z;
+      } else {
+        target_position_ = boost::none;
+        return boost::none;
+      }
+    } else {
+      target_position.x = p.x + s0 * vec.x;
+      target_position.y = p.y + s0 * vec.y;
+      target_position.z = p.z + s0 * vec.z;
+    }
+  }
+  target_position_ = target_position;
   geometry_msgs::msg::Vector3 rpy =
     quaternion_operation::convertQuaternionToEulerAngle(current_pose_->pose.orientation);
   double theta = rpy.z;

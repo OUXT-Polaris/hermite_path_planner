@@ -221,7 +221,7 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
 }
 
 std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getPointsOnHermitePath(
-  hermite_path_msgs::msg::HermitePath path, int resolution,double max_t)
+  hermite_path_msgs::msg::HermitePath path, int resolution, double max_t)
 {
   std::vector<geometry_msgs::msg::Point> p;
   double step_size = max_t / static_cast<double>(resolution);
@@ -365,7 +365,7 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
   center_line.action = visualization_msgs::msg::Marker::ADD;
   center_line.frame_locked = false;
   center_line.scale.x = 0.1;
-  center_line.points = getPointsOnHermitePath(path.path, resolution,1.2);
+  center_line.points = getPointsOnHermitePath(path.path, resolution, 1.0);
   center_line.colors =
     std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
   marker.markers.push_back(center_line);

@@ -99,6 +99,7 @@ private:
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
   boost::optional<double> current_t_, target_t_;
+  boost::optional<geometry_msgs::msg::Point> target_position_;
   visualization_msgs::msg::MarkerArray generateMarker();
 };
 }  // namespace pure_pursuit_planner
