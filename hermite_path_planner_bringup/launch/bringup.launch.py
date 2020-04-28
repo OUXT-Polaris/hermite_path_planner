@@ -43,6 +43,12 @@ def generate_launch_description():
             get_package_share_directory('velocity_planner'),
             'config', 'obstacle_planner.yaml')
     )
+    hermite_path_planner_parm_file = LaunchConfiguration(
+        'hermite_path_planner_parm_file',
+        default=os.path.join(
+            get_package_share_directory('hermite_path_planner'),
+            'config', 'hermite_path_planner.yaml')
+    )
     return LaunchDescription([
         DeclareLaunchArgument(
             'planner_concatenator_param_file',
@@ -63,6 +69,11 @@ def generate_launch_description():
             default_value=obstacle_planner_param_file,
             description='obstacle planner parameters'
         ),
+        DeclareLaunchArgument(
+            'hermite_path_planner_parm_file',
+            default_value=hermite_path_planner_parm_file,
+            description='hremite path planner parameters'
+        ),
         Node(
             package='hermite_path_planner_bringup',
             node_executable='hermite_path_planner_bringup_node',
@@ -70,6 +81,7 @@ def generate_launch_description():
                 planner_concatenator_param_file,
                 curve_planner_param_file,
                 obstacle_planner_param_file,
-                stop_planner_parm_file],
+                stop_planner_parm_file,
+                hermite_path_planner_parm_file],
             output='screen'),
     ])

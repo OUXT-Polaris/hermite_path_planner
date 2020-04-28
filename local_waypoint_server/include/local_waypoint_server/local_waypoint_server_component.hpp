@@ -60,6 +60,7 @@ extern "C" {
 #endif
 
 #include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <string>
 
 namespace local_waypoint_server
@@ -69,9 +70,12 @@ class LocalWaypointServerComponent : public rclcpp::Node
 public:
   LOCAL_WAYPOINT_SERVER_LOCAL_WAYPOINT_SERVER_COMPONENT_PUBLIC
   explicit LocalWaypointServerComponent(const rclcpp::NodeOptions & options);
+  void GoalPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
 
 private:
-  std::string xml_path_;
+  std::string goal_pose_topic_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pose_sub_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr local_waypoint_pub_;
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_

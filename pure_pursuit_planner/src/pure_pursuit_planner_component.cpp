@@ -177,12 +177,12 @@ void PurePursuitPlannerComponent::currentPoseCallback(
     return;
   }
   // overwrite invalid result
-  if(target_t_ && current_t_){
-    if(target_t_.get() < current_t_.get()){
+  if (target_t_ && current_t_) {
+    if (target_t_.get() < current_t_.get()) {
       target_t_ = boost::none;
     }
   }
-  if (!target_t_ && current_t_){
+  if (!target_t_ && current_t_) {
     target_t_ = 1.0;
   }
   auto twist = getCurrentTwist(target_t_.get());
