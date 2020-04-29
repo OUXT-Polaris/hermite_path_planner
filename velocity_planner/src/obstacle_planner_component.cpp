@@ -22,7 +22,8 @@
 namespace velocity_planner
 {
 ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & options)
-: Node("obstacle_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_), viz_(get_name())
+: Node("obstacle_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_),
+  viz_(get_name())
 {
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   obstacle_marker_pub_ =

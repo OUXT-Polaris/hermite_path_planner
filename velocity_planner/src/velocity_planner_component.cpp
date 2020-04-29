@@ -22,7 +22,8 @@
 namespace velocity_planner
 {
 VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & options)
-: Node("velocity_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_), viz_(get_name())
+: Node("velocity_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_),
+  viz_(get_name())
 {
   std::string current_twist_topic;
   declare_parameter("current_twist_topic", "current_twist");
