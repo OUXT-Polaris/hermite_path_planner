@@ -25,7 +25,7 @@
 namespace velocity_planner
 {
 PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOptions & options)
-: Node("planner_concatenator", options), viz_(get_name())
+: Node("planner_concatenator", "velocity_planner", options), viz_(get_name())
 {
   hermite_path_pub_ =
     this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>("~/hermite_path", 1);

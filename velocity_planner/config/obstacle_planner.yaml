@@ -1,4 +1,4 @@
-obstacle_planner:
+/velocity_planner/obstacle_planner:
   ros__parameters:
     max_deceleration : 0.3
     max_linear_velocity : 0.5

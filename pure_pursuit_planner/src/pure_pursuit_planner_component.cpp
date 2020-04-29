@@ -48,7 +48,7 @@ PurePursuitPlannerComponent::PurePursuitPlannerComponent(const rclcpp::NodeOptio
     std::bind(&PurePursuitPlannerComponent::currentPoseCallback, this, std::placeholders::_1));
 
   std::string hermite_path_topic;
-  declare_parameter("hermite_path_topic", "/velocity_planner/hermite_path");
+  declare_parameter("hermite_path_topic", "/velocity_planner/velocity_planner/hermite_path");
   get_parameter("hermite_path_topic", hermite_path_topic);
   hermite_path_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>(
     hermite_path_topic, 1,

@@ -20,7 +20,7 @@
 namespace velocity_planner
 {
 StopPlannerComponent::StopPlannerComponent(const rclcpp::NodeOptions & options)
-: Node("stop_planner", options), generator_(0.0), viz_(get_name())
+: Node("stop_planner", "velocity_planner", options), generator_(0.0), viz_(get_name())
 {
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   hermite_path_pub_ =

@@ -1,4 +1,4 @@
-stop_planner:
+/velocity_planner/stop_planner:
   ros__parameters:
     max_deceleration : 0.5
     max_linear_velocity : 0.5

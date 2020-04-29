@@ -1,0 +1,5 @@
+/velocity_planner/velocity_planner:
+  ros__parameters:
+    current_twist_topic : "current_twist"
+    current_pose_topic : "current_pose"
+    hermite_path_topic : "/velocity_planner/planner_concatenator/hermite_path"
