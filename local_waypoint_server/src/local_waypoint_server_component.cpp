@@ -31,5 +31,6 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
 void LocalWaypointServerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
+  local_waypoint_pub_->publish(*msg);
 }
 }  // namespace local_waypoint_server
