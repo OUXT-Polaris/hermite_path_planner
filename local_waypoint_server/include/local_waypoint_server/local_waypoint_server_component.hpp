@@ -92,8 +92,11 @@ private:
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
   std::string planning_frame_id_;
   geometry_msgs::msg::PoseStamped TransformToPlanningFrame(geometry_msgs::msg::PoseStamped pose);
+  geometry_msgs::msg::PointStamped TransformToPlanningFrame(geometry_msgs::msg::PointStamped pose);
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
+  std::vector<geometry_msgs::msg::Point> getPoints(sensor_msgs::msg::LaserScan scan);
+  bool checkCollision(geometry_msgs::msg::PoseStamped goal_pose);
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_

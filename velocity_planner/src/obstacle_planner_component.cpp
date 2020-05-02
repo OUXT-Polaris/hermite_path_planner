@@ -143,7 +143,8 @@ ObstaclePlannerComponent::addObstacleConstraints()
       p.point.z = 0.0;
       p.header = scan_->header;
       p = TransformToMapFrame(p);
-      auto t_value = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
+      auto t_value = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path,
+          p.point);
       if (t_value) {
         geometry_msgs::msg::Point nearest_point =
           generator.getPointOnHermitePath(path_->path, t_value.get());

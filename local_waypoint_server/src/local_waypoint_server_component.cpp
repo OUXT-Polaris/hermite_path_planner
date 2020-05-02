@@ -60,6 +60,26 @@ void LocalWaypointServerComponent::GoalPoseCallback(
   local_waypoint_pub_->publish(*msg);
 }
 
+bool LocalWaypointServerComponent::checkCollision(geometry_msgs::msg::PoseStamped goal_pose)
+{
+  if (!scan_ || !current_pose_ || !goal_pose_) {
+    return false;
+  }
+  geometry_msgs::msg::PoseStamped current_goal_pose = TransformToPlanningFrame(current_pose_.get());
+  geometry_msgs::msg::PoseStamped current_pose = TransformToPlanningFrame(current_pose_.get());
+  double goal_distance =
+    std::sqrt(std::pow(goal_pose.pose.position.x - current_pose.pose.position.x, 2) +
+      std::pow(goal_pose.pose.position.y - current_pose.pose.position.y, 2));
+  hermite_path_msgs::msg::HermitePathStamped path;
+  path.path = generator_->generateHermitePath(current_pose.pose, goal_pose.pose,
+      goal_distance * 0.25, goal_distance * 0.75);
+  std::vector<geometry_msgs::msg::Point> points = getPoints(scan_.get());
+  std::vector<boost::optional<double> > lateral_dists;
+  for (auto itr = points.begin(); itr != points.end(); itr++) {
+    lateral_dists.push_back(generator_->getLateralDistanceInFrenetCoordinate(path.path, *itr));
+  }
+}
+
 void LocalWaypointServerComponent::updateLocalWaypoint()
 {
   if (!scan_ || !current_pose_ || !goal_pose_) {
@@ -78,6 +98,40 @@ void LocalWaypointServerComponent::currentPoseCallback(
 {
   current_pose_ = *data;
   updateLocalWaypoint();
+}
+
+std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
+  sensor_msgs::msg::LaserScan scan)
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  for (int i = 0; i < static_cast<int>(scan.ranges.size()); i++) {
+    if (scan.range_max >= scan.ranges[i] && scan.ranges[i] >= scan.range_min) {
+      double theta = scan.angle_min + scan.angle_increment * static_cast<double>(i);
+      geometry_msgs::msg::PointStamped p;
+      p.point.x = scan.ranges[i] * std::cos(theta);
+      p.point.y = scan.ranges[i] * std::sin(theta);
+      p.point.z = 0.0;
+      p.header = scan.header;
+      p = TransformToPlanningFrame(p);
+      ret.push_back(p.point);
+    }
+  }
+  return ret;
+}
+
+geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanningFrame(
+  geometry_msgs::msg::PointStamped point)
+{
+  if (point.header.frame_id == planning_frame_id_) {
+    return point;
+  }
+  tf2::TimePoint time_point = tf2::TimePoint(
+    std::chrono::seconds(point.header.stamp.sec) +
+    std::chrono::nanoseconds(point.header.stamp.nanosec));
+  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+    point.header.frame_id, planning_frame_id_, time_point, tf2::durationFromSec(1.0));
+  tf2::doTransform(point, point, transform_stamped);
+  return point;
 }
 
 geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlanningFrame(
