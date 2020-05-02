@@ -1,0 +1,4 @@
+local_waypoint_server:
+  ros__parameters:
+    goal_pose_topic: "/move_base_simple/goal"
+    obstacle_scan_topic : "/obstacle_scan"

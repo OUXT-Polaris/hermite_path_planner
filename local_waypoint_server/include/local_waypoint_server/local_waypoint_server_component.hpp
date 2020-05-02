@@ -60,7 +60,10 @@ extern "C" {
 #endif
 
 #include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <hermite_path_planner/hermite_path_generator.hpp>
+#include <boost/optional.hpp>
 #include <string>
 
 namespace local_waypoint_server
@@ -75,7 +78,15 @@ public:
 private:
   std::string goal_pose_topic_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pose_sub_;
+  boost::optional<geometry_msgs::msg::PoseStamped> goal_pose_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr local_waypoint_pub_;
+  void scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data);
+  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
+  boost::optional<sensor_msgs::msg::LaserScan> scan_;
+  void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
+  boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
+  void updateLocalWaypoint();
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_

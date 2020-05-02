@@ -49,6 +49,12 @@ def generate_launch_description():
             get_package_share_directory('velocity_planner'),
             'config', 'velocity_planner.yaml')
     )
+    local_waypoint_server_param_file = LaunchConfiguration(
+        'local_waypoint_server_param_file',
+        default=os.path.join(
+            get_package_share_directory('local_waypoint_server'),
+            'config', 'local_waypoint_server.yaml')
+    )
     hermite_path_planner_parm_file = LaunchConfiguration(
         'hermite_path_planner_parm_file',
         default=os.path.join(
@@ -85,6 +91,11 @@ def generate_launch_description():
             default_value=velocity_planner_param_file,
             description='velocity planner parameters'
         ),
+        DeclareLaunchArgument(
+            'local_waypoint_server_param_file',
+            default_value=local_waypoint_server_param_file,
+            description='local waypoint server parameters'
+        ),
         Node(
             package='hermite_path_planner_bringup',
             node_executable='hermite_path_planner_bringup_node',
@@ -94,6 +105,7 @@ def generate_launch_description():
                 obstacle_planner_param_file,
                 stop_planner_parm_file,
                 velocity_planner_param_file,
+                local_waypoint_server_param_file,
                 hermite_path_planner_parm_file],
             output='screen'),
     ])

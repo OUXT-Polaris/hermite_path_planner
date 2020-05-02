@@ -12,6 +12,11 @@
   <depend>geometry_msgs</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
+  <depend>sensor_msgs</depend>
+  <depend>hermite_path_planner</depend>
+  <depend>hermite_path_msgs</depend>
+  <depend>quaternion_operation</depend>
+  <depend>eigen</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -20,9 +20,15 @@ find_package(ament_cmake REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(hermite_path_planner REQUIRED)
+find_package(hermite_path_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(quaternion_operation REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 include_directories(
   include
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 add_library(local_waypoint_server_component SHARED
@@ -32,7 +38,11 @@ target_compile_definitions(local_waypoint_server_component
 ament_target_dependencies(local_waypoint_server_component
   rclcpp
   rclcpp_components
-  geometry_msgs)
+  geometry_msgs
+  hermite_path_planner
+  hermite_path_msgs
+  sensor_msgs
+  quaternion_operation)
 rclcpp_components_register_nodes(local_waypoint_server_component
   "local_waypoint_server::LocalWaypointServerComponent")
 
@@ -43,7 +53,11 @@ target_link_libraries(local_waypoint_server_node local_waypoint_server_component
 ament_target_dependencies(local_waypoint_server_node
   rclcpp
   rclcpp_components
-  geometry_msgs)
+  geometry_msgs
+  hermite_path_planner
+  hermite_path_msgs
+  sensor_msgs
+  quaternion_operation)
 
 install(TARGETS
   local_waypoint_server_node
@@ -60,6 +74,11 @@ ament_export_libraries(local_waypoint_server_component)
 install(
   DIRECTORY "include/"
   DESTINATION include
+)
+
+# launch/conifg file
+install(DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
