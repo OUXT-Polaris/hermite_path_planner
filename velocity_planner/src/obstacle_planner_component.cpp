@@ -131,7 +131,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
     path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
     tf2::durationFromSec(1.0));
   tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
-  auto current_t = generator.getLongitudinalDistanceInFrenetCoordinate(
+  auto current_t = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(
     path_->path, pose_transformed.pose.position);
   std::set<double> t_values;
   for (int i = 0; i < static_cast<int>(scan_->ranges.size()); i++) {
@@ -143,7 +143,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
       p.point.z = 0.0;
       p.header = scan_->header;
       p = TransformToMapFrame(p);
-      auto t_value = generator.getLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
+      auto t_value = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
       if (t_value) {
         geometry_msgs::msg::Point nearest_point =
           generator.getPointOnHermitePath(path_->path, t_value.get());

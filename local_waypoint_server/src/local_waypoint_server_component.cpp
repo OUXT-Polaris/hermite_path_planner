@@ -17,8 +17,14 @@
 namespace local_waypoint_server
 {
 LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOptions & options)
-: Node("local_waypoint_server", options)
+: Node("local_waypoint_server", options), buffer_(get_clock()), listener_(buffer_)
 {
+  declare_parameter("robot_width", 3.0);
+  double robot_width;
+  get_parameter("robot_width", robot_width);
+  generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
+  declare_parameter("planning_frame_id", "map");
+  get_parameter("planning_frame_id", planning_frame_id_);
   /**
    * Publishers
    */
@@ -50,24 +56,42 @@ void LocalWaypointServerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
   goal_pose_ = *msg;
+  updateLocalWaypoint();
   local_waypoint_pub_->publish(*msg);
 }
 
 void LocalWaypointServerComponent::updateLocalWaypoint()
 {
-  if (scan_ && current_pose_ && goal_pose_) {
-
+  if (!scan_ || !current_pose_ || !goal_pose_) {
+    return;
   }
 }
 
 void LocalWaypointServerComponent::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data)
 {
   scan_ = *data;
+  updateLocalWaypoint();
 }
 
 void LocalWaypointServerComponent::currentPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr data)
 {
   current_pose_ = *data;
+  updateLocalWaypoint();
+}
+
+geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlanningFrame(
+  geometry_msgs::msg::PoseStamped pose)
+{
+  if (pose.header.frame_id == planning_frame_id_) {
+    return pose;
+  }
+  tf2::TimePoint time_point = tf2::TimePoint(
+    std::chrono::seconds(pose.header.stamp.sec) +
+    std::chrono::nanoseconds(pose.header.stamp.nanosec));
+  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+    pose.header.frame_id, planning_frame_id_, time_point, tf2::durationFromSec(1.0));
+  tf2::doTransform(pose, pose, transform_stamped);
+  return pose;
 }
 }  // namespace local_waypoint_server

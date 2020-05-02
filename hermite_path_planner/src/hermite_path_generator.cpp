@@ -92,7 +92,28 @@ double HermitePathGenerator::getReferenceVelocity(
   return 0.0;
 }
 
+boost::optional<double> HermitePathGenerator::getLateralDistanceInFrenetCoordinate(
+  hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p, int resolution)
+{
+  boost::optional<double> t = getLongitudinalDistanceInFrenetCoordinate(path, p, resolution);
+  if(!t){
+    return boost::none;
+  }
+  geometry_msgs::msg::Point point = getPointOnHermitePath(path,t.get());
+  return std::sqrt(std::pow(point.x-p.x,2)+std::pow(point.y-p.y,2));
+}
+
 boost::optional<double> HermitePathGenerator::getLongitudinalDistanceInFrenetCoordinate(
+  hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p, int resolution){
+    boost::optional<double> t = getNormalizedLongitudinalDistanceInFrenetCoordinate(path, p);
+    if(!t){
+      return boost::none;
+    }
+    double l = getLength(path, resolution);
+    return l*t.get();
+  }
+
+boost::optional<double> HermitePathGenerator::getNormalizedLongitudinalDistanceInFrenetCoordinate(
   hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p)
 {
   auto func =
@@ -184,7 +205,7 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
 {
   constexpr int max_iteration = 30;
   constexpr double torelance = 0.01;
-  auto dist = getLongitudinalDistanceInFrenetCoordinate(path, center);
+  auto dist = getNormalizedLongitudinalDistanceInFrenetCoordinate(path, center);
   if (!dist) {
     return boost::none;
   }

@@ -60,6 +60,8 @@ extern "C" {
 #endif
 
 #include <rclcpp/rclcpp.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/transform_listener.h>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
@@ -87,6 +89,11 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
   boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
   void updateLocalWaypoint();
+  std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
+  std::string planning_frame_id_;
+  geometry_msgs::msg::PoseStamped TransformToPlanningFrame(geometry_msgs::msg::PoseStamped pose);
+  tf2_ros::Buffer buffer_;
+  tf2_ros::TransformListener listener_;
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_

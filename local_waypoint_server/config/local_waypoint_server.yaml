@@ -2,3 +2,5 @@ local_waypoint_server:
   ros__parameters:
     goal_pose_topic: "/move_base_simple/goal"
     obstacle_scan_topic : "/obstacle_scan"
+    planning_frame_id : "map"
+    robot_width : 3.0
