@@ -98,8 +98,7 @@ boost::optional<double> HermitePathGenerator::getLateralDistanceInFrenetCoordina
   boost::optional<double> t = getNormalizedLongitudinalDistanceInFrenetCoordinate(path, p);
   if (!t) {
     return boost::none;
-  }
-  else if (t.get() < 0.0 || 1.0 < t.get()){
+  } else if (t.get() < 0.0 || 1.0 < t.get()) {
     return boost::none;
   }
   geometry_msgs::msg::Point point = getPointOnHermitePath(path, t.get());
@@ -112,12 +111,10 @@ boost::optional<double> HermitePathGenerator::getLongitudinalDistanceInFrenetCoo
   boost::optional<double> t = getNormalizedLongitudinalDistanceInFrenetCoordinate(path, p);
   if (!t) {
     return boost::none;
-  }
-  else if (t.get() < 0.0 || 1.0 < t.get()){
+  } else if (t.get() < 0.0 || 1.0 < t.get()) {
     return boost::none;
   }
   double l = getLength(path, resolution);
-  std::cout << "l:" << l << " t:" << t.get() << std::endl;
   return l * t.get();
 }
 
@@ -140,9 +137,9 @@ boost::optional<double> HermitePathGenerator::getNormalizedLongitudinalDistanceI
       double x_term = std::pow(point.x - path.ax * t3 - path.bx * t2 - path.cx * t - path.dx, 2);
       double y_term = std::pow(point.y - path.ay * t3 - path.by * t2 - path.cy * t - path.dy, 2);
       double x_term_diff = 2 * (point.x - path.ax * t3 - path.bx * t2 - path.cx * t - path.dx) *
-        (-2 * path.ax * t2 - path.bx * t - path.cx);
+        (-3 * path.ax * t2 - 2 * path.bx * t - path.cx);
       double y_term_diff = 2 * (point.y - path.ay * t3 - path.by * t2 - path.cy * t - path.dy) *
-        (-2 * path.ay * t2 - path.by * t - path.cy);
+        (-3 * path.ay * t2 - 2 * path.by * t - path.cy);
       double ret = (x_term + y_term) / (x_term_diff + y_term_diff);
       return ret;
     };

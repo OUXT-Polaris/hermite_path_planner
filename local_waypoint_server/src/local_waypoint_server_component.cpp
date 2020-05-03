@@ -34,6 +34,13 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   /**
    * Subscribers
    */
+  std::string hermite_path_topic;
+  declare_parameter("hermite_path_topic", "/hermite_path_planner/hermite_path");
+  get_parameter("hermite_path_topic", hermite_path_topic);
+  hermite_path_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>(
+    hermite_path_topic, 1,
+    std::bind(&LocalWaypointServerComponent::hermitePathCallback, this, std::placeholders::_1));
+
   declare_parameter("goal_pose_topic", "/move_base_simple/goal");
   get_parameter("goal_pose_topic", goal_pose_topic_);
   goal_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -53,50 +60,17 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
     std::bind(&LocalWaypointServerComponent::scanCallback, this, std::placeholders::_1));
 }
 
+void LocalWaypointServerComponent::hermitePathCallback(
+  const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
+{
+  current_path_ = *data;
+}
+
 void LocalWaypointServerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
   goal_pose_ = *msg;
   updateLocalWaypoint();
-}
-
-bool LocalWaypointServerComponent::checkCollision(geometry_msgs::msg::PoseStamped goal_pose, double& longitudal_distance)
-{
-  geometry_msgs::msg::PoseStamped current_goal_pose = TransformToPlanningFrame(goal_pose_.get());
-  geometry_msgs::msg::PoseStamped current_pose = TransformToPlanningFrame(current_pose_.get());
-  double goal_distance =
-    std::sqrt(std::pow(goal_pose.pose.position.x - current_pose.pose.position.x, 2) +
-      std::pow(goal_pose.pose.position.y - current_pose.pose.position.y, 2));
-  hermite_path_msgs::msg::HermitePathStamped path;
-  path.path = generator_->generateHermitePath(current_pose.pose, goal_pose.pose,
-      goal_distance * 0.25, goal_distance * 0.75);
-  path.header = goal_pose.header;
-  std::vector<geometry_msgs::msg::Point> points = getPoints(scan_.get());
-  std::vector<double> lateral_dists;
-  std::vector<geometry_msgs::msg::Point> obstacle_points;
-  for (auto itr = points.begin(); itr != points.end(); itr++) {
-    auto dist = generator_->getLateralDistanceInFrenetCoordinate(path.path, *itr);
-    if (dist) {
-      lateral_dists.push_back(dist.get());
-      obstacle_points.push_back(*itr);
-    }
-  }
-  if (lateral_dists.size() == 0) {
-    return false;
-  }
-  std::vector<double>::iterator min_itr = std::min_element(lateral_dists.begin(),
-      lateral_dists.end());
-  double min_lateral_dist = *min_itr;
-  if (min_lateral_dist < robot_width_ * 0.5) {
-    size_t index = std::distance(lateral_dists.begin(), min_itr);
-    auto lon_dist = generator_->getLongitudinalDistanceInFrenetCoordinate(path.path, obstacle_points[index], 200);
-    if(lon_dist){
-      std::cout << lon_dist.get() << std::endl;
-      longitudal_distance = lon_dist.get();
-      return true;
-    }
-  }
-  return false;
 }
 
 bool LocalWaypointServerComponent::isSame(
@@ -118,6 +92,7 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
   if (!scan_ || !current_pose_ || !goal_pose_) {
     return;
   }
+  auto result = checkCollisionToCurrentPath();
   geometry_msgs::msg::PoseStamped current_target_pose;
   current_target_pose = goal_pose_.get();
   if (!previous_local_waypoint_) {
@@ -125,19 +100,17 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
     local_waypoint_pub_->publish(current_target_pose);
   } else {
     auto previous_local_waypoint = previous_local_waypoint_.get();
-    if (isSame(previous_local_waypoint, current_target_pose)) {
+    if (!isSame(previous_local_waypoint, current_target_pose)) {
+      previous_local_waypoint_ = current_target_pose;
+      local_waypoint_pub_->publish(current_target_pose);
     }
   }
-  double dist;
-  if(checkCollision(current_target_pose,dist)){
-    return;
-  }
-  std::cout << "collision not found" << std::endl;
 }
 
 void LocalWaypointServerComponent::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data)
 {
   scan_ = *data;
+  scan_points_ = getPoints(*data);
   updateLocalWaypoint();
 }
 
@@ -146,6 +119,33 @@ void LocalWaypointServerComponent::currentPoseCallback(
 {
   current_pose_ = *data;
   updateLocalWaypoint();
+}
+
+boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPath(){
+  if(!current_path_ || !current_pose_){
+    return boost::none;
+  }
+  geometry_msgs::msg::PoseStamped pose_transformed = TransformToPlanningFrame(current_pose_.get());
+  auto current_t = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
+    current_path_ ->path, pose_transformed.pose.position);
+  std::set<double> t_values;
+  for(auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++){
+    auto t_value = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(current_path_->path, *points_itr);
+    if (t_value) {
+      geometry_msgs::msg::Point nearest_point =
+        generator_->getPointOnHermitePath(current_path_->path, t_value.get());
+      double lat_dist = std::sqrt(
+        std::pow(nearest_point.x - points_itr->x, 2) + std::pow(nearest_point.y - points_itr->y, 2));
+      if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
+        t_values.insert(t_value.get());
+      }
+    }
+  }
+  if (t_values.size() != 0) {
+    double t = *t_values.begin();
+    return t;
+  }
+  return boost::none;
 }
 
 std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
@@ -177,7 +177,7 @@ geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanni
     std::chrono::seconds(point.header.stamp.sec) +
     std::chrono::nanoseconds(point.header.stamp.nanosec));
   geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    point.header.frame_id, planning_frame_id_, time_point, tf2::durationFromSec(1.0));
+    planning_frame_id_, point.header.frame_id, time_point, tf2::durationFromSec(1.0));
   tf2::doTransform(point, point, transform_stamped);
   return point;
 }
@@ -192,7 +192,7 @@ geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlannin
     std::chrono::seconds(pose.header.stamp.sec) +
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
   geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    pose.header.frame_id, planning_frame_id_, time_point, tf2::durationFromSec(1.0));
+    planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
   tf2::doTransform(pose, pose, transform_stamped);
   return pose;
 }
