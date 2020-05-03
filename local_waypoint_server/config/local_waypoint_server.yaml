@@ -4,5 +4,5 @@ local_waypoint_server:
     obstacle_scan_topic : "/obstacle_scan"
     planning_frame_id : "map"
     robot_width : 3.0
-    num_candidates : 10
-    
+    num_candidates : 16
+    sampling_interval : 1.0

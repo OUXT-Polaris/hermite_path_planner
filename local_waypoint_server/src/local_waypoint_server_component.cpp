@@ -28,7 +28,7 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width_);
   declare_parameter("planning_frame_id", "map");
   get_parameter("planning_frame_id", planning_frame_id_);
-  declare_parameter("num_candidates", 10);
+  declare_parameter("num_candidates", 20);
   get_parameter("num_candidates", num_candidates_);
   declare_parameter("sampling_interval", 0.5);
   get_parameter("sampling_interval", sampling_interval_);
@@ -102,17 +102,26 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   }
   geometry_msgs::msg::Pose p;
   p.position = generator_->getPointOnHermitePath(current_path_->path, obstacle_t);
-  geometry_msgs::msg::Vector3 rpy = generator_->getTangentVector(current_path_->path, obstacle_t);
-  p.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  geometry_msgs::msg::Vector3 tangent_vec = generator_->getTangentVector(current_path_->path, obstacle_t);
+  double theta = std::atan2(tangent_vec.y, tangent_vec.x);
+  geometry_msgs::msg::Vector3 orientation_vec;
+  orientation_vec.x = 0.0;
+  orientation_vec.y = 0.0;
+  orientation_vec.z = theta;
+  p.orientation = quaternion_operation::convertEulerAngleToQuaternion(orientation_vec);
   geometry_msgs::msg::Vector3 n = generator_->getNormalVector(current_path_->path, obstacle_t);
+  double norm = std::sqrt(n.x*n.x+n.y*n.y+n.z*n.z);
+  n.x = n.x/norm;
+  n.y = n.y/norm;
+  n.z = n.z/norm;
   for (int i = 0; (i * 2) < num_candidates_; i++) {
     geometry_msgs::msg::Pose p0 = p;
-    p0.position.x = p0.position.x + static_cast<double>(i) * sampling_interval_ * n.x;
-    p0.position.y = p0.position.y + static_cast<double>(i) * sampling_interval_ * n.y;
+    p0.position.x = p0.position.x + static_cast<double>(i+1) * sampling_interval_ * n.x;
+    p0.position.y = p0.position.y + static_cast<double>(i+1) * sampling_interval_ * n.y;
     ret.push_back(p0);
     geometry_msgs::msg::Pose p1 = p;
-    p1.position.x = p1.position.x - static_cast<double>(i) * sampling_interval_ * n.x;
-    p1.position.y = p1.position.y - static_cast<double>(i) * sampling_interval_ * n.y;
+    p1.position.x = p1.position.x - static_cast<double>(+1) * sampling_interval_ * n.x;
+    p1.position.y = p1.position.y - static_cast<double>(i+1) * sampling_interval_ * n.y;
     ret.push_back(p1);
   }
   return ret;
@@ -125,31 +134,34 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
   }
   auto result = checkCollisionToCurrentPath();
   if (result) {
-    std::vector<geometry_msgs::msg::Pose> candidates = getLocalWaypointCandidates(result.get());
-    replaned_goalpose_ = evaluateCandidates(candidates);
-    if(replaned_goalpose_){
-      geometry_msgs::msg::PoseStamped p;
-      p.pose = replaned_goalpose_.get();
-      p.header.frame_id = planning_frame_id_;
-      p.header.stamp = get_clock()->now();
-      previous_local_waypoint_ = p;
-      local_waypoint_pub_->publish(p);
-      return;
+    if(result.get() <= 1.0)
+    {
+      std::vector<geometry_msgs::msg::Pose> candidates = getLocalWaypointCandidates(result.get());
+      replaned_goalpose_ = evaluateCandidates(candidates);
+      if(replaned_goalpose_){
+        geometry_msgs::msg::PoseStamped p;
+        p.pose = replaned_goalpose_.get();
+        p.header.frame_id = planning_frame_id_;
+        p.header.stamp = get_clock()->now();
+        previous_local_waypoint_ = p;
+        local_waypoint_pub_->publish(p);
+        return;
+      }
     }
-    else{
-      return;
-    }
+    return;
   }
-  geometry_msgs::msg::PoseStamped current_goal_pose;
-  current_goal_pose = goal_pose_.get();
-  if (!previous_local_waypoint_) {
-    previous_local_waypoint_ = current_goal_pose;
-    local_waypoint_pub_->publish(current_goal_pose);
-  } else {
-    auto previous_local_waypoint = previous_local_waypoint_.get();
-    if (!isSame(previous_local_waypoint, current_goal_pose)) {
+  if(!replaned_goalpose_){
+    geometry_msgs::msg::PoseStamped current_goal_pose;
+    current_goal_pose = goal_pose_.get();
+    if (!previous_local_waypoint_) {
       previous_local_waypoint_ = current_goal_pose;
       local_waypoint_pub_->publish(current_goal_pose);
+    } else {
+      auto previous_local_waypoint = previous_local_waypoint_.get();
+      if (!isSame(previous_local_waypoint, current_goal_pose)) {
+        previous_local_waypoint_ = current_goal_pose;
+        local_waypoint_pub_->publish(current_goal_pose);
+      }
     }
   }
 }
