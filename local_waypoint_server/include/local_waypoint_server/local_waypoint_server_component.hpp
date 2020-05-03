@@ -68,6 +68,8 @@ extern "C" {
 #include <quaternion_operation/quaternion_operation.h>
 #include <boost/optional.hpp>
 #include <string>
+#include <memory>
+#include <vector>
 
 namespace local_waypoint_server
 {
@@ -100,13 +102,19 @@ private:
   std::vector<geometry_msgs::msg::Point> getPoints(sensor_msgs::msg::LaserScan scan);
   bool checkCollision(geometry_msgs::msg::PoseStamped goal_pose, double & longitudinal_distance);
   double robot_width_;
-  int max_iterations_;
   boost::optional<geometry_msgs::msg::PoseStamped> previous_local_waypoint_;
   bool isSame(geometry_msgs::msg::PoseStamped pose0, geometry_msgs::msg::PoseStamped pose1);
   rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
   void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> current_path_;
   boost::optional<double> checkCollisionToCurrentPath();
+  boost::optional<double> checkCollisionToPath(hermite_path_msgs::msg::HermitePath path);
+  std::vector<geometry_msgs::msg::Pose> getLocalWaypointCandidates(double obstacle_t);
+  boost::optional<geometry_msgs::msg::Pose> evaluateCandidates(
+    std::vector<geometry_msgs::msg::Pose> candidates);
+  int num_candidates_;
+  double sampling_interval_;
+  boost::optional<geometry_msgs::msg::Pose> replaned_goalpose_;
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_

@@ -13,6 +13,10 @@
 // limitations under the License.
 
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
+#include <memory>
+#include <vector>
+#include <string>
+#include <set>
 
 namespace local_waypoint_server
 {
@@ -24,8 +28,10 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width_);
   declare_parameter("planning_frame_id", "map");
   get_parameter("planning_frame_id", planning_frame_id_);
-  declare_parameter("max_iterations", 10);
-  get_parameter("max_iterations", max_iterations_);
+  declare_parameter("num_candidates", 10);
+  get_parameter("num_candidates", num_candidates_);
+  declare_parameter("sampling_interval", 0.5);
+  get_parameter("sampling_interval", sampling_interval_);
   /**
    * Publishers
    */
@@ -87,22 +93,63 @@ bool LocalWaypointServerComponent::isSame(
   return false;
 }
 
+std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWaypointCandidates(
+  double obstacle_t)
+{
+  std::vector<geometry_msgs::msg::Pose> ret;
+  if (!current_path_) {
+    return ret;
+  }
+  geometry_msgs::msg::Pose p;
+  p.position = generator_->getPointOnHermitePath(current_path_->path, obstacle_t);
+  geometry_msgs::msg::Vector3 rpy = generator_->getTangentVector(current_path_->path, obstacle_t);
+  p.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  geometry_msgs::msg::Vector3 n = generator_->getNormalVector(current_path_->path, obstacle_t);
+  for (int i = 0; (i * 2) < num_candidates_; i++) {
+    geometry_msgs::msg::Pose p0 = p;
+    p0.position.x = p0.position.x + static_cast<double>(i) * sampling_interval_ * n.x;
+    p0.position.y = p0.position.y + static_cast<double>(i) * sampling_interval_ * n.y;
+    ret.push_back(p0);
+    geometry_msgs::msg::Pose p1 = p;
+    p1.position.x = p1.position.x - static_cast<double>(i) * sampling_interval_ * n.x;
+    p1.position.y = p1.position.y - static_cast<double>(i) * sampling_interval_ * n.y;
+    ret.push_back(p1);
+  }
+  return ret;
+}
+
 void LocalWaypointServerComponent::updateLocalWaypoint()
 {
   if (!scan_ || !current_pose_ || !goal_pose_) {
     return;
   }
   auto result = checkCollisionToCurrentPath();
-  geometry_msgs::msg::PoseStamped current_target_pose;
-  current_target_pose = goal_pose_.get();
+  if (result) {
+    std::vector<geometry_msgs::msg::Pose> candidates = getLocalWaypointCandidates(result.get());
+    replaned_goalpose_ = evaluateCandidates(candidates);
+    if(replaned_goalpose_){
+      geometry_msgs::msg::PoseStamped p;
+      p.pose = replaned_goalpose_.get();
+      p.header.frame_id = planning_frame_id_;
+      p.header.stamp = get_clock()->now();
+      previous_local_waypoint_ = p;
+      local_waypoint_pub_->publish(p);
+      return;
+    }
+    else{
+      return;
+    }
+  }
+  geometry_msgs::msg::PoseStamped current_goal_pose;
+  current_goal_pose = goal_pose_.get();
   if (!previous_local_waypoint_) {
-    previous_local_waypoint_ = current_target_pose;
-    local_waypoint_pub_->publish(current_target_pose);
+    previous_local_waypoint_ = current_goal_pose;
+    local_waypoint_pub_->publish(current_goal_pose);
   } else {
     auto previous_local_waypoint = previous_local_waypoint_.get();
-    if (!isSame(previous_local_waypoint, current_target_pose)) {
-      previous_local_waypoint_ = current_target_pose;
-      local_waypoint_pub_->publish(current_target_pose);
+    if (!isSame(previous_local_waypoint, current_goal_pose)) {
+      previous_local_waypoint_ = current_goal_pose;
+      local_waypoint_pub_->publish(current_goal_pose);
     }
   }
 }
@@ -121,21 +168,90 @@ void LocalWaypointServerComponent::currentPoseCallback(
   updateLocalWaypoint();
 }
 
-boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPath(){
-  if(!current_path_ || !current_pose_){
+boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluateCandidates(
+  std::vector<geometry_msgs::msg::Pose> candidates)
+{
+  if (!current_pose_ || !goal_pose_) {
+    return boost::none;
+  }
+  geometry_msgs::msg::PoseStamped start = TransformToPlanningFrame(current_pose_.get());
+  std::vector<geometry_msgs::msg::Pose> non_collision_goal_list;
+  for (auto pose_itr = candidates.begin(); pose_itr != candidates.end(); pose_itr++) {
+    double goal_distance =
+      std::sqrt(std::pow(pose_itr->position.x - start.pose.position.x, 2) +
+        std::pow(pose_itr->position.y - start.pose.position.y, 2));
+    auto path = generator_->generateHermitePath(start.pose, *pose_itr,
+        goal_distance * 0.25, goal_distance * 0.75);
+    auto obstacle_distance = checkCollisionToPath(path);
+    if (!obstacle_distance) {
+      non_collision_goal_list.push_back(*pose_itr);
+    }
+  }
+  if (non_collision_goal_list.size() == 0) {
+    RCLCPP_ERROR(get_logger(), "stacked");
+    return boost::none;
+  }
+  std::vector<double> distance_to_goal;
+  for (auto itr = non_collision_goal_list.begin(); itr != non_collision_goal_list.end(); itr++) {
+    double dist =
+      std::sqrt(std::pow(goal_pose_->pose.position.x - itr->position.x,
+        2) + std::pow(goal_pose_->pose.position.y - itr->position.y, 2));
+    distance_to_goal.push_back(dist);
+  }
+  std::vector<double>::iterator min_itr = std::min_element(distance_to_goal.begin(), distance_to_goal.end());
+  size_t min_index = std::distance(distance_to_goal.begin(), min_itr);
+  return non_collision_goal_list[min_index];
+}
+
+boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
+  hermite_path_msgs::msg::HermitePath path)
+{
+  if (!current_pose_) {
     return boost::none;
   }
   geometry_msgs::msg::PoseStamped pose_transformed = TransformToPlanningFrame(current_pose_.get());
   auto current_t = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
-    current_path_ ->path, pose_transformed.pose.position);
+    path, pose_transformed.pose.position);
   std::set<double> t_values;
-  for(auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++){
-    auto t_value = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(current_path_->path, *points_itr);
+  for (auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++) {
+    auto t_value = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
+      path, *points_itr);
+    if (t_value) {
+      geometry_msgs::msg::Point nearest_point =
+        generator_->getPointOnHermitePath(path, t_value.get());
+      double lat_dist = std::sqrt(
+        std::pow(nearest_point.x - points_itr->x,
+        2) + std::pow(nearest_point.y - points_itr->y, 2));
+      if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
+        t_values.insert(t_value.get());
+      }
+    }
+  }
+  if (t_values.size() != 0) {
+    double t = *t_values.begin();
+    return t;
+  }
+  return boost::none;
+}
+
+boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPath()
+{
+  if (!current_path_ || !current_pose_) {
+    return boost::none;
+  }
+  geometry_msgs::msg::PoseStamped pose_transformed = TransformToPlanningFrame(current_pose_.get());
+  auto current_t = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
+    current_path_->path, pose_transformed.pose.position);
+  std::set<double> t_values;
+  for (auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++) {
+    auto t_value = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
+      current_path_->path, *points_itr);
     if (t_value) {
       geometry_msgs::msg::Point nearest_point =
         generator_->getPointOnHermitePath(current_path_->path, t_value.get());
       double lat_dist = std::sqrt(
-        std::pow(nearest_point.x - points_itr->x, 2) + std::pow(nearest_point.y - points_itr->y, 2));
+        std::pow(nearest_point.x - points_itr->x,
+        2) + std::pow(nearest_point.y - points_itr->y, 2));
       if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
         t_values.insert(t_value.get());
       }
