@@ -20,11 +20,12 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
 : Node("local_waypoint_server", options), buffer_(get_clock()), listener_(buffer_)
 {
   declare_parameter("robot_width", 3.0);
-  double robot_width;
-  get_parameter("robot_width", robot_width);
-  generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
+  get_parameter("robot_width", robot_width_);
+  generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width_);
   declare_parameter("planning_frame_id", "map");
   get_parameter("planning_frame_id", planning_frame_id_);
+  declare_parameter("max_iterations", 10);
+  get_parameter("max_iterations", max_iterations_);
   /**
    * Publishers
    */
@@ -57,15 +58,11 @@ void LocalWaypointServerComponent::GoalPoseCallback(
 {
   goal_pose_ = *msg;
   updateLocalWaypoint();
-  local_waypoint_pub_->publish(*msg);
 }
 
-bool LocalWaypointServerComponent::checkCollision(geometry_msgs::msg::PoseStamped goal_pose)
+bool LocalWaypointServerComponent::checkCollision(geometry_msgs::msg::PoseStamped goal_pose, double& longitudal_distance)
 {
-  if (!scan_ || !current_pose_ || !goal_pose_) {
-    return false;
-  }
-  geometry_msgs::msg::PoseStamped current_goal_pose = TransformToPlanningFrame(current_pose_.get());
+  geometry_msgs::msg::PoseStamped current_goal_pose = TransformToPlanningFrame(goal_pose_.get());
   geometry_msgs::msg::PoseStamped current_pose = TransformToPlanningFrame(current_pose_.get());
   double goal_distance =
     std::sqrt(std::pow(goal_pose.pose.position.x - current_pose.pose.position.x, 2) +
@@ -73,11 +70,47 @@ bool LocalWaypointServerComponent::checkCollision(geometry_msgs::msg::PoseStampe
   hermite_path_msgs::msg::HermitePathStamped path;
   path.path = generator_->generateHermitePath(current_pose.pose, goal_pose.pose,
       goal_distance * 0.25, goal_distance * 0.75);
+  path.header = goal_pose.header;
   std::vector<geometry_msgs::msg::Point> points = getPoints(scan_.get());
-  std::vector<boost::optional<double> > lateral_dists;
+  std::vector<double> lateral_dists;
+  std::vector<geometry_msgs::msg::Point> obstacle_points;
   for (auto itr = points.begin(); itr != points.end(); itr++) {
-    lateral_dists.push_back(generator_->getLateralDistanceInFrenetCoordinate(path.path, *itr));
+    auto dist = generator_->getLateralDistanceInFrenetCoordinate(path.path, *itr);
+    if (dist) {
+      lateral_dists.push_back(dist.get());
+      obstacle_points.push_back(*itr);
+    }
   }
+  if (lateral_dists.size() == 0) {
+    return false;
+  }
+  std::vector<double>::iterator min_itr = std::min_element(lateral_dists.begin(),
+      lateral_dists.end());
+  double min_lateral_dist = *min_itr;
+  if (min_lateral_dist < robot_width_ * 0.5) {
+    size_t index = std::distance(lateral_dists.begin(), min_itr);
+    auto lon_dist = generator_->getLongitudinalDistanceInFrenetCoordinate(path.path, obstacle_points[index], 200);
+    if(lon_dist){
+      std::cout << lon_dist.get() << std::endl;
+      longitudal_distance = lon_dist.get();
+      return true;
+    }
+  }
+  return false;
+}
+
+bool LocalWaypointServerComponent::isSame(
+  geometry_msgs::msg::PoseStamped pose0,
+  geometry_msgs::msg::PoseStamped pose1)
+{
+  if (pose0.pose.position.x == pose1.pose.position.x) {
+    if (pose0.pose.position.y == pose1.pose.position.y) {
+      if (quaternion_operation::equals(pose0.pose.orientation, pose1.pose.orientation)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 void LocalWaypointServerComponent::updateLocalWaypoint()
@@ -85,6 +118,21 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
   if (!scan_ || !current_pose_ || !goal_pose_) {
     return;
   }
+  geometry_msgs::msg::PoseStamped current_target_pose;
+  current_target_pose = goal_pose_.get();
+  if (!previous_local_waypoint_) {
+    previous_local_waypoint_ = current_target_pose;
+    local_waypoint_pub_->publish(current_target_pose);
+  } else {
+    auto previous_local_waypoint = previous_local_waypoint_.get();
+    if (isSame(previous_local_waypoint, current_target_pose)) {
+    }
+  }
+  double dist;
+  if(checkCollision(current_target_pose,dist)){
+    return;
+  }
+  std::cout << "collision not found" << std::endl;
 }
 
 void LocalWaypointServerComponent::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr data)

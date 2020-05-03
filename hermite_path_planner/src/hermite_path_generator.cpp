@@ -99,6 +99,9 @@ boost::optional<double> HermitePathGenerator::getLateralDistanceInFrenetCoordina
   if (!t) {
     return boost::none;
   }
+  else if (t.get() < 0.0 || 1.0 < t.get()){
+    return boost::none;
+  }
   geometry_msgs::msg::Point point = getPointOnHermitePath(path, t.get());
   return std::sqrt(std::pow(point.x - p.x, 2) + std::pow(point.y - p.y, 2));
 }
@@ -110,7 +113,11 @@ boost::optional<double> HermitePathGenerator::getLongitudinalDistanceInFrenetCoo
   if (!t) {
     return boost::none;
   }
+  else if (t.get() < 0.0 || 1.0 < t.get()){
+    return boost::none;
+  }
   double l = getLength(path, resolution);
+  std::cout << "l:" << l << " t:" << t.get() << std::endl;
   return l * t.get();
 }
 
@@ -370,7 +377,7 @@ geometry_msgs::msg::Vector3 HermitePathGenerator::getNormalVector(
 }
 
 visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
-  hermite_path_msgs::msg::HermitePathStamped path, int resolution)
+  hermite_path_msgs::msg::HermitePathStamped path, int resolution, bool with_polygon)
 {
   visualization_msgs::msg::MarkerArray marker;
 
@@ -393,7 +400,9 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
   marker.markers.push_back(center_line);
 
   // Setup Left Bounds Marker
-  marker.markers.push_back(getBoundsPolygon(path, resolution, -0.3));
+  if (with_polygon) {
+    marker.markers.push_back(getBoundsPolygon(path, resolution, -0.3));
+  }
   return marker;
 }
 }  // namespace hermite_path_planner

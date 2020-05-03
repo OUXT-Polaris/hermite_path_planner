@@ -65,6 +65,7 @@ extern "C" {
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
+#include <quaternion_operation/quaternion_operation.h>
 #include <boost/optional.hpp>
 #include <string>
 
@@ -96,7 +97,11 @@ private:
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
   std::vector<geometry_msgs::msg::Point> getPoints(sensor_msgs::msg::LaserScan scan);
-  bool checkCollision(geometry_msgs::msg::PoseStamped goal_pose);
+  bool checkCollision(geometry_msgs::msg::PoseStamped goal_pose, double& longitudinal_distance);
+  double robot_width_;
+  int max_iterations_;
+  boost::optional<geometry_msgs::msg::PoseStamped> previous_local_waypoint_;
+  bool isSame(geometry_msgs::msg::PoseStamped pose0, geometry_msgs::msg::PoseStamped pose1);
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_
