@@ -76,7 +76,6 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
 void LocalWaypointServerComponent::hermitePathCallback(
   const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
 {
-  std::cout << "update path" << std::endl;
   current_path_ = *data;
   updateLocalWaypoint();
 }
@@ -149,7 +148,6 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
   auto result = checkCollisionToCurrentPath();
   if (result) {
     if (result.get() <= 1.0) {
-      std::cout << "collision detected" << std::endl;
       std::vector<geometry_msgs::msg::Pose> candidates = getLocalWaypointCandidates(result.get());
       replaned_goalpose_ = evaluateCandidates(candidates);
       if (replaned_goalpose_) {
