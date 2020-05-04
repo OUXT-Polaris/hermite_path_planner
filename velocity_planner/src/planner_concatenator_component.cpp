@@ -362,8 +362,7 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> vel;
   std::set<std::string> update_targets;
   for (auto itr = data->reference_velocity.begin(); itr != data->reference_velocity.end(); itr++) {
-    if(itr->t >= 0.0 && 1.0 >= itr->t)
-    {
+    if (itr->t >= 0.0 && 1.0 >= itr->t) {
       update_targets.insert(itr->from_node);
     }
   }
@@ -383,10 +382,8 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
   vel.insert(vel.end(), data->reference_velocity.begin(), data->reference_velocity.end());
   std::sort(vel.begin(), vel.end(), [](const auto & a, const auto & b) {return a.t < b.t;});
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> filtered_vel;
-  for(auto itr= vel.begin(); itr != vel.end(); itr++)
-  {
-    if(itr->t >= 0.0 && 1.0 >= itr->t)
-    {
+  for (auto itr = vel.begin(); itr != vel.end(); itr++) {
+    if (itr->t >= 0.0 && 1.0 >= itr->t) {
       filtered_vel.push_back(*itr);
     }
   }
