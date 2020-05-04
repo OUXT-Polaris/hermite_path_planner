@@ -102,7 +102,8 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   }
   geometry_msgs::msg::Pose p;
   p.position = generator_->getPointOnHermitePath(current_path_->path, obstacle_t);
-  geometry_msgs::msg::Vector3 tangent_vec = generator_->getTangentVector(current_path_->path, obstacle_t);
+  geometry_msgs::msg::Vector3 tangent_vec = generator_->getTangentVector(current_path_->path,
+      obstacle_t);
   double theta = std::atan2(tangent_vec.y, tangent_vec.x);
   geometry_msgs::msg::Vector3 orientation_vec;
   orientation_vec.x = 0.0;
@@ -110,18 +111,18 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   orientation_vec.z = theta;
   p.orientation = quaternion_operation::convertEulerAngleToQuaternion(orientation_vec);
   geometry_msgs::msg::Vector3 n = generator_->getNormalVector(current_path_->path, obstacle_t);
-  double norm = std::sqrt(n.x*n.x+n.y*n.y+n.z*n.z);
-  n.x = n.x/norm;
-  n.y = n.y/norm;
-  n.z = n.z/norm;
+  double norm = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+  n.x = n.x / norm;
+  n.y = n.y / norm;
+  n.z = n.z / norm;
   for (int i = 0; (i * 2) < num_candidates_; i++) {
     geometry_msgs::msg::Pose p0 = p;
-    p0.position.x = p0.position.x + static_cast<double>(i+1) * sampling_interval_ * n.x;
-    p0.position.y = p0.position.y + static_cast<double>(i+1) * sampling_interval_ * n.y;
+    p0.position.x = p0.position.x + static_cast<double>(i + 1) * sampling_interval_ * n.x;
+    p0.position.y = p0.position.y + static_cast<double>(i + 1) * sampling_interval_ * n.y;
     ret.push_back(p0);
     geometry_msgs::msg::Pose p1 = p;
     p1.position.x = p1.position.x - static_cast<double>(+1) * sampling_interval_ * n.x;
-    p1.position.y = p1.position.y - static_cast<double>(i+1) * sampling_interval_ * n.y;
+    p1.position.y = p1.position.y - static_cast<double>(i + 1) * sampling_interval_ * n.y;
     ret.push_back(p1);
   }
   return ret;
@@ -134,11 +135,10 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
   }
   auto result = checkCollisionToCurrentPath();
   if (result) {
-    if(result.get() <= 1.0)
-    {
+    if (result.get() <= 1.0) {
       std::vector<geometry_msgs::msg::Pose> candidates = getLocalWaypointCandidates(result.get());
       replaned_goalpose_ = evaluateCandidates(candidates);
-      if(replaned_goalpose_){
+      if (replaned_goalpose_) {
         geometry_msgs::msg::PoseStamped p;
         p.pose = replaned_goalpose_.get();
         p.header.frame_id = planning_frame_id_;
@@ -150,7 +150,7 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
     }
     return;
   }
-  if(!replaned_goalpose_){
+  if (!replaned_goalpose_) {
     geometry_msgs::msg::PoseStamped current_goal_pose;
     current_goal_pose = goal_pose_.get();
     if (!previous_local_waypoint_) {
@@ -210,7 +210,8 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
         2) + std::pow(goal_pose_->pose.position.y - itr->position.y, 2));
     distance_to_goal.push_back(dist);
   }
-  std::vector<double>::iterator min_itr = std::min_element(distance_to_goal.begin(), distance_to_goal.end());
+  std::vector<double>::iterator min_itr = std::min_element(
+    distance_to_goal.begin(), distance_to_goal.end());
   size_t min_index = std::distance(distance_to_goal.begin(), min_itr);
   return non_collision_goal_list[min_index];
 }

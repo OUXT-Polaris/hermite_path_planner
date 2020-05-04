@@ -373,6 +373,37 @@ geometry_msgs::msg::Vector3 HermitePathGenerator::getNormalVector(
   return vec;
 }
 
+visualization_msgs::msg::MarkerArray HermitePathGenerator::generateDeleteMarker()
+{
+  visualization_msgs::msg::MarkerArray ret;
+  visualization_msgs::msg::Marker marker;
+  marker.action = marker.DELETEALL;
+  ret.markers.push_back(marker);
+  return ret;
+}
+
+visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
+  std::vector<hermite_path_msgs::msg::HermitePathStamped> path, int resolution)
+{
+  visualization_msgs::msg::MarkerArray marker;
+  std_msgs::msg::ColorRGBA color_center_line = color_names::makeColorMsg("red", 1.0);
+  for (int i = 0; i < static_cast<int>(path.size()); i++) {
+    hermite_path_msgs::msg::HermitePathStamped p = path[i];
+    visualization_msgs::msg::Marker center_line;
+    center_line.ns = "center_line";
+    center_line.id = i;
+    center_line.type = visualization_msgs::msg::Marker::LINE_STRIP;
+    center_line.action = visualization_msgs::msg::Marker::ADD;
+    center_line.frame_locked = false;
+    center_line.scale.x = 0.1;
+    center_line.points = getPointsOnHermitePath(p.path, resolution, 1.0);
+    center_line.colors =
+      std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
+    marker.markers.push_back(center_line);
+  }
+  return marker;
+}
+
 visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
   hermite_path_msgs::msg::HermitePathStamped path, int resolution, bool with_polygon)
 {

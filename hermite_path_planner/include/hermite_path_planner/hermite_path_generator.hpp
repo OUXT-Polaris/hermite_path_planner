@@ -38,8 +38,6 @@ public:
     hermite_path_msgs::msg::HermitePath path, double t);
   std::vector<geometry_msgs::msg::Point> getPointsOnHermitePath(
     hermite_path_msgs::msg::HermitePath path, int resolution, double max_t = 1.0);
-  visualization_msgs::msg::MarkerArray generateMarker(
-    hermite_path_msgs::msg::HermitePathStamped path, int resolution, bool with_polygon = true);
   boost::optional<double> checkFirstCollisionWithCircle(
     hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point center, double radius);
   double getLength(hermite_path_msgs::msg::HermitePath path, int resolution);
@@ -53,6 +51,11 @@ public:
   geometry_msgs::msg::Vector3 getTangentVector(hermite_path_msgs::msg::HermitePath path, double t);
   geometry_msgs::msg::Vector3 getNormalVector(hermite_path_msgs::msg::HermitePath path, double t);
   double getReferenceVelocity(hermite_path_msgs::msg::HermitePathStamped path, double t);
+  visualization_msgs::msg::MarkerArray generateDeleteMarker();
+  visualization_msgs::msg::MarkerArray generateMarker(
+    hermite_path_msgs::msg::HermitePathStamped path, int resolution, bool with_polygon = true);
+  visualization_msgs::msg::MarkerArray generateMarker(
+    std::vector<hermite_path_msgs::msg::HermitePathStamped> path, int resolution);
 
 private:
   visualization_msgs::msg::Marker getBoundsPolygon(
