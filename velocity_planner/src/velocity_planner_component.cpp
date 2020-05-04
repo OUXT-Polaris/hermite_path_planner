@@ -100,11 +100,13 @@ void VelocityPlannerComponent::updatePath()
     return;
   }
   auto start_time = get_clock()->now();
-  VelocityGraph graph(path_.get(), velocity_resoluation_, maximum_accerelation_, minimum_deceleration_, max_linear_velocity_);
+  VelocityGraph graph(path_.get(), velocity_resoluation_, maximum_accerelation_,
+    minimum_deceleration_, max_linear_velocity_);
   auto plan = graph.getPlan();
   auto end_time = get_clock()->now();
   auto plannig_duration = end_time - start_time;
-  RCLCPP_INFO(get_logger(), "velocity planner takes " + std::to_string(plannig_duration.seconds()) + " seconts");
+  RCLCPP_INFO(get_logger(), "velocity planner takes " + std::to_string(
+      plannig_duration.seconds()) + " seconts");
   if (plan) {
     RCLCPP_INFO(get_logger(), "velocity planning succeed");
     hermite_path_msgs::msg::HermitePathStamped path;

@@ -178,7 +178,7 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
     double dist_to_replaned_goal = std::sqrt(std::pow(
           current_pose_->pose.position.x - replaned_goalpose_->position.x, 2) + std::pow(
           current_pose_->pose.position.y - replaned_goalpose_->position.y, 2));
-    if(dist_to_replaned_goal < 1.3){
+    if (dist_to_replaned_goal < 1.3) {
       replaned_goalpose_ = boost::none;
     }
   }
