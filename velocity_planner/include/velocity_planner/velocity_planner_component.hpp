@@ -103,6 +103,8 @@ private:
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
   double maximum_accerelation_ = 0.3;
   double minimum_deceleration_ = -0.1;
+  double max_linear_velocity_ = 1.0;
+  double velocity_resoluation_ = 0.2;
   VelocityVisualizer viz_;
 };
 }  // namespace velocity_planner

@@ -76,7 +76,9 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
 void LocalWaypointServerComponent::hermitePathCallback(
   const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
 {
+  std::cout << "update path" << std::endl;
   current_path_ = *data;
+  updateLocalWaypoint();
 }
 
 void LocalWaypointServerComponent::GoalPoseCallback(
@@ -147,6 +149,7 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
   auto result = checkCollisionToCurrentPath();
   if (result) {
     if (result.get() <= 1.0) {
+      std::cout << "collision detected" << std::endl;
       std::vector<geometry_msgs::msg::Pose> candidates = getLocalWaypointCandidates(result.get());
       replaned_goalpose_ = evaluateCandidates(candidates);
       if (replaned_goalpose_) {
@@ -159,7 +162,6 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
         return;
       }
     }
-    return;
   }
   if (!replaned_goalpose_) {
     geometry_msgs::msg::PoseStamped current_goal_pose;
@@ -173,6 +175,13 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
         previous_local_waypoint_ = current_goal_pose;
         local_waypoint_pub_->publish(current_goal_pose);
       }
+    }
+  } else {
+    double dist_to_replaned_goal = std::sqrt(std::pow(
+          current_pose_->pose.position.x - replaned_goalpose_->position.x, 2) + std::pow(
+          current_pose_->pose.position.y - replaned_goalpose_->position.y, 2));
+    if(dist_to_replaned_goal < 1.3){
+      replaned_goalpose_ = boost::none;
     }
   }
 }
