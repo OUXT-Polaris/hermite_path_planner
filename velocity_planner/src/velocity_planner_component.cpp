@@ -48,6 +48,8 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
 
   hermite_path_pub_ =
     this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>("~/hermite_path", 1);
+  polygon_marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
+    "~/marker/polygon", 1);
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
 
   double robot_width;
@@ -55,8 +57,8 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
   get_parameter("robot_width", robot_width);
   generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
 
-  declare_parameter("minimum_deceleration", -0.1);
-  get_parameter("minimum_deceleration", minimum_deceleration_);
+  declare_parameter("minimum_accerelation", -0.1);
+  get_parameter("minimum_accerelation", minimum_accerelation_);
   declare_parameter("maximum_accerelation", 0.3);
   get_parameter("maximum_accerelation", maximum_accerelation_);
   declare_parameter("max_linear_velocity", 1.0);
@@ -101,7 +103,7 @@ void VelocityPlannerComponent::updatePath()
   }
   auto start_time = get_clock()->now();
   VelocityGraph graph(path_.get(), velocity_resoluation_, maximum_accerelation_,
-    minimum_deceleration_, max_linear_velocity_);
+    minimum_accerelation_, max_linear_velocity_);
   auto plan = graph.getPlan();
   auto end_time = get_clock()->now();
   auto plannig_duration = end_time - start_time;
@@ -120,11 +122,14 @@ void VelocityPlannerComponent::updatePath()
     RCLCPP_INFO(
       get_logger(),
       "minimum acceleration is " + std::to_string(graph.getPlannedMinimumAcceleration()));
+    polygon_marker_pub_->publish(viz_.generateDeleteMarker());
+    polygon_marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, 3.0));
     marker_pub_->publish(viz_.generateDeleteMarker());
-    marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, 3.0));
-    // marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
+    auto color = color_names::makeColorMsg("deepskyblue", 1.0);
+    marker_pub_->publish(viz_.generateMarker(path, color));
+    // polygon_marker_pub_->publish(viz_.generateMarker(path,color_names::makeColorMsg("royalblue",1.0)));
   } else {
-    marker_pub_->publish(viz_.generateDeleteMarker());
+    polygon_marker_pub_->publish(viz_.generateDeleteMarker());
     RCLCPP_INFO(get_logger(), "velocity planning failed");
     RCLCPP_WARN(get_logger(), graph.getReason());
   }

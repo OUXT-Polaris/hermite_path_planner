@@ -198,9 +198,9 @@ boost::optional<std::vector<Edge>> VelocityGraph::makeEdges(
           edge.before_node_id = before_itr->id;
           edge.after_node_id = after_itr->id;
           edge.linear_accerelation = a;
-          edge.weight = std::min(
-            std::fabs(std::fabs(v0) - maximum_velocity_),
-            std::fabs(std::fabs(v1) - maximum_velocity_));
+          edge.weight =
+            std::fabs(std::fabs(v0) - maximum_velocity_) +
+            std::fabs(std::fabs(v1) - maximum_velocity_);
           edges.push_back(edge);
         }
       }
@@ -218,7 +218,7 @@ std::vector<Node> VelocityGraph::makeNodes(hermite_path_msgs::msg::ReferenceVelo
 {
   std::vector<Node> ret;
   double v = 0.0;
-  int count = 0;
+  int count = 1;
   if (velocity_resoluation_ < vel.linear_velocity) {
     while (v < vel.linear_velocity) {
       v = velocity_resoluation_ * count;
@@ -230,18 +230,11 @@ std::vector<Node> VelocityGraph::makeNodes(hermite_path_msgs::msg::ReferenceVelo
       count++;
     }
   } else {
-    Node n0;
-    n0.vel.t = vel.t;
-    n0.vel.linear_velocity = 0.0;
-    n0.id = boost::uuids::random_generator()();
-    ret.push_back(n0);
-    if (std::fabs(vel.linear_velocity) > 0.01) {
-      Node n1;
-      n1.vel.t = vel.t;
-      n1.vel.linear_velocity = vel.linear_velocity;
-      n1.id = boost::uuids::random_generator()();
-      ret.push_back(n1);
-    }
+    Node n;
+    n.vel.t = vel.t;
+    n.vel.linear_velocity = vel.linear_velocity;
+    n.id = boost::uuids::random_generator()();
+    ret.push_back(n);
   }
   return ret;
 }

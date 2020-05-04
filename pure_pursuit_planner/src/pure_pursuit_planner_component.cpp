@@ -185,7 +185,7 @@ void PurePursuitPlannerComponent::currentPoseCallback(
   if (!target_t_ && current_t_) {
     target_t_ = 1.0;
   }
-  auto twist = getCurrentTwist(target_t_.get());
+  auto twist = getTargetTwist(target_t_.get());
   if (twist) {
     twist_cmd = twist.get();
   } else {
@@ -195,7 +195,7 @@ void PurePursuitPlannerComponent::currentPoseCallback(
   target_twist_pub_->publish(twist_cmd);
 }
 
-boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurrentTwist(
+boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getTargetTwist(
   double target_t)
 {
   if (!current_pose_) {
@@ -260,7 +260,7 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     double a = vec.x * vec.x + vec.y * vec.y;
     double b = 2 * x * vec.x + 2 * y * vec.y;
     double c = x * x + y * y - lookahead_distance_ * lookahead_distance_;
-    if (b * b - 4 * a * c < 0.0) {
+    if ((b * b - 4 * a * c) < 0.0) {
       target_position_ = boost::none;
       RCLCPP_WARN(
         get_logger(), "target position does not calculate because of b * b - 4 * a * c < 0.0");
@@ -269,14 +269,9 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     double s0 = (-b - std::sqrt(b * b - 4 * a * c)) / (2 * a);
     double s1 = (-b + std::sqrt(b * b - 4 * a * c)) / (2 * a);
     if (s0 < 0.0) {
-      if (s1 > 0.0) {
-        target_position.x = p.x + s1 * vec.x;
-        target_position.y = p.y + s1 * vec.y;
-        target_position.z = p.z + s1 * vec.z;
-      } else {
-        target_position_ = boost::none;
-        return boost::none;
-      }
+      target_position.x = p.x + s1 * vec.x;
+      target_position.y = p.y + s1 * vec.y;
+      target_position.z = p.z + s1 * vec.z;
     } else {
       target_position.x = p.x + s0 * vec.x;
       target_position.y = p.y + s0 * vec.y;

@@ -86,6 +86,8 @@ double HermitePathGenerator::getReferenceVelocity(
       if (v2 <= 0.0) {
         return 0.0;
       } else {
+        std::cout << i << "," << path.reference_velocity[i].linear_velocity << "," << 2 * a *
+          diff_l_target << std::endl;
         return std::sqrt(v2);
       }
     }
