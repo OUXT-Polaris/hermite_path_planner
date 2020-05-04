@@ -124,12 +124,16 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   n.z = n.z / norm;
   for (int i = 0; (i * 2) < num_candidates_; i++) {
     geometry_msgs::msg::Pose p0 = p;
-    p0.position.x = p0.position.x + (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
-    p0.position.y = p0.position.y + (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
+    p0.position.x = p0.position.x +
+      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
+    p0.position.y = p0.position.y +
+      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
     ret.push_back(p0);
     geometry_msgs::msg::Pose p1 = p;
-    p1.position.x = p1.position.x - (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
-    p1.position.y = p1.position.y - (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
+    p1.position.x = p1.position.x -
+      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
+    p1.position.y = p1.position.y -
+      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
     ret.push_back(p1);
   }
   return ret;
@@ -249,7 +253,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
       path, *points_itr);
     if (t_value) {
       if (t_value.get() <= 1.3 && t_value.get() >= 0.0) {
-        if(t_value.get() >=1.0){
+        if (t_value.get() >= 1.0) {
           t_value.get() = 1.0;
         }
         geometry_msgs::msg::Point nearest_point =
@@ -257,8 +261,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
         double lat_dist = std::sqrt(
           std::pow(nearest_point.x - points_itr->x,
           2) + std::pow(nearest_point.y - points_itr->y, 2));
-        if (lat_dist < std::fabs(robot_width_) * 0.5 + margin_)
-        {
+        if (lat_dist < std::fabs(robot_width_) * 0.5 + margin_) {
           t_values.insert(t_value.get());
         }
       }
