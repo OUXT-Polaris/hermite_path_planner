@@ -21,7 +21,7 @@
 namespace velocity_planner
 {
 CurvePlannerComponent::CurvePlannerComponent(const rclcpp::NodeOptions & options)
-: Node("curve_planner", options), generator_(0.0), viz_(get_name())
+: Node("curve_planner", "velocity_planner", options), generator_(0.0), viz_(get_name())
 {
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   hermite_path_pub_ =

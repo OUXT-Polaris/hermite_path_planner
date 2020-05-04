@@ -22,7 +22,8 @@
 namespace velocity_planner
 {
 VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & options)
-: Node("velocity_planner", options), buffer_(get_clock()), listener_(buffer_), viz_(get_name())
+: Node("velocity_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_),
+  viz_(get_name())
 {
   std::string current_twist_topic;
   declare_parameter("current_twist_topic", "current_twist");
@@ -50,6 +51,7 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
 
   double robot_width;
+  declare_parameter("robot_width", 3.0);
   get_parameter("robot_width", robot_width);
   generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
 }

@@ -14,6 +14,7 @@
 
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <color_names/color_names.h>
+#include <rclcpp/rclcpp.hpp>
 #include <vector>
 #include <algorithm>
 
@@ -92,7 +93,33 @@ double HermitePathGenerator::getReferenceVelocity(
   return 0.0;
 }
 
+boost::optional<double> HermitePathGenerator::getLateralDistanceInFrenetCoordinate(
+  hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p)
+{
+  boost::optional<double> t = getNormalizedLongitudinalDistanceInFrenetCoordinate(path, p);
+  if (!t) {
+    return boost::none;
+  } else if (t.get() < 0.0 || 1.0 < t.get()) {
+    return boost::none;
+  }
+  geometry_msgs::msg::Point point = getPointOnHermitePath(path, t.get());
+  return std::sqrt(std::pow(point.x - p.x, 2) + std::pow(point.y - p.y, 2));
+}
+
 boost::optional<double> HermitePathGenerator::getLongitudinalDistanceInFrenetCoordinate(
+  hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p, int resolution)
+{
+  boost::optional<double> t = getNormalizedLongitudinalDistanceInFrenetCoordinate(path, p);
+  if (!t) {
+    return boost::none;
+  } else if (t.get() < 0.0 || 1.0 < t.get()) {
+    return boost::none;
+  }
+  double l = getLength(path, resolution);
+  return l * t.get();
+}
+
+boost::optional<double> HermitePathGenerator::getNormalizedLongitudinalDistanceInFrenetCoordinate(
   hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p)
 {
   auto func =
@@ -111,9 +138,9 @@ boost::optional<double> HermitePathGenerator::getLongitudinalDistanceInFrenetCoo
       double x_term = std::pow(point.x - path.ax * t3 - path.bx * t2 - path.cx * t - path.dx, 2);
       double y_term = std::pow(point.y - path.ay * t3 - path.by * t2 - path.cy * t - path.dy, 2);
       double x_term_diff = 2 * (point.x - path.ax * t3 - path.bx * t2 - path.cx * t - path.dx) *
-        (-2 * path.ax * t2 - path.bx * t - path.cx);
+        (-3 * path.ax * t2 - 2 * path.bx * t - path.cx);
       double y_term_diff = 2 * (point.y - path.ay * t3 - path.by * t2 - path.cy * t - path.dy) *
-        (-2 * path.ay * t2 - path.by * t - path.cy);
+        (-3 * path.ay * t2 - 2 * path.by * t - path.cy);
       double ret = (x_term + y_term) / (x_term_diff + y_term_diff);
       return ret;
     };
@@ -184,7 +211,7 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
 {
   constexpr int max_iteration = 30;
   constexpr double torelance = 0.01;
-  auto dist = getLongitudinalDistanceInFrenetCoordinate(path, center);
+  auto dist = getNormalizedLongitudinalDistanceInFrenetCoordinate(path, center);
   if (!dist) {
     return boost::none;
   }
@@ -199,15 +226,16 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
     double diff = calculateNewtonMethodStepSize(path, center, radius, ret);
     ret = ret - diff;
   }
-  return ret;
+  return boost::none;
 }
 
 hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
-  geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal)
+  geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal, double start_vector_magnitude,
+  double end_vector_magnitude)
 {
   hermite_path_msgs::msg::HermitePath path;
-  geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start, 10.0);
-  geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal, 30.0);
+  geometry_msgs::msg::Vector3 start_vector = getVectorFromPose(start, start_vector_magnitude);
+  geometry_msgs::msg::Vector3 goal_vector = getVectorFromPose(goal, end_vector_magnitude);
   path.ax = 2 * start.position.x - 2 * goal.position.x + start_vector.x + goal_vector.x;
   path.ay = 2 * start.position.y - 2 * goal.position.y + start_vector.y + goal_vector.y;
   path.bx = -3 * start.position.x + 3 * goal.position.x - 2 * start_vector.x - goal_vector.x;
@@ -220,10 +248,10 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
 }
 
 std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getPointsOnHermitePath(
-  hermite_path_msgs::msg::HermitePath path, int resolution)
+  hermite_path_msgs::msg::HermitePath path, int resolution, double max_t)
 {
   std::vector<geometry_msgs::msg::Point> p;
-  double step_size = 1.0 / static_cast<double>(resolution);
+  double step_size = max_t / static_cast<double>(resolution);
   for (int i = 0; i < (resolution + 1); i++) {
     double t = step_size * static_cast<double>(i);
     p.push_back(getPointOnHermitePath(path, t));
@@ -346,8 +374,41 @@ geometry_msgs::msg::Vector3 HermitePathGenerator::getNormalVector(
   return vec;
 }
 
+visualization_msgs::msg::MarkerArray HermitePathGenerator::generateDeleteMarker()
+{
+  visualization_msgs::msg::MarkerArray ret;
+  visualization_msgs::msg::Marker marker;
+  marker.action = marker.DELETEALL;
+  ret.markers.push_back(marker);
+  return ret;
+}
+
 visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
-  hermite_path_msgs::msg::HermitePathStamped path, int resolution)
+  std::vector<hermite_path_msgs::msg::HermitePathStamped> path, int resolution)
+{
+  visualization_msgs::msg::MarkerArray marker;
+  std_msgs::msg::ColorRGBA color_center_line = color_names::makeColorMsg("green", 1.0);
+  for (int i = 0; i < static_cast<int>(path.size()); i++) {
+    hermite_path_msgs::msg::HermitePathStamped p = path[i];
+    visualization_msgs::msg::Marker center_line;
+    center_line.header = path[i].header;
+    center_line.ns = "center_line";
+    center_line.id = i;
+    center_line.type = visualization_msgs::msg::Marker::LINE_STRIP;
+    center_line.action = visualization_msgs::msg::Marker::ADD;
+    center_line.frame_locked = false;
+    center_line.scale.x = 0.1;
+    center_line.points = getPointsOnHermitePath(p.path, resolution, 1.0);
+    center_line.colors =
+      std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
+    center_line.lifetime = rclcpp::Duration::from_seconds(1.0);
+    marker.markers.push_back(center_line);
+  }
+  return marker;
+}
+
+visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
+  hermite_path_msgs::msg::HermitePathStamped path, int resolution, bool with_polygon)
 {
   visualization_msgs::msg::MarkerArray marker;
 
@@ -364,13 +425,15 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
   center_line.action = visualization_msgs::msg::Marker::ADD;
   center_line.frame_locked = false;
   center_line.scale.x = 0.1;
-  center_line.points = getPointsOnHermitePath(path.path, resolution);
+  center_line.points = getPointsOnHermitePath(path.path, resolution, 1.0);
   center_line.colors =
     std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
   marker.markers.push_back(center_line);
 
   // Setup Left Bounds Marker
-  marker.markers.push_back(getBoundsPolygon(path, resolution, -0.3));
+  if (with_polygon) {
+    marker.markers.push_back(getBoundsPolygon(path, resolution, -0.3));
+  }
   return marker;
 }
 }  // namespace hermite_path_planner

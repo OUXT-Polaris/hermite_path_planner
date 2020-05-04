@@ -43,6 +43,24 @@ def generate_launch_description():
             get_package_share_directory('velocity_planner'),
             'config', 'obstacle_planner.yaml')
     )
+    velocity_planner_param_file = LaunchConfiguration(
+        'velocity_planner_param_file',
+        default=os.path.join(
+            get_package_share_directory('velocity_planner'),
+            'config', 'velocity_planner.yaml')
+    )
+    local_waypoint_server_param_file = LaunchConfiguration(
+        'local_waypoint_server_param_file',
+        default=os.path.join(
+            get_package_share_directory('local_waypoint_server'),
+            'config', 'local_waypoint_server.yaml')
+    )
+    hermite_path_planner_parm_file = LaunchConfiguration(
+        'hermite_path_planner_parm_file',
+        default=os.path.join(
+            get_package_share_directory('hermite_path_planner'),
+            'config', 'hermite_path_planner.yaml')
+    )
     return LaunchDescription([
         DeclareLaunchArgument(
             'planner_concatenator_param_file',
@@ -63,6 +81,21 @@ def generate_launch_description():
             default_value=obstacle_planner_param_file,
             description='obstacle planner parameters'
         ),
+        DeclareLaunchArgument(
+            'hermite_path_planner_parm_file',
+            default_value=hermite_path_planner_parm_file,
+            description='hremite path planner parameters'
+        ),
+        DeclareLaunchArgument(
+            'velocity_planner_param_file',
+            default_value=velocity_planner_param_file,
+            description='velocity planner parameters'
+        ),
+        DeclareLaunchArgument(
+            'local_waypoint_server_param_file',
+            default_value=local_waypoint_server_param_file,
+            description='local waypoint server parameters'
+        ),
         Node(
             package='hermite_path_planner_bringup',
             node_executable='hermite_path_planner_bringup_node',
@@ -70,6 +103,9 @@ def generate_launch_description():
                 planner_concatenator_param_file,
                 curve_planner_param_file,
                 obstacle_planner_param_file,
-                stop_planner_parm_file],
+                stop_planner_parm_file,
+                velocity_planner_param_file,
+                local_waypoint_server_param_file,
+                hermite_path_planner_parm_file],
             output='screen'),
     ])

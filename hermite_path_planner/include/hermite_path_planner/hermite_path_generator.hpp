@@ -23,6 +23,7 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <iostream>
 #include <vector>
+#include <map>
 
 namespace hermite_path_planner
 {
@@ -31,22 +32,30 @@ class HermitePathGenerator
 public:
   explicit HermitePathGenerator(double robot_width);
   hermite_path_msgs::msg::HermitePath generateHermitePath(
-    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal);
+    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal,
+    double start_vector_magnitude = 10.0, double end_vector_magnitude = 30.0);
   geometry_msgs::msg::Point getPointOnHermitePath(
     hermite_path_msgs::msg::HermitePath path, double t);
   std::vector<geometry_msgs::msg::Point> getPointsOnHermitePath(
-    hermite_path_msgs::msg::HermitePath path, int resolution);
-  visualization_msgs::msg::MarkerArray generateMarker(
-    hermite_path_msgs::msg::HermitePathStamped path, int resolution);
+    hermite_path_msgs::msg::HermitePath path, int resolution, double max_t = 1.0);
   boost::optional<double> checkFirstCollisionWithCircle(
     hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point center, double radius);
   double getLength(hermite_path_msgs::msg::HermitePath path, int resolution);
   double getCurvature(hermite_path_msgs::msg::HermitePath path, double t);
+  boost::optional<double> getNormalizedLongitudinalDistanceInFrenetCoordinate(
+    hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p);
   boost::optional<double> getLongitudinalDistanceInFrenetCoordinate(
+    hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p, int resolution);
+  boost::optional<double> getLateralDistanceInFrenetCoordinate(
     hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p);
   geometry_msgs::msg::Vector3 getTangentVector(hermite_path_msgs::msg::HermitePath path, double t);
   geometry_msgs::msg::Vector3 getNormalVector(hermite_path_msgs::msg::HermitePath path, double t);
   double getReferenceVelocity(hermite_path_msgs::msg::HermitePathStamped path, double t);
+  visualization_msgs::msg::MarkerArray generateDeleteMarker();
+  visualization_msgs::msg::MarkerArray generateMarker(
+    hermite_path_msgs::msg::HermitePathStamped path, int resolution, bool with_polygon = true);
+  visualization_msgs::msg::MarkerArray generateMarker(
+    std::vector<hermite_path_msgs::msg::HermitePathStamped> path, int resolution);
 
 private:
   visualization_msgs::msg::Marker getBoundsPolygon(

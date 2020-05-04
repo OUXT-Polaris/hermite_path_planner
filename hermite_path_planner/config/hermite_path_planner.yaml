@@ -1,0 +1,6 @@
+hermite_path_planner:
+  ros__parameters:
+    planning_frame_id : "map"
+    goal_pose_topic : "/local_waypoint_server/local_waypoint"
+    current_pose_topic : "/current_pose"
+    robot_width : 3.0

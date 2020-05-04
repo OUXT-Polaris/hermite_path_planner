@@ -1,7 +1,9 @@
-obstacle_planner:
+/velocity_planner/obstacle_planner:
   ros__parameters:
     max_deceleration : 0.3
     max_linear_velocity : 0.5
     section_length : 0.3
-    stop_margin : 3.0
+    stop_margin : 5.0
     robot_width : 2.0
+    update_path_topic : "/velocity_planner/planner_concatenator/update"
+    obstacle_scan_topic : "/obstacle_scan"

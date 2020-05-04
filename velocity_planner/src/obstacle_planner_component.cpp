@@ -22,15 +22,19 @@
 namespace velocity_planner
 {
 ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & options)
-: Node("obstacle_planner", options), buffer_(get_clock()), listener_(buffer_), viz_(get_name())
+: Node("obstacle_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_),
+  viz_(get_name())
 {
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   obstacle_marker_pub_ =
     this->create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacle/marker", 1);
   hermite_path_pub_ =
     this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>("~/hermite_path", 1);
+  std::string update_path_topic;
+  declare_parameter("update_path_topic", "/planner_concatenator/update");
+  get_parameter("update_path_topic", update_path_topic);
   update_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>(
-    "/planner_concatenator/update", 1);
+    update_path_topic, 1);
   std::string hermite_path_topic;
   declare_parameter("hermite_path_topic", "/hermite_path_planner/hermite_path");
   get_parameter("hermite_path_topic", hermite_path_topic);
@@ -127,7 +131,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
     path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
     tf2::durationFromSec(1.0));
   tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
-  auto current_t = generator.getLongitudinalDistanceInFrenetCoordinate(
+  auto current_t = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(
     path_->path, pose_transformed.pose.position);
   std::set<double> t_values;
   for (int i = 0; i < static_cast<int>(scan_->ranges.size()); i++) {
@@ -139,7 +143,8 @@ ObstaclePlannerComponent::addObstacleConstraints()
       p.point.z = 0.0;
       p.header = scan_->header;
       p = TransformToMapFrame(p);
-      auto t_value = generator.getLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
+      auto t_value = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path,
+          p.point);
       if (t_value) {
         geometry_msgs::msg::Point nearest_point =
           generator.getPointOnHermitePath(path_->path, t_value.get());

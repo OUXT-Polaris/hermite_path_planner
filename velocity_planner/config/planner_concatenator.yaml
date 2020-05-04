@@ -1,6 +1,6 @@
-planner_concatenator:
+/velocity_planner/planner_concatenator:
   ros__parameters:
     num_input : 3
-    input_topic0: "curve_planner/hermite_path"
-    input_topic1: "obstacle_planner/hermite_path"
-    input_topic2: "stop_planner/hermite_path"
+    input_topic0: "/velocity_planner/curve_planner/hermite_path"
+    input_topic1: "/velocity_planner/obstacle_planner/hermite_path"
+    input_topic2: "/velocity_planner/stop_planner/hermite_path"
