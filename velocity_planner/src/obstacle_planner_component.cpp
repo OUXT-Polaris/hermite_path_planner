@@ -160,6 +160,10 @@ ObstaclePlannerComponent::addObstacleConstraints()
     double t = *t_values.begin();
     double length = generator.getLength(path_.get().path, 200);
     double target_t = t - (stop_margin_ / length);
+    if ((target_t - 1) * length > 1.5) {
+      target_obstacle_t_ = boost::none;
+      return boost::none;
+    }
     if (!target_obstacle_t_) {
       target_obstacle_t_ = target_t;
     } else {

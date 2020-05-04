@@ -199,12 +199,15 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
   double target_t)
 {
   if (!current_pose_) {
+    RCLCPP_WARN(get_logger(), "current pose does not subscribe yet");
     return boost::none;
   }
   if (!path_) {
+    RCLCPP_WARN(get_logger(), "path does not subscribe yet");
     return boost::none;
   }
   if (!current_t_) {
+    RCLCPP_WARN(get_logger(), "t value on the current path path does not subscribe yet");
     return boost::none;
   }
   geometry_msgs::msg::Point target_position;
@@ -213,6 +216,10 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     target_position = generator_->getPointOnHermitePath(path_->path, target_t);
   } else if (target_t < 0.0) {
     geometry_msgs::msg::Vector3 vec = generator_->getTangentVector(path_->path, 0.0);
+    double norm = std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    vec.x = vec.x / norm;
+    vec.y = vec.y / norm;
+    vec.z = vec.z / norm;
     geometry_msgs::msg::Point p = generator_->getPointOnHermitePath(path_->path, 0.0);
     double x = p.x - current_pose_->pose.position.x;
     double y = p.y - current_pose_->pose.position.y;
@@ -221,6 +228,8 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     double c = x * x + y * y - lookahead_distance_ * lookahead_distance_;
     if (b * b - 4 * a * c < 0.0) {
       target_position_ = boost::none;
+      RCLCPP_WARN(
+        get_logger(), "target position does not calculate because of b * b - 4 * a * c < 0.0");
       return boost::none;
     }
     double s0 = (-b - std::sqrt(b * b - 4 * a * c)) / (2 * a);
@@ -241,6 +250,10 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     }
   } else {
     geometry_msgs::msg::Vector3 vec = generator_->getTangentVector(path_->path, 1.0);
+    double norm = std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    vec.x = vec.x / norm;
+    vec.y = vec.y / norm;
+    vec.z = vec.z / norm;
     geometry_msgs::msg::Point p = generator_->getPointOnHermitePath(path_->path, 1.0);
     double x = p.x - current_pose_->pose.position.x;
     double y = p.y - current_pose_->pose.position.y;
@@ -249,6 +262,8 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     double c = x * x + y * y - lookahead_distance_ * lookahead_distance_;
     if (b * b - 4 * a * c < 0.0) {
       target_position_ = boost::none;
+      RCLCPP_WARN(
+        get_logger(), "target position does not calculate because of b * b - 4 * a * c < 0.0");
       return boost::none;
     }
     double s0 = (-b - std::sqrt(b * b - 4 * a * c)) / (2 * a);

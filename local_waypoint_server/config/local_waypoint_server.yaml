@@ -6,3 +6,4 @@ local_waypoint_server:
     robot_width : 3.0
     num_candidates : 16
     sampling_interval : 1.0
+    margin : 0.3

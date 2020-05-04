@@ -132,18 +132,20 @@ PlannerConcatenatorComponent::filterReferenceVelocity(
   keys.sort();
   keys.unique();
   for (auto key_itr = keys.begin(); key_itr != keys.end(); key_itr++) {
-    std::list<std::pair<std::string, double>> vels;
-    auto p = dict.equal_range(*key_itr);
-    for (auto it = p.first; it != p.second; ++it) {
-      vels.emplace_back(it->second);
+    if (*key_itr >= 0.0 && 1.0 >= *key_itr) {
+      std::list<std::pair<std::string, double>> vels;
+      auto p = dict.equal_range(*key_itr);
+      for (auto it = p.first; it != p.second; ++it) {
+        vels.emplace_back(it->second);
+      }
+      vels.sort();
+      hermite_path_msgs::msg::ReferenceVelocity ref_vel;
+      ref_vel.t = *key_itr;
+      std::pair<std::string, double> vel = *vels.begin();
+      ref_vel.linear_velocity = vel.second;
+      ref_vel.from_node = vel.first;
+      ret.push_back(ref_vel);
     }
-    vels.sort();
-    hermite_path_msgs::msg::ReferenceVelocity ref_vel;
-    ref_vel.t = *key_itr;
-    std::pair<std::string, double> vel = *vels.begin();
-    ref_vel.linear_velocity = vel.second;
-    ref_vel.from_node = vel.first;
-    ret.push_back(ref_vel);
   }
   return ret;
 }
@@ -360,7 +362,10 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> vel;
   std::set<std::string> update_targets;
   for (auto itr = data->reference_velocity.begin(); itr != data->reference_velocity.end(); itr++) {
-    update_targets.insert(itr->from_node);
+    if(itr->t >= 0.0 && 1.0 >= itr->t)
+    {
+      update_targets.insert(itr->from_node);
+    }
   }
   for (auto itr = path_.reference_velocity.begin(); itr != path_.reference_velocity.end(); itr++) {
     bool is_update_target = false;
@@ -377,7 +382,15 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
   }
   vel.insert(vel.end(), data->reference_velocity.begin(), data->reference_velocity.end());
   std::sort(vel.begin(), vel.end(), [](const auto & a, const auto & b) {return a.t < b.t;});
-  path_.reference_velocity = vel;
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> filtered_vel;
+  for(auto itr= vel.begin(); itr != vel.end(); itr++)
+  {
+    if(itr->t >= 0.0 && 1.0 >= itr->t)
+    {
+      filtered_vel.push_back(*itr);
+    }
+  }
+  path_.reference_velocity = filtered_vel;
   hermite_path_pub_->publish(path_);
   marker_pub_->publish(viz_.generateDeleteMarker());
   marker_pub_->publish(viz_.generateMarker(path_));

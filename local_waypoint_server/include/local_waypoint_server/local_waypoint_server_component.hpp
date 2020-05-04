@@ -114,6 +114,7 @@ private:
     std::vector<geometry_msgs::msg::Pose> candidates);
   int num_candidates_;
   double sampling_interval_;
+  double margin_;
   boost::optional<geometry_msgs::msg::Pose> replaned_goalpose_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 };

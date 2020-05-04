@@ -32,6 +32,8 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   get_parameter("num_candidates", num_candidates_);
   declare_parameter("sampling_interval", 0.5);
   get_parameter("sampling_interval", sampling_interval_);
+  declare_parameter("margin", 0.5);
+  get_parameter("margin", margin_);
   /**
    * Publishers
    */
@@ -208,7 +210,7 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
     }
   }
   marker_pub_->publish(generator_->generateDeleteMarker());
-  marker_pub_->publish(generator_->generateMarker(path_lists,200));
+  marker_pub_->publish(generator_->generateMarker(path_lists, 200));
   if (non_collision_goal_list.size() == 0) {
     RCLCPP_ERROR(get_logger(), "stacked");
     return boost::none;
@@ -245,7 +247,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
       double lat_dist = std::sqrt(
         std::pow(nearest_point.x - points_itr->x,
         2) + std::pow(nearest_point.y - points_itr->y, 2));
-      if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
+      if (std::fabs(lat_dist) < std::fabs(robot_width_)*0.5+margin_ && t_value.get() > current_t.get()) {
         t_values.insert(t_value.get());
       }
     }
