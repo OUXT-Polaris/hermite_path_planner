@@ -54,6 +54,15 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
   declare_parameter("robot_width", 3.0);
   get_parameter("robot_width", robot_width);
   generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
+
+  declare_parameter("minimum_deceleration", -0.1);
+  get_parameter("minimum_deceleration", minimum_deceleration_);
+  declare_parameter("maximum_accerelation", 0.3);
+  get_parameter("maximum_accerelation", maximum_accerelation_);
+  declare_parameter("max_linear_velocity", 1.0);
+  get_parameter("max_linear_velocity", max_linear_velocity_);
+  declare_parameter("velocity_resoluation", 0.2);
+  get_parameter("velocity_resoluation", velocity_resoluation_);
 }
 
 bool VelocityPlannerComponent::checkTopics()
@@ -90,8 +99,14 @@ void VelocityPlannerComponent::updatePath()
     mtx_.unlock();
     return;
   }
-  VelocityGraph graph(path_.get(), 0.05, 0.1, -0.1, 0.5);
+  auto start_time = get_clock()->now();
+  VelocityGraph graph(path_.get(), velocity_resoluation_, maximum_accerelation_,
+    minimum_deceleration_, max_linear_velocity_);
   auto plan = graph.getPlan();
+  auto end_time = get_clock()->now();
+  auto plannig_duration = end_time - start_time;
+  RCLCPP_INFO(get_logger(), "velocity planner takes " + std::to_string(
+      plannig_duration.seconds()) + " seconts");
   if (plan) {
     RCLCPP_INFO(get_logger(), "velocity planning succeed");
     hermite_path_msgs::msg::HermitePathStamped path;

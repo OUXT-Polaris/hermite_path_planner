@@ -77,6 +77,7 @@ void LocalWaypointServerComponent::hermitePathCallback(
   const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
 {
   current_path_ = *data;
+  updateLocalWaypoint();
 }
 
 void LocalWaypointServerComponent::GoalPoseCallback(
@@ -159,7 +160,6 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
         return;
       }
     }
-    return;
   }
   if (!replaned_goalpose_) {
     geometry_msgs::msg::PoseStamped current_goal_pose;
@@ -173,6 +173,13 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
         previous_local_waypoint_ = current_goal_pose;
         local_waypoint_pub_->publish(current_goal_pose);
       }
+    }
+  } else {
+    double dist_to_replaned_goal = std::sqrt(std::pow(
+          current_pose_->pose.position.x - replaned_goalpose_->position.x, 2) + std::pow(
+          current_pose_->pose.position.y - replaned_goalpose_->position.y, 2));
+    if (dist_to_replaned_goal < 1.3) {
+      replaned_goalpose_ = boost::none;
     }
   }
 }

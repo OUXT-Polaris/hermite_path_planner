@@ -164,8 +164,8 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
     polygon.points.push_back(p0r);
     polygon.points.push_back(p1r);
     std_msgs::msg::ColorRGBA color;
-    double ratio = std::fabs(v) / 0.5;
-    polygon.color = color_names::fromHsv(0.5 * ratio, 1.0, 1.0, 1.0);
+    double ratio = std::fabs(v) / 0.8;
+    polygon.color = color_names::fromHsv(0.6 * ratio, 1.0, 1.0, 1.0);
     ret.markers.push_back(polygon);
   }
   return ret;

@@ -3,3 +3,7 @@
     current_twist_topic : "/current_twist"
     current_pose_topic : "/current_pose"
     hermite_path_topic : "/velocity_planner/planner_concatenator/hermite_path"
+    max_linear_velocity: 0.8
+    maximum_accerelation : 0.3
+    minimum_deceleration : -0.2
+    velocity_resoluation : 0.1
