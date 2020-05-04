@@ -115,6 +115,7 @@ private:
   int num_candidates_;
   double sampling_interval_;
   boost::optional<geometry_msgs::msg::Pose> replaned_goalpose_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_

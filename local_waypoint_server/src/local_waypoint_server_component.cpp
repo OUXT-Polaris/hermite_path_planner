@@ -37,6 +37,7 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
    */
   local_waypoint_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("~/local_waypoint",
       1);
+  marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   /**
    * Subscribers
    */
@@ -186,6 +187,8 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
   if (!current_pose_ || !goal_pose_) {
     return boost::none;
   }
+  rclcpp::Time now = get_clock()->now();
+  std::vector<hermite_path_msgs::msg::HermitePathStamped> path_lists;
   geometry_msgs::msg::PoseStamped start = TransformToPlanningFrame(current_pose_.get());
   std::vector<geometry_msgs::msg::Pose> non_collision_goal_list;
   for (auto pose_itr = candidates.begin(); pose_itr != candidates.end(); pose_itr++) {
@@ -194,11 +197,18 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
         std::pow(pose_itr->position.y - start.pose.position.y, 2));
     auto path = generator_->generateHermitePath(start.pose, *pose_itr,
         goal_distance * 0.25, goal_distance * 0.75);
+    hermite_path_msgs::msg::HermitePathStamped stamped_path;
+    stamped_path.header.frame_id = planning_frame_id_;
+    stamped_path.header.stamp = now;
+    stamped_path.path = path;
+    path_lists.push_back(stamped_path);
     auto obstacle_distance = checkCollisionToPath(path);
     if (!obstacle_distance) {
       non_collision_goal_list.push_back(*pose_itr);
     }
   }
+  marker_pub_->publish(generator_->generateDeleteMarker());
+  marker_pub_->publish(generator_->generateMarker(path_lists,200));
   if (non_collision_goal_list.size() == 0) {
     RCLCPP_ERROR(get_logger(), "stacked");
     return boost::none;

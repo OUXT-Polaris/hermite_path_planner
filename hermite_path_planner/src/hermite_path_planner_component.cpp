@@ -75,7 +75,7 @@ void HermitePathPlannerComponent::GoalPoseCallback(
   path.header.stamp = msg->header.stamp;
   path.header.frame_id = planning_frame_id_;
   hermite_path_pub_->publish(path);
-  marker_pub_->publish(generator_->generateMarker(path, 200));
+  marker_pub_->publish(generator_->generateMarker(path, 30));
 }
 
 void HermitePathPlannerComponent::CurrentPoseCallback(

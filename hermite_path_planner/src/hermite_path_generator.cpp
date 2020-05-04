@@ -14,6 +14,7 @@
 
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <color_names/color_names.h>
+#include <rclcpp/rclcpp.hpp>
 #include <vector>
 #include <algorithm>
 
@@ -386,10 +387,11 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
   std::vector<hermite_path_msgs::msg::HermitePathStamped> path, int resolution)
 {
   visualization_msgs::msg::MarkerArray marker;
-  std_msgs::msg::ColorRGBA color_center_line = color_names::makeColorMsg("red", 1.0);
+  std_msgs::msg::ColorRGBA color_center_line = color_names::makeColorMsg("green", 1.0);
   for (int i = 0; i < static_cast<int>(path.size()); i++) {
     hermite_path_msgs::msg::HermitePathStamped p = path[i];
     visualization_msgs::msg::Marker center_line;
+    center_line.header = path[i].header;
     center_line.ns = "center_line";
     center_line.id = i;
     center_line.type = visualization_msgs::msg::Marker::LINE_STRIP;
@@ -399,6 +401,7 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
     center_line.points = getPointsOnHermitePath(p.path, resolution, 1.0);
     center_line.colors =
       std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
+    center_line.lifetime = rclcpp::Duration::from_seconds(1.0);
     marker.markers.push_back(center_line);
   }
   return marker;
