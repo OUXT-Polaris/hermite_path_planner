@@ -84,6 +84,7 @@ void LocalWaypointServerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
   goal_pose_ = *msg;
+  replaned_goalpose_ = boost::none;
   updateLocalWaypoint();
 }
 
