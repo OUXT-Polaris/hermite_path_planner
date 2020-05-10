@@ -54,6 +54,8 @@ ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & o
   get_parameter("max_linear_velocity", max_linear_velocity_);
   declare_parameter("max_deceleration", 0.5);
   get_parameter("max_deceleration", max_deceleration_);
+  declare_parameter("t_upper_threashold", 1.2);
+  get_parameter("t_upper_threashold", t_upper_threashold_);
   scan_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
     obstacle_scan_topic, 1,
     std::bind(&ObstaclePlannerComponent::scanCallback, this, std::placeholders::_1));
@@ -158,6 +160,10 @@ ObstaclePlannerComponent::addObstacleConstraints()
   }
   if (t_values.size() != 0) {
     double t = *t_values.begin();
+    if (t > t_upper_threashold_) {
+      obstacle_marker_pub_->publish(viz_.generateDeleteMarker());
+      return path_.get();
+    }
     double length = generator.getLength(path_.get().path, 200);
     double target_t = t - (stop_margin_ / length);
     if (!target_obstacle_t_) {
@@ -190,23 +196,9 @@ ObstaclePlannerComponent::addObstacleConstraints()
       path.reference_velocity.push_back(ref);
       i++;
     }
-    i = 0;
-    while (true) {
-      double t = (length * target_t + (static_cast<double>(i) * section_length_)) / length;
-      if (t > 1.0) {
-        break;
-      }
-      hermite_path_msgs::msg::ReferenceVelocity ref;
-      ref.t = t;
-      ref.linear_velocity = 0;
-      ref.from_node = get_name();
-      path.reference_velocity.push_back(ref);
-      i++;
-    }
-
     obstacle_marker_pub_->publish(viz_.generateDeleteMarker());
     obstacle_marker_pub_->publish(
-      viz_.generateObstacleMarker(t, path_.get(), color_names::makeColorMsg("red", 0.8)));
+      viz_.generateObstacleMarker(t, path_.get(), color_names::makeColorMsg("red", 0.8), 1.5));
     return path;
   } else {
     obstacle_marker_pub_->publish(viz_.generateDeleteMarker());

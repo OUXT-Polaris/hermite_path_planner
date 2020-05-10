@@ -5,5 +5,6 @@
     section_length : 0.5
     stop_margin : 5.0
     robot_width : 2.0
+    t_upper_threashold: 1.2
     update_path_topic : "/velocity_planner/planner_concatenator/update"
     obstacle_scan_topic : "/obstacle_scan"

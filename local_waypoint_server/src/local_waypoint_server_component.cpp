@@ -211,11 +211,7 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
   geometry_msgs::msg::PoseStamped start = TransformToPlanningFrame(current_pose_.get());
   std::vector<geometry_msgs::msg::Pose> non_collision_goal_list;
   for (auto pose_itr = candidates.begin(); pose_itr != candidates.end(); pose_itr++) {
-    double goal_distance =
-      std::sqrt(std::pow(pose_itr->position.x - start.pose.position.x, 2) +
-        std::pow(pose_itr->position.y - start.pose.position.y, 2));
-    auto path = generator_->generateHermitePath(start.pose, *pose_itr,
-        goal_distance * 0.25, goal_distance * 0.75);
+    auto path = generator_->generateHermitePath(start.pose, *pose_itr);
     hermite_path_msgs::msg::HermitePathStamped stamped_path;
     stamped_path.header.frame_id = planning_frame_id_;
     stamped_path.header.stamp = now;

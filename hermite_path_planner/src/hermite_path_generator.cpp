@@ -26,9 +26,9 @@ double HermitePathGenerator::getCurvature(hermite_path_msgs::msg::HermitePath pa
 {
   double t2 = t * t;
   double x_dot = 3 * path.ax * t2 + 2 * path.bx * t + path.cx;
-  double x_dot_dot = 6 * path.ax + 2 * path.bx;
+  double x_dot_dot = 6 * path.ax * t + 2 * path.bx;
   double y_dot = 3 * path.ay * t2 + 2 * path.by * t + path.cy;
-  double y_dot_dot = 6 * path.ay + 2 * path.by;
+  double y_dot_dot = 6 * path.ay * t + 2 * path.by;
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
@@ -227,6 +227,17 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
     ret = ret - diff;
   }
   return boost::none;
+}
+
+hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
+  geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal)
+{
+  double goal_distance =
+    std::sqrt(std::pow(goal.position.x - start.position.x, 2) +
+      std::pow(goal.position.y - start.position.y, 2));
+  auto path = generateHermitePath(start, goal,
+      goal_distance * 0.25, goal_distance * 0.75);
+  return path;
 }
 
 hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
