@@ -265,7 +265,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
         double lat_dist = std::sqrt(
           std::pow(nearest_point.x - points_itr->x,
           2) + std::pow(nearest_point.y - points_itr->y, 2));
-        if (lat_dist < std::fabs(robot_width_) * 0.5 + margin_) {
+        if (lat_dist < std::fabs(robot_width_ * 0.5 + margin_)) {
           t_values.insert(t_value.get());
         }
       }
@@ -296,7 +296,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPat
       double lat_dist = std::sqrt(
         std::pow(nearest_point.x - points_itr->x,
         2) + std::pow(nearest_point.y - points_itr->y, 2));
-      if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
+      if (std::fabs(lat_dist) < std::fabs(robot_width_ * 0.5 + margin_) && t_value.get() > current_t.get()) {
         t_values.insert(t_value.get());
       }
     }

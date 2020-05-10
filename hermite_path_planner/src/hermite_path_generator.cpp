@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <hermite_path_planner/hermite_path_generator.hpp>
+#include <quaternion_operation/quaternion_operation.h>
 #include <color_names/color_names.h>
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
@@ -21,6 +22,19 @@
 namespace hermite_path_planner
 {
 HermitePathGenerator::HermitePathGenerator(double robot_width) {robot_width_ = robot_width;}
+
+double HermitePathGenerator::getMaximumCurvature(
+  hermite_path_msgs::msg::HermitePath path,
+  int resolution)
+{
+  std::vector<double> curvatures;
+  double step_size = 1.0 / static_cast<double>(resolution);
+  for (int i = 0; i < (resolution + 1); i++) {
+    double t = step_size * static_cast<double>(i);
+    curvatures.push_back(getCurvature(path,t));
+  }
+  return *std::max_element(curvatures.begin(),curvatures.end());
+}
 
 double HermitePathGenerator::getCurvature(hermite_path_msgs::msg::HermitePath path, double t)
 {
@@ -235,9 +249,26 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
   double goal_distance =
     std::sqrt(std::pow(goal.position.x - start.position.x, 2) +
       std::pow(goal.position.y - start.position.y, 2));
-  auto path = generateHermitePath(start, goal,
-      goal_distance * 0.25, goal_distance * 0.75);
-  return path;
+  /*
+  double diff_x = goal.position.x - start.position.x;
+  double diff_y = goal.position.y - start.position.y;
+  double diff_theta = std::fabs(std::atan2(diff_y, diff_x));
+  double ratio = sigmoid(1.0, diff_theta) * 3.0;
+  */
+  const int resolution = 50;
+  double step_size = 5.0 / static_cast<double>(resolution);
+  std::vector<double> max_curvatures;
+  std::vector<hermite_path_msgs::msg::HermitePath> path_list;
+  for (int i = 0; i < (resolution + 1); i++) {
+    double ratio = step_size * static_cast<double>(i) + 1.0;
+    auto path = generateHermitePath(start, goal,
+      ratio * goal_distance * 0.75, goal_distance * 0.75);
+    max_curvatures.push_back(getMaximumCurvature(path,50));
+    path_list.push_back(path);
+  }
+  auto itr = std::min_element(max_curvatures.begin(), max_curvatures.end());
+  size_t index = std::distance(max_curvatures.begin(), itr);
+  return path_list[index];
 }
 
 hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
@@ -412,7 +443,7 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
     center_line.points = getPointsOnHermitePath(p.path, resolution, 1.0);
     center_line.colors =
       std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
-    center_line.lifetime = rclcpp::Duration::from_seconds(1.0);
+    center_line.lifetime = rclcpp::Duration::from_seconds(3.0);
     marker.markers.push_back(center_line);
   }
   return marker;

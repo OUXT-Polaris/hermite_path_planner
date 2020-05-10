@@ -100,7 +100,7 @@ private:
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
   boost::optional<double> current_t_, target_t_;
   boost::optional<geometry_msgs::msg::Point> target_position_;
-  visualization_msgs::msg::MarkerArray generateMarker();
+  visualization_msgs::msg::MarkerArray generateMarker(boost::optional<geometry_msgs::msg::Twist> twist);
 };
 }  // namespace pure_pursuit_planner
 
