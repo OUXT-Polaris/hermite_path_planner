@@ -72,6 +72,7 @@ double HermitePathGenerator::getReferenceVelocity(
       return std::sqrt(v2);
     }
   }
+  /*
   if (path.reference_velocity.end()->t > t) {
     size_t end_ref_vel_index = path.reference_velocity.size() - 1;
     double diff_l = (path.reference_velocity[end_ref_vel_index].t -
@@ -89,6 +90,7 @@ double HermitePathGenerator::getReferenceVelocity(
       return std::sqrt(v2);
     }
   }
+  */
   for (int i = 0; i < static_cast<int>(path.reference_velocity.size()) - 1; i++) {
     if (path.reference_velocity[i + 1].t >= t && t >= path.reference_velocity[i].t) {
       double diff_l = (path.reference_velocity[i + 1].t - path.reference_velocity[i].t) * l;
@@ -255,19 +257,23 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
   double diff_theta = std::fabs(std::atan2(diff_y, diff_x));
   double ratio = sigmoid(1.0, diff_theta) * 3.0;
   */
-  const int resolution = 50;
+  const int resolution = 20;
   double step_size = 5.0 / static_cast<double>(resolution);
-  std::vector<double> max_curvatures;
+  std::vector<double> path_lengths;
   std::vector<hermite_path_msgs::msg::HermitePath> path_list;
   for (int i = 0; i < (resolution + 1); i++) {
-    double ratio = step_size * static_cast<double>(i) + 1.0;
-    auto path = generateHermitePath(start, goal,
-      ratio * goal_distance * 0.75, goal_distance * 0.75);
-    max_curvatures.push_back(getMaximumCurvature(path,50));
-    path_list.push_back(path);
+    for (int m = 0; m < (resolution + 1); m++) {
+      double ratio_start = step_size * static_cast<double>(i) + 0.5;
+      double ratio_goal = step_size * static_cast<double>(i) + 0.5;
+      auto path = generateHermitePath(start, goal,
+        ratio_start * goal_distance, ratio_goal * goal_distance);
+      path_lengths.push_back(getLength(path,100));
+      // path_lengths.push_back(getMaximumCurvature(path,50));
+      path_list.push_back(path);
+    }
   }
-  auto itr = std::min_element(max_curvatures.begin(), max_curvatures.end());
-  size_t index = std::distance(max_curvatures.begin(), itr);
+  auto itr = std::min_element(path_lengths.begin(), path_lengths.end());
+  size_t index = std::distance(path_lengths.begin(), itr);
   return path_list[index];
 }
 
