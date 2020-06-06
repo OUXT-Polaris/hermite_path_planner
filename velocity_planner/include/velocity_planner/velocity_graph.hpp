@@ -76,7 +76,6 @@ private:
   VelocityGraphData & graph_;
 };
 
-/*
 struct found_goal {};
 class AstarGoalVisitor : public boost::default_astar_visitor
 {
@@ -92,10 +91,8 @@ public:
   }
 
 private:
-  //Vertex m_goal;
   VelocityGraphData::vertex_descriptor m_goal;
 };
-*/
 
 class VelocityGraph
 {
