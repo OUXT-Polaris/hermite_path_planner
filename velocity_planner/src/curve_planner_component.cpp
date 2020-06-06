@@ -48,6 +48,10 @@ void CurvePlannerComponent::hermitePathCallback(
   for (int i = 0; i < num_resolution_; i++) {
     double t = (0.5 + static_cast<double>(i)) / num_resolution_;
     double curvature = generator_.getCurvature(path_->path, t);
+    if(1 / std::fabs(curvature) * target_angular_velocity_ > max_linear_velocity_)
+    {
+      continue;
+    }
     hermite_path_msgs::msg::ReferenceVelocity vel;
     vel.t = t;
     if (std::fabs(curvature) < e) {
