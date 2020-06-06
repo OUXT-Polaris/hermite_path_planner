@@ -220,8 +220,8 @@ std::vector<Node> VelocityGraph::makeNodes(hermite_path_msgs::msg::ReferenceVelo
 {
   std::vector<Node> ret;
   double v = 0.0;
-  int count = 1;
   if (velocity_resoluation_ < vel.linear_velocity) {
+    int count = 0;
     while (v < vel.linear_velocity) {
       v = velocity_resoluation_ * count;
       Node n;

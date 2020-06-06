@@ -97,9 +97,13 @@ geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(pose.header.stamp.sec) +
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped =
-    buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(pose, pose, transform_stamped);
+
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped =
+      buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(pose, pose, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return pose;
 }
 
@@ -112,9 +116,12 @@ geometry_msgs::msg::PointStamped ObstaclePlannerComponent::TransformToMapFrame(
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(point.header.stamp.sec) +
     std::chrono::nanoseconds(point.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped =
-    buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(point, point, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped =
+      buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(point, point, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return point;
 }
 
@@ -129,10 +136,14 @@ ObstaclePlannerComponent::addObstacleConstraints()
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(current_pose_->header.stamp.sec) +
     std::chrono::nanoseconds(current_pose_->header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
-    tf2::durationFromSec(1.0));
-  tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
+      tf2::durationFromSec(1.0));
+    tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+    return boost::none;
+  }
   auto current_t = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(
     path_->path, pose_transformed.pose.position);
   std::set<double> t_values;

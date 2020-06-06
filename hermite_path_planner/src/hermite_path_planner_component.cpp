@@ -51,9 +51,12 @@ geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanning
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(pose.header.stamp.sec) +
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(pose, pose, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(pose, pose, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return pose;
 }
 

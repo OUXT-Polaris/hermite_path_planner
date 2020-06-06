@@ -195,10 +195,14 @@ void PurePursuitPlannerComponent::currentPoseCallback(
     tf2::TimePoint time_point = tf2::TimePoint(
       std::chrono::seconds(current_pose_->header.stamp.sec) +
       std::chrono::nanoseconds(current_pose_->header.stamp.nanosec));
-    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-      current_pose_->header.frame_id, path_->header.frame_id, time_point,
-      tf2::durationFromSec(1.0));
-    tf2::doTransform(*current_pose_, current_pose_transformed_.get(), transform_stamped);
+    try {
+      geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+        current_pose_->header.frame_id, path_->header.frame_id, time_point,
+        tf2::durationFromSec(1.0));
+      tf2::doTransform(*current_pose_, current_pose_transformed_.get(), transform_stamped);
+    } catch (tf2::ExtrapolationException e) {
+      return;
+    }
   } else {
     current_pose_transformed_ = current_pose_.get();
   }
