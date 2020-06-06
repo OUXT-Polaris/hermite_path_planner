@@ -31,9 +31,9 @@ double HermitePathGenerator::getMaximumCurvature(
   double step_size = 1.0 / static_cast<double>(resolution);
   for (int i = 0; i < (resolution + 1); i++) {
     double t = step_size * static_cast<double>(i);
-    curvatures.push_back(getCurvature(path,t));
+    curvatures.push_back(getCurvature(path, t));
   }
-  return *std::max_element(curvatures.begin(),curvatures.end());
+  return *std::max_element(curvatures.begin(), curvatures.end());
 }
 
 double HermitePathGenerator::getCurvature(hermite_path_msgs::msg::HermitePath path, double t)
@@ -266,8 +266,8 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
       double ratio_start = step_size * static_cast<double>(i) + 0.5;
       double ratio_goal = step_size * static_cast<double>(i) + 0.5;
       auto path = generateHermitePath(start, goal,
-        ratio_start * goal_distance, ratio_goal * goal_distance);
-      path_lengths.push_back(getLength(path,100));
+          ratio_start * goal_distance, ratio_goal * goal_distance);
+      path_lengths.push_back(getLength(path, 100));
       // path_lengths.push_back(getMaximumCurvature(path,50));
       path_list.push_back(path);
     }

@@ -43,6 +43,7 @@ include_directories(
 add_library(velocity_planner_component SHARED
   src/velocity_planner_component.cpp
   src/velocity_visualizer.cpp
+  src/heuristic_function.cpp
   src/velocity_graph.cpp)
 target_compile_definitions(velocity_planner_component
   PRIVATE "VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_BUILDING_DLL")

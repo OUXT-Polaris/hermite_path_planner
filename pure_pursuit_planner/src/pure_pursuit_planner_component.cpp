@@ -69,11 +69,12 @@ void PurePursuitPlannerComponent::currentTwistCallback(
   }
 }
 
-visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker(boost::optional<geometry_msgs::msg::Twist> twist)
+visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker(
+  boost::optional<geometry_msgs::msg::Twist> twist)
 {
   visualization_msgs::msg::MarkerArray marker;
   // draw text marker
-  if (current_pose_transformed_){
+  if (current_pose_transformed_) {
     visualization_msgs::msg::Marker text_marker;
     text_marker.header = current_pose_transformed_->header;
     text_marker.ns = "target_twist";
@@ -89,12 +90,12 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
     text_marker.scale.x = 0.4;
     text_marker.scale.y = 0.4;
     text_marker.scale.z = 0.4;
-    if(twist){
-      text_marker.text = "linear:" + std::to_string(twist->linear.x) + "(m/s)\nangular:" + std::to_string(twist->angular.z)+"(rad/s)";
+    if (twist) {
+      text_marker.text = "linear:" + std::to_string(twist->linear.x) + "(m/s)\nangular:" +
+        std::to_string(twist->angular.z) + "(rad/s)";
       double ratio = std::fabs(twist->linear.x) / 0.8;
       text_marker.color = color_names::fromHsv(0.6 * ratio, 1.0, 1.0, 1.0);
-    }
-    else{
+    } else {
       text_marker.text = "linear : invalid\n angular : invalid";
       text_marker.color = color_names::makeColorMsg("white", 1.0);
     }
@@ -323,7 +324,7 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getTarge
     target_position.y - current_pose_->pose.position.y,
     target_position.x - current_pose_->pose.position.x);
   auto diff_quat = quaternion_operation::convertEulerAngleToQuaternion(diff_rpy);
-  auto rot_quat = quaternion_operation::getRotation(current_pose_->pose.orientation,diff_quat);
+  auto rot_quat = quaternion_operation::getRotation(current_pose_->pose.orientation, diff_quat);
   double alpha = quaternion_operation::convertQuaternionToEulerAngle(rot_quat).z;
   double r = std::sqrt(
     std::pow(target_position.x - current_pose_->pose.position.x, 2) +
