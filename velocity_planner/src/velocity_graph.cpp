@@ -71,6 +71,7 @@ void VelocityGraph::plan()
   for (auto id_itr = start_node_ids_.begin(); id_itr != start_node_ids_.end(); id_itr++) {
     VelocityGraphData::vertex_descriptor from = vertex_dict_[*id_itr];
     VelocityGraphData::vertex_descriptor to = vertex_dict_[end_node_id_];
+    HeuristicFunc(to, data_);
     boost::dijkstra_shortest_paths(
       data_, from,
       boost::weight_map(boost::get(&Edge::weight, data_))
