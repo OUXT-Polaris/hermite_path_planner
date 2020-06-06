@@ -71,25 +71,26 @@ void VelocityGraph::plan()
   for (auto id_itr = start_node_ids_.begin(); id_itr != start_node_ids_.end(); id_itr++) {
     VelocityGraphData::vertex_descriptor from = vertex_dict_[*id_itr];
     VelocityGraphData::vertex_descriptor to = vertex_dict_[end_node_id_];
-    HeuristicFunc(to, data_);
-    boost::dijkstra_shortest_paths(
-      data_, from,
-      boost::weight_map(boost::get(&Edge::weight, data_))
+    auto visitor = boost::weight_map(boost::get(&Edge::weight, data_))
       .predecessor_map(&parents[0])
-      .distance_map(&weights[0]));
-    if (weights[to] != to) {
-      Plan p;
-      for (auto v = to;; v = parents[v]) {
-        hermite_path_msgs::msg::ReferenceVelocity vel;
-        vel = data_[v].vel;
-        p.plan.push_front(vel);
-        if (v == from || plan_length_ < static_cast<int>(p.plan.size())) {
-          break;
+      .distance_map(&weights[0]).visitor(AstarGoalVisitor(to));
+    try {
+      boost::astar_search_tree(data_, from, HeuristicFunc(to, data_), visitor);
+    } catch (found_goal fg) {
+      if (parents[to] != to) {
+        Plan p;
+        for (auto v = to;; v = parents[v]) {
+          hermite_path_msgs::msg::ReferenceVelocity vel;
+          vel = data_[v].vel;
+          p.plan.push_front(vel);
+          if (v == from || plan_length_ < static_cast<int>(p.plan.size())) {
+            break;
+          }
         }
-      }
-      if (plan_length_ == static_cast<int>(p.plan.size())) {
-        p.total_weights = weights[to];
-        plans.push_back(p);
+        if (plan_length_ == static_cast<int>(p.plan.size())) {
+          p.total_weights = weights[to];
+          plans.push_back(p);
+        }
       }
     }
   }

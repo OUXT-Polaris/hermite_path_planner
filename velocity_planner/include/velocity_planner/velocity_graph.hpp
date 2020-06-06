@@ -64,11 +64,13 @@ public:
   using Vertex = VelocityGraphData::vertex_descriptor;
 
   explicit HeuristicFunc(Vertex goal, VelocityGraphData & g)
-  : goal_(goal), graph_(g) {}
+  : goal_(goal), graph_(g)
+  {
+  }
 
   double operator()(Vertex u) const
   {
-    return 0;//get(boost::vertex_index, graph_, goal_) - get(boost::vertex_index, graph_, u);
+    return graph_[u].vel.linear_velocity;
   }
 
 private:
@@ -83,6 +85,7 @@ public:
   explicit AstarGoalVisitor(VelocityGraphData::vertex_descriptor goal)
   : m_goal(goal) {}
 
+  template<class Graph>
   void examine_vertex(VelocityGraphData::vertex_descriptor u, Graph &)
   {
     if (u == m_goal) {
