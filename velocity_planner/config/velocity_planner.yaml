@@ -6,4 +6,4 @@
     max_linear_velocity: 0.8
     maximum_accerelation : 0.3
     minimum_accerelation : -0.2
-    velocity_resoluation : 0.1
+    velocity_resoluation : 0.2

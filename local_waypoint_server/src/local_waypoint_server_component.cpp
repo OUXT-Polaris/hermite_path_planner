@@ -218,7 +218,9 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
     stamped_path.path = path;
     path_lists.push_back(stamped_path);
     auto obstacle_distance = checkCollisionToPath(path);
-    if (!obstacle_distance) {
+    auto after_path = generator_->generateHermitePath(*pose_itr, goal_pose_.get().pose);
+    auto obstacle_distance_in_after_path = checkCollisionToPath(after_path);
+    if (!obstacle_distance && !obstacle_distance_in_after_path) {
       non_collision_goal_list.push_back(*pose_itr);
       non_collision_path_lists.push_back(stamped_path);
     }

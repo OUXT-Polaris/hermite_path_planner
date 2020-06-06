@@ -2,5 +2,5 @@
   ros__parameters:
     target_angular_velocity : 0.1
     max_linear_velocity: 0.8
-    num_resolution : 30
+    num_resolution : 10
     hermite_path_topic : /hermite_path_planner/hermite_path
