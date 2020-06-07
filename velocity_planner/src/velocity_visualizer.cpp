@@ -118,9 +118,10 @@ double VelocityVisualizer::getVelocity(
 visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
   hermite_path_msgs::msg::HermitePathStamped path, double ratio, double width)
 {
+  constexpr int num_segment = 100;
+  constexpr double segment_length = 1 / static_cast<double>(num_segment);
   visualization_msgs::msg::MarkerArray ret;
-  int path_length = path.reference_velocity.size();
-  for (int i = 0; i < (path_length - 1); i++) {
+  for (int i = 0; i < num_segment; i++) {
     visualization_msgs::msg::Marker polygon;
     polygon.header = path.header;
     polygon.ns = "polygon";
@@ -130,11 +131,11 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
     polygon.scale.x = 1.0;
     polygon.scale.y = 1.0;
     polygon.scale.z = 1.0;
-    double t0 = path.reference_velocity[i].t;
-    double t1 = path.reference_velocity[i + 1].t;
-    double v0 = path.reference_velocity[i].linear_velocity;
-    double v1 = path.reference_velocity[i + 1].linear_velocity;
-    double v = (v0 + v1) / 2.0;
+    double t0 = static_cast<double>(i) * segment_length;
+    double t1 = static_cast<double>(i + 1) * segment_length;
+    double v0 = generator_.getReferenceVelocity(path, t0);
+    double v1 = generator_.getReferenceVelocity(path, t1);
+    double v = (v0 + v1) * 0.5;
     geometry_msgs::msg::Vector3 vec0 = generator_.getNormalVector(path.path, t0);
     geometry_msgs::msg::Vector3 vec1 = generator_.getNormalVector(path.path, t1);
     double theta0 = std::atan2(vec0.y, vec0.x);
