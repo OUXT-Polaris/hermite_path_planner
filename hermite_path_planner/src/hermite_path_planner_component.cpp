@@ -51,9 +51,12 @@ geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanning
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(pose.header.stamp.sec) +
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(pose, pose, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(pose, pose, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return pose;
 }
 
@@ -67,11 +70,7 @@ void HermitePathPlannerComponent::GoalPoseCallback(
   geometry_msgs::msg::PoseStamped goal_pose = TransformToPlanningFrame(*msg);
   geometry_msgs::msg::PoseStamped current_pose = TransformToPlanningFrame(*current_pose_);
   hermite_path_msgs::msg::HermitePathStamped path;
-  double goal_distance =
-    std::sqrt(std::pow(goal_pose.pose.position.x - current_pose.pose.position.x, 2) +
-      std::pow(goal_pose.pose.position.y - current_pose.pose.position.y, 2));
-  path.path = generator_->generateHermitePath(current_pose.pose, goal_pose.pose,
-      goal_distance * 0.25, goal_distance * 0.75);
+  path.path = generator_->generateHermitePath(current_pose.pose, goal_pose.pose);
   path.header.stamp = msg->header.stamp;
   path.header.frame_id = planning_frame_id_;
   hermite_path_pub_->publish(path);

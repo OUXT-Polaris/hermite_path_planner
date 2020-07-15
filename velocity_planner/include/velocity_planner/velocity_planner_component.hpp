@@ -93,6 +93,7 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
   boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
   void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr polygon_marker_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
@@ -102,7 +103,7 @@ private:
   std::mutex mtx_;
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
   double maximum_accerelation_ = 0.3;
-  double minimum_deceleration_ = -0.1;
+  double minimum_accerelation_ = -0.1;
   double max_linear_velocity_ = 1.0;
   double velocity_resoluation_ = 0.2;
   VelocityVisualizer viz_;

@@ -84,6 +84,7 @@ void LocalWaypointServerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
   goal_pose_ = *msg;
+  replaned_goalpose_ = boost::none;
   updateLocalWaypoint();
 }
 
@@ -210,18 +211,16 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
   geometry_msgs::msg::PoseStamped start = TransformToPlanningFrame(current_pose_.get());
   std::vector<geometry_msgs::msg::Pose> non_collision_goal_list;
   for (auto pose_itr = candidates.begin(); pose_itr != candidates.end(); pose_itr++) {
-    double goal_distance =
-      std::sqrt(std::pow(pose_itr->position.x - start.pose.position.x, 2) +
-        std::pow(pose_itr->position.y - start.pose.position.y, 2));
-    auto path = generator_->generateHermitePath(start.pose, *pose_itr,
-        goal_distance * 0.25, goal_distance * 0.75);
+    auto path = generator_->generateHermitePath(start.pose, *pose_itr);
     hermite_path_msgs::msg::HermitePathStamped stamped_path;
     stamped_path.header.frame_id = planning_frame_id_;
     stamped_path.header.stamp = now;
     stamped_path.path = path;
     path_lists.push_back(stamped_path);
     auto obstacle_distance = checkCollisionToPath(path);
-    if (!obstacle_distance) {
+    auto after_path = generator_->generateHermitePath(*pose_itr, goal_pose_.get().pose);
+    auto obstacle_distance_in_after_path = checkCollisionToPath(after_path);
+    if (!obstacle_distance && !obstacle_distance_in_after_path) {
       non_collision_goal_list.push_back(*pose_itr);
       non_collision_path_lists.push_back(stamped_path);
     }
@@ -268,7 +267,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
         double lat_dist = std::sqrt(
           std::pow(nearest_point.x - points_itr->x,
           2) + std::pow(nearest_point.y - points_itr->y, 2));
-        if (lat_dist < std::fabs(robot_width_) * 0.5 + margin_) {
+        if (lat_dist < std::fabs(robot_width_ * 0.5 + margin_)) {
           t_values.insert(t_value.get());
         }
       }
@@ -299,7 +298,9 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPat
       double lat_dist = std::sqrt(
         std::pow(nearest_point.x - points_itr->x,
         2) + std::pow(nearest_point.y - points_itr->y, 2));
-      if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
+      if (std::fabs(lat_dist) < std::fabs(robot_width_ * 0.5 + margin_) &&
+        t_value.get() > current_t.get())
+      {
         t_values.insert(t_value.get());
       }
     }
@@ -339,9 +340,12 @@ geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanni
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(point.header.stamp.sec) +
     std::chrono::nanoseconds(point.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    planning_frame_id_, point.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(point, point, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      planning_frame_id_, point.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(point, point, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return point;
 }
 
@@ -354,9 +358,12 @@ geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlannin
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(pose.header.stamp.sec) +
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(pose, pose, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(pose, pose, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return pose;
 }
 }  // namespace local_waypoint_server

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <hermite_path_planner/hermite_path_generator.hpp>
+#include <quaternion_operation/quaternion_operation.h>
 #include <color_names/color_names.h>
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
@@ -22,13 +23,26 @@ namespace hermite_path_planner
 {
 HermitePathGenerator::HermitePathGenerator(double robot_width) {robot_width_ = robot_width;}
 
+double HermitePathGenerator::getMaximumCurvature(
+  hermite_path_msgs::msg::HermitePath path,
+  int resolution)
+{
+  std::vector<double> curvatures;
+  double step_size = 1.0 / static_cast<double>(resolution);
+  for (int i = 0; i < (resolution + 1); i++) {
+    double t = step_size * static_cast<double>(i);
+    curvatures.push_back(getCurvature(path, t));
+  }
+  return *std::max_element(curvatures.begin(), curvatures.end());
+}
+
 double HermitePathGenerator::getCurvature(hermite_path_msgs::msg::HermitePath path, double t)
 {
   double t2 = t * t;
   double x_dot = 3 * path.ax * t2 + 2 * path.bx * t + path.cx;
-  double x_dot_dot = 6 * path.ax + 2 * path.bx;
+  double x_dot_dot = 6 * path.ax * t + 2 * path.bx;
   double y_dot = 3 * path.ay * t2 + 2 * path.by * t + path.cy;
-  double y_dot_dot = 6 * path.ay + 2 * path.by;
+  double y_dot_dot = 6 * path.ay * t + 2 * path.by;
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
@@ -58,6 +72,7 @@ double HermitePathGenerator::getReferenceVelocity(
       return std::sqrt(v2);
     }
   }
+  /*
   if (path.reference_velocity.end()->t > t) {
     size_t end_ref_vel_index = path.reference_velocity.size() - 1;
     double diff_l = (path.reference_velocity[end_ref_vel_index].t -
@@ -75,6 +90,7 @@ double HermitePathGenerator::getReferenceVelocity(
       return std::sqrt(v2);
     }
   }
+  */
   for (int i = 0; i < static_cast<int>(path.reference_velocity.size()) - 1; i++) {
     if (path.reference_velocity[i + 1].t >= t && t >= path.reference_velocity[i].t) {
       double diff_l = (path.reference_velocity[i + 1].t - path.reference_velocity[i].t) * l;
@@ -227,6 +243,38 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
     ret = ret - diff;
   }
   return boost::none;
+}
+
+hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
+  geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal)
+{
+  double goal_distance =
+    std::sqrt(std::pow(goal.position.x - start.position.x, 2) +
+      std::pow(goal.position.y - start.position.y, 2));
+  /*
+  double diff_x = goal.position.x - start.position.x;
+  double diff_y = goal.position.y - start.position.y;
+  double diff_theta = std::fabs(std::atan2(diff_y, diff_x));
+  double ratio = sigmoid(1.0, diff_theta) * 3.0;
+  */
+  const int resolution = 20;
+  double step_size = 5.0 / static_cast<double>(resolution);
+  std::vector<double> path_lengths;
+  std::vector<hermite_path_msgs::msg::HermitePath> path_list;
+  for (int i = 0; i < (resolution + 1); i++) {
+    for (int m = 0; m < (resolution + 1); m++) {
+      double ratio_start = step_size * static_cast<double>(i) + 0.5;
+      double ratio_goal = step_size * static_cast<double>(i) + 0.5;
+      auto path = generateHermitePath(start, goal,
+          ratio_start * goal_distance, ratio_goal * goal_distance);
+      path_lengths.push_back(getLength(path, 100));
+      // path_lengths.push_back(getMaximumCurvature(path,50));
+      path_list.push_back(path);
+    }
+  }
+  auto itr = std::min_element(path_lengths.begin(), path_lengths.end());
+  size_t index = std::distance(path_lengths.begin(), itr);
+  return path_list[index];
 }
 
 hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
@@ -401,7 +449,7 @@ visualization_msgs::msg::MarkerArray HermitePathGenerator::generateMarker(
     center_line.points = getPointsOnHermitePath(p.path, resolution, 1.0);
     center_line.colors =
       std::vector<std_msgs::msg::ColorRGBA>(center_line.points.size(), color_center_line);
-    center_line.lifetime = rclcpp::Duration::from_seconds(1.0);
+    center_line.lifetime = rclcpp::Duration::from_seconds(3.0);
     marker.markers.push_back(center_line);
   }
   return marker;

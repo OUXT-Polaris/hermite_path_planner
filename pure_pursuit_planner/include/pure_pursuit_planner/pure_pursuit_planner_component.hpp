@@ -79,7 +79,7 @@ public:
   explicit PurePursuitPlannerComponent(const rclcpp::NodeOptions & options);
 
 private:
-  boost::optional<geometry_msgs::msg::Twist> getCurrentTwist(double target_t);
+  boost::optional<geometry_msgs::msg::Twist> getTargetTwist(double target_t);
   void currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data);
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
   void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
@@ -100,7 +100,8 @@ private:
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
   boost::optional<double> current_t_, target_t_;
   boost::optional<geometry_msgs::msg::Point> target_position_;
-  visualization_msgs::msg::MarkerArray generateMarker();
+  visualization_msgs::msg::MarkerArray generateMarker(
+    boost::optional<geometry_msgs::msg::Twist> twist);
 };
 }  // namespace pure_pursuit_planner
 

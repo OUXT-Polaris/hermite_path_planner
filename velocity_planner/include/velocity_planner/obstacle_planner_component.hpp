@@ -98,6 +98,7 @@ private:
   double section_length_;
   double max_linear_velocity_;
   double max_deceleration_;
+  double t_upper_threashold_;
   boost::optional<double> target_obstacle_t_;
 };
 }  // namespace velocity_planner

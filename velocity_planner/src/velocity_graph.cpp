@@ -71,24 +71,26 @@ void VelocityGraph::plan()
   for (auto id_itr = start_node_ids_.begin(); id_itr != start_node_ids_.end(); id_itr++) {
     VelocityGraphData::vertex_descriptor from = vertex_dict_[*id_itr];
     VelocityGraphData::vertex_descriptor to = vertex_dict_[end_node_id_];
-    boost::dijkstra_shortest_paths(
-      data_, from,
-      boost::weight_map(boost::get(&Edge::weight, data_))
+    auto visitor = boost::weight_map(boost::get(&Edge::weight, data_))
       .predecessor_map(&parents[0])
-      .distance_map(&weights[0]));
-    if (weights[to] != to) {
-      Plan p;
-      for (auto v = to;; v = parents[v]) {
-        hermite_path_msgs::msg::ReferenceVelocity vel;
-        vel = data_[v].vel;
-        p.plan.push_front(vel);
-        if (v == from || plan_length_ < static_cast<int>(p.plan.size())) {
-          break;
+      .distance_map(&weights[0]).visitor(AstarGoalVisitor(to));
+    try {
+      boost::astar_search_tree(data_, from, HeuristicFunc(to, data_), visitor);
+    } catch (found_goal fg) {
+      if (parents[to] != to) {
+        Plan p;
+        for (auto v = to;; v = parents[v]) {
+          hermite_path_msgs::msg::ReferenceVelocity vel;
+          vel = data_[v].vel;
+          p.plan.push_front(vel);
+          if (v == from || plan_length_ < static_cast<int>(p.plan.size())) {
+            break;
+          }
         }
-      }
-      if (plan_length_ == static_cast<int>(p.plan.size())) {
-        p.total_weights = weights[to];
-        plans.push_back(p);
+        if (plan_length_ == static_cast<int>(p.plan.size())) {
+          p.total_weights = weights[to];
+          plans.push_back(p);
+        }
       }
     }
   }
@@ -198,9 +200,9 @@ boost::optional<std::vector<Edge>> VelocityGraph::makeEdges(
           edge.before_node_id = before_itr->id;
           edge.after_node_id = after_itr->id;
           edge.linear_accerelation = a;
-          edge.weight = std::min(
-            std::fabs(std::fabs(v0) - maximum_velocity_),
-            std::fabs(std::fabs(v1) - maximum_velocity_));
+          edge.weight =
+            std::fabs(std::fabs(v0) - maximum_velocity_) +
+            std::fabs(std::fabs(v1) - maximum_velocity_);
           edges.push_back(edge);
         }
       }
@@ -230,18 +232,11 @@ std::vector<Node> VelocityGraph::makeNodes(hermite_path_msgs::msg::ReferenceVelo
       count++;
     }
   } else {
-    Node n0;
-    n0.vel.t = vel.t;
-    n0.vel.linear_velocity = 0.0;
-    n0.id = boost::uuids::random_generator()();
-    ret.push_back(n0);
-    if (std::fabs(vel.linear_velocity) > 0.01) {
-      Node n1;
-      n1.vel.t = vel.t;
-      n1.vel.linear_velocity = vel.linear_velocity;
-      n1.id = boost::uuids::random_generator()();
-      ret.push_back(n1);
-    }
+    Node n;
+    n.vel.t = vel.t;
+    n.vel.linear_velocity = vel.linear_velocity;
+    n.id = boost::uuids::random_generator()();
+    ret.push_back(n);
   }
   return ret;
 }

@@ -69,14 +69,39 @@ void PurePursuitPlannerComponent::currentTwistCallback(
   }
 }
 
-visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker()
+visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker(
+  boost::optional<geometry_msgs::msg::Twist> twist)
 {
   visualization_msgs::msg::MarkerArray marker;
+  // draw text marker
+  if (current_pose_transformed_) {
+    visualization_msgs::msg::Marker text_marker;
+    text_marker.header = current_pose_transformed_->header;
+    text_marker.ns = "target_twist";
+    text_marker.id = 0;
+    text_marker.action = visualization_msgs::msg::Marker::ADD;
+    text_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+    text_marker.pose.position = current_pose_transformed_->pose.position;
+    text_marker.pose.position.z = text_marker.pose.position.z + 2.5;
+    text_marker.pose.orientation.x = 0.0f;
+    text_marker.pose.orientation.y = 0.0f;
+    text_marker.pose.orientation.z = 0.0f;
+    text_marker.pose.orientation.w = 1.0f;
+    text_marker.scale.x = 0.4;
+    text_marker.scale.y = 0.4;
+    text_marker.scale.z = 0.4;
+    if (twist) {
+      text_marker.text = "linear:" + std::to_string(twist->linear.x) + "(m/s)\nangular:" +
+        std::to_string(twist->angular.z) + "(rad/s)";
+      double ratio = std::fabs(twist->linear.x) / 0.8;
+      text_marker.color = color_names::fromHsv(0.6 * ratio, 1.0, 1.0, 1.0);
+    } else {
+      text_marker.text = "linear : invalid\n angular : invalid";
+      text_marker.color = color_names::makeColorMsg("white", 1.0);
+    }
+    marker.markers.push_back(text_marker);
+  }
   if (target_position_ && current_pose_transformed_) {
-    /*
-    geometry_msgs::msg::Point target_position =
-      generator_->getPointOnHermitePath(path_->path, target_t_.get());
-    */
     // draw target marker
     visualization_msgs::msg::Marker target_marker;
     target_marker.header = current_pose_transformed_->header;
@@ -95,12 +120,19 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
     target_marker.color = color_names::makeColorMsg("yellow", 1.0);
     marker.markers.push_back(target_marker);
   } else {
+    // delete target marker
+    visualization_msgs::msg::Marker target_marker;
+    target_marker.header = current_pose_transformed_->header;
+    target_marker.ns = "target";
+    target_marker.id = 0;
+    target_marker.action = visualization_msgs::msg::Marker::DELETE;
+    marker.markers.push_back(target_marker);
     RCLCPP_ERROR(get_logger(), "failed to find target point");
   }
   if (current_t_) {
     geometry_msgs::msg::Point current_position =
       generator_->getPointOnHermitePath(path_->path, current_t_.get());
-    // draw target marker
+    // draw current marker
     visualization_msgs::msg::Marker current_marker;
     current_marker.header = current_pose_transformed_->header;
     current_marker.ns = "current";
@@ -118,6 +150,14 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
     current_marker.color = color_names::makeColorMsg("green", 1.0);
     marker.markers.push_back(current_marker);
   } else {
+    // delete current marker
+    // draw target marker
+    visualization_msgs::msg::Marker current_marker;
+    current_marker.header = current_pose_transformed_->header;
+    current_marker.ns = "current";
+    current_marker.id = 0;
+    current_marker.action = visualization_msgs::msg::Marker::DELETE;
+    marker.markers.push_back(current_marker);
     RCLCPP_ERROR(get_logger(), "failed to current position in path");
   }
 
@@ -155,10 +195,14 @@ void PurePursuitPlannerComponent::currentPoseCallback(
     tf2::TimePoint time_point = tf2::TimePoint(
       std::chrono::seconds(current_pose_->header.stamp.sec) +
       std::chrono::nanoseconds(current_pose_->header.stamp.nanosec));
-    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-      current_pose_->header.frame_id, path_->header.frame_id, time_point,
-      tf2::durationFromSec(1.0));
-    tf2::doTransform(*current_pose_, current_pose_transformed_.get(), transform_stamped);
+    try {
+      geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+        current_pose_->header.frame_id, path_->header.frame_id, time_point,
+        tf2::durationFromSec(1.0));
+      tf2::doTransform(*current_pose_, current_pose_transformed_.get(), transform_stamped);
+    } catch (tf2::ExtrapolationException e) {
+      return;
+    }
   } else {
     current_pose_transformed_ = current_pose_.get();
   }
@@ -185,17 +229,17 @@ void PurePursuitPlannerComponent::currentPoseCallback(
   if (!target_t_ && current_t_) {
     target_t_ = 1.0;
   }
-  auto twist = getCurrentTwist(target_t_.get());
+  auto twist = getTargetTwist(target_t_.get());
   if (twist) {
     twist_cmd = twist.get();
   } else {
     RCLCPP_ERROR(get_logger(), "failed to get twist cmd");
   }
-  marker_pub_->publish(generateMarker());
+  marker_pub_->publish(generateMarker(twist));
   target_twist_pub_->publish(twist_cmd);
 }
 
-boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurrentTwist(
+boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getTargetTwist(
   double target_t)
 {
   if (!current_pose_) {
@@ -260,7 +304,7 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     double a = vec.x * vec.x + vec.y * vec.y;
     double b = 2 * x * vec.x + 2 * y * vec.y;
     double c = x * x + y * y - lookahead_distance_ * lookahead_distance_;
-    if (b * b - 4 * a * c < 0.0) {
+    if ((b * b - 4 * a * c) < 0.0) {
       target_position_ = boost::none;
       RCLCPP_WARN(
         get_logger(), "target position does not calculate because of b * b - 4 * a * c < 0.0");
@@ -269,14 +313,9 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     double s0 = (-b - std::sqrt(b * b - 4 * a * c)) / (2 * a);
     double s1 = (-b + std::sqrt(b * b - 4 * a * c)) / (2 * a);
     if (s0 < 0.0) {
-      if (s1 > 0.0) {
-        target_position.x = p.x + s1 * vec.x;
-        target_position.y = p.y + s1 * vec.y;
-        target_position.z = p.z + s1 * vec.z;
-      } else {
-        target_position_ = boost::none;
-        return boost::none;
-      }
+      target_position.x = p.x + s1 * vec.x;
+      target_position.y = p.y + s1 * vec.y;
+      target_position.z = p.z + s1 * vec.z;
     } else {
       target_position.x = p.x + s0 * vec.x;
       target_position.y = p.y + s0 * vec.y;
@@ -284,13 +323,13 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getCurre
     }
   }
   target_position_ = target_position;
-  geometry_msgs::msg::Vector3 rpy =
-    quaternion_operation::convertQuaternionToEulerAngle(current_pose_->pose.orientation);
-  double theta = rpy.z;
-  double alpha = std::atan2(
+  geometry_msgs::msg::Vector3 diff_rpy;
+  diff_rpy.z = std::atan2(
     target_position.y - current_pose_->pose.position.y,
-    target_position.x - current_pose_->pose.position.x) -
-    theta;
+    target_position.x - current_pose_->pose.position.x);
+  auto diff_quat = quaternion_operation::convertEulerAngleToQuaternion(diff_rpy);
+  auto rot_quat = quaternion_operation::getRotation(current_pose_->pose.orientation, diff_quat);
+  double alpha = quaternion_operation::convertQuaternionToEulerAngle(rot_quat).z;
   double r = std::sqrt(
     std::pow(target_position.x - current_pose_->pose.position.x, 2) +
     std::pow(target_position.y - current_pose_->pose.position.y, 2)) /

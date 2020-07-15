@@ -54,6 +54,8 @@ ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & o
   get_parameter("max_linear_velocity", max_linear_velocity_);
   declare_parameter("max_deceleration", 0.5);
   get_parameter("max_deceleration", max_deceleration_);
+  declare_parameter("t_upper_threashold", 1.2);
+  get_parameter("t_upper_threashold", t_upper_threashold_);
   scan_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
     obstacle_scan_topic, 1,
     std::bind(&ObstaclePlannerComponent::scanCallback, this, std::placeholders::_1));
@@ -95,9 +97,13 @@ geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(pose.header.stamp.sec) +
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped =
-    buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(pose, pose, transform_stamped);
+
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped =
+      buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(pose, pose, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return pose;
 }
 
@@ -110,9 +116,12 @@ geometry_msgs::msg::PointStamped ObstaclePlannerComponent::TransformToMapFrame(
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(point.header.stamp.sec) +
     std::chrono::nanoseconds(point.header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped =
-    buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
-  tf2::doTransform(point, point, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped =
+      buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    tf2::doTransform(point, point, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+  }
   return point;
 }
 
@@ -127,10 +136,14 @@ ObstaclePlannerComponent::addObstacleConstraints()
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(current_pose_->header.stamp.sec) +
     std::chrono::nanoseconds(current_pose_->header.stamp.nanosec));
-  geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-    path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
-    tf2::durationFromSec(1.0));
-  tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
+  try {
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
+      tf2::durationFromSec(1.0));
+    tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
+  } catch (tf2::ExtrapolationException) {
+    return boost::none;
+  }
   auto current_t = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(
     path_->path, pose_transformed.pose.position);
   std::set<double> t_values;
@@ -158,6 +171,10 @@ ObstaclePlannerComponent::addObstacleConstraints()
   }
   if (t_values.size() != 0) {
     double t = *t_values.begin();
+    if (t > t_upper_threashold_) {
+      obstacle_marker_pub_->publish(viz_.generateDeleteMarker());
+      return path_.get();
+    }
     double length = generator.getLength(path_.get().path, 200);
     double target_t = t - (stop_margin_ / length);
     if (!target_obstacle_t_) {
@@ -190,23 +207,9 @@ ObstaclePlannerComponent::addObstacleConstraints()
       path.reference_velocity.push_back(ref);
       i++;
     }
-    i = 0;
-    while (true) {
-      double t = (length * target_t + (static_cast<double>(i) * section_length_)) / length;
-      if (t > 1.0) {
-        break;
-      }
-      hermite_path_msgs::msg::ReferenceVelocity ref;
-      ref.t = t;
-      ref.linear_velocity = 0;
-      ref.from_node = get_name();
-      path.reference_velocity.push_back(ref);
-      i++;
-    }
-
     obstacle_marker_pub_->publish(viz_.generateDeleteMarker());
     obstacle_marker_pub_->publish(
-      viz_.generateObstacleMarker(t, path_.get(), color_names::makeColorMsg("red", 0.8)));
+      viz_.generateObstacleMarker(t, path_.get(), color_names::makeColorMsg("red", 0.8), 1.5));
     return path;
   } else {
     obstacle_marker_pub_->publish(viz_.generateDeleteMarker());
