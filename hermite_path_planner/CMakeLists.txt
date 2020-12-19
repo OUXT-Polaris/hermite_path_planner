@@ -92,7 +92,8 @@ install(TARGETS hermite_path_planner_component hermite_path_generator
 EXPORT export_hermite_path_generator
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include)
 ament_export_libraries(hermite_path_planner_component)
 
 # Install header files
