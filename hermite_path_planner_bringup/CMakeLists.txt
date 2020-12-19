@@ -27,6 +27,12 @@ find_package(quaternion_operation REQUIRED)
 find_package(geometry_msgs_data_buffer REQUIRED)
 find_package(data_buffer REQUIRED)
 find_package(local_waypoint_server REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(rclcpp_component REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(color_names REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 include_directories(include
   ${rclcpp_INCLUDE_DIRS}
@@ -43,7 +49,13 @@ ament_target_dependencies(hermite_path_planner_bringup_node
   pure_pursuit_planner
   velocity_planner
   quaternion_operation
-  local_waypoint_server)
+  local_waypoint_server
+  geometry_msgs
+  tf2_ros
+  rclcpp_component
+  visualization_msgs
+  color_names
+  tf2_geometry_msgs)
 
 install(TARGETS
   hermite_path_planner_bringup_node
