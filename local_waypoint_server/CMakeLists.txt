@@ -27,6 +27,7 @@ find_package(quaternion_operation REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(color_names REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -48,7 +49,8 @@ ament_target_dependencies(local_waypoint_server_component
   quaternion_operation
   tf2_ros
   tf2_geometry_msgs
-  visualization_msgs)
+  visualization_msgs
+  color_names)
 rclcpp_components_register_nodes(local_waypoint_server_component
   "local_waypoint_server::LocalWaypointServerComponent")
 
@@ -66,7 +68,8 @@ ament_target_dependencies(local_waypoint_server_node
   quaternion_operation
   tf2_ros
   tf2_geometry_msgs
-  visualization_msgs)
+  visualization_msgs
+  color_names)
 
 install(TARGETS
   local_waypoint_server_node
