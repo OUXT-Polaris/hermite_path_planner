@@ -45,7 +45,8 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
     sync2_ =
       std::make_shared<message_filters::TimeSynchronizer<HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], 10);
-    sync2_->registerCallback(std::bind(
+    sync2_->registerCallback(
+      std::bind(
         &PlannerConcatenatorComponent::callback2, this, std::placeholders::_1,
         std::placeholders::_2));
   }
@@ -53,7 +54,8 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
     sync3_ = std::make_shared<message_filters::TimeSynchronizer<
           HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], 10);
-    sync3_->registerCallback(std::bind(
+    sync3_->registerCallback(
+      std::bind(
         &PlannerConcatenatorComponent::callback3, this, std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3));
@@ -62,7 +64,8 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
     sync4_ = std::make_shared<message_filters::TimeSynchronizer<
           HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], 10);
-    sync4_->registerCallback(std::bind(
+    sync4_->registerCallback(
+      std::bind(
         &PlannerConcatenatorComponent::callback4, this, std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4));
@@ -72,7 +75,8 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
           HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
           HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], 10);
-    sync5_->registerCallback(std::bind(
+    sync5_->registerCallback(
+      std::bind(
         &PlannerConcatenatorComponent::callback5, this, std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
@@ -82,7 +86,8 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
           HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
           HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5], 10);
-    sync6_->registerCallback(std::bind(
+    sync6_->registerCallback(
+      std::bind(
         &PlannerConcatenatorComponent::callback6, this, std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5,
@@ -94,7 +99,8 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
           HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5],
       *sub_ptrs_[6], 10);
-    sync7_->registerCallback(std::bind(
+    sync7_->registerCallback(
+      std::bind(
         &PlannerConcatenatorComponent::callback7, this, std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
@@ -106,7 +112,8 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
           HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5],
       *sub_ptrs_[6], *sub_ptrs_[7], 10);
-    sync8_->registerCallback(std::bind(
+    sync8_->registerCallback(
+      std::bind(
         &PlannerConcatenatorComponent::callback8, this, std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
