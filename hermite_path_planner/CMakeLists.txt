@@ -47,7 +47,7 @@ ament_target_dependencies(hermite_path_generator
   quaternion_operation
   hermite_path_msgs
   color_names)
-ament_export_interfaces(export_hermite_path_generator HAS_LIBRARY_TARGET)
+ament_export_targets(export_hermite_path_generator HAS_LIBRARY_TARGET)
 ament_export_libraries(hermite_path_generator)
 
 add_library(hermite_path_planner_component SHARED
