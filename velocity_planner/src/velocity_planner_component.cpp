@@ -107,7 +107,8 @@ void VelocityPlannerComponent::updatePath()
   auto plan = graph.getPlan();
   auto end_time = get_clock()->now();
   auto plannig_duration = end_time - start_time;
-  RCLCPP_INFO(get_logger(), "velocity planner takes " + std::to_string(
+  RCLCPP_INFO(
+    get_logger(), "velocity planner takes " + std::to_string(
       plannig_duration.seconds()) + " seconts");
   if (plan) {
     RCLCPP_INFO(get_logger(), "velocity planning succeed");

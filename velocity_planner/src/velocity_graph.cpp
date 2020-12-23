@@ -100,7 +100,8 @@ void VelocityGraph::plan()
   } else {
     planning_succeed_ = true;
     result_.clear();
-    std::sort(plans.begin(), plans.end(), [](const auto & a, const auto & b) {
+    std::sort(
+      plans.begin(), plans.end(), [](const auto & a, const auto & b) {
         return a.total_weights < b.total_weights;
       });
     Plan p = plans[0];

@@ -249,8 +249,9 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
   geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal)
 {
   double goal_distance =
-    std::sqrt(std::pow(goal.position.x - start.position.x, 2) +
-      std::pow(goal.position.y - start.position.y, 2));
+    std::sqrt(
+    std::pow(goal.position.x - start.position.x, 2) +
+    std::pow(goal.position.y - start.position.y, 2));
   /*
   double diff_x = goal.position.x - start.position.x;
   double diff_y = goal.position.y - start.position.y;
@@ -265,8 +266,9 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
     for (int m = 0; m < (resolution + 1); m++) {
       double ratio_start = step_size * static_cast<double>(i) + 0.5;
       double ratio_goal = step_size * static_cast<double>(i) + 0.5;
-      auto path = generateHermitePath(start, goal,
-          ratio_start * goal_distance, ratio_goal * goal_distance);
+      auto path = generateHermitePath(
+        start, goal,
+        ratio_start * goal_distance, ratio_goal * goal_distance);
       path_lengths.push_back(getLength(path, 100));
       // path_lengths.push_back(getMaximumCurvature(path,50));
       path_list.push_back(path);

@@ -24,6 +24,10 @@ find_package(hermite_path_planner REQUIRED)
 find_package(hermite_path_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(color_names REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -42,7 +46,11 @@ ament_target_dependencies(local_waypoint_server_component
   hermite_path_planner
   hermite_path_msgs
   sensor_msgs
-  quaternion_operation)
+  quaternion_operation
+  tf2_ros
+  tf2_geometry_msgs
+  visualization_msgs
+  color_names)
 rclcpp_components_register_nodes(local_waypoint_server_component
   "local_waypoint_server::LocalWaypointServerComponent")
 
@@ -57,7 +65,11 @@ ament_target_dependencies(local_waypoint_server_node
   hermite_path_planner
   hermite_path_msgs
   sensor_msgs
-  quaternion_operation)
+  quaternion_operation
+  tf2_ros
+  tf2_geometry_msgs
+  visualization_msgs
+  color_names)
 
 install(TARGETS
   local_waypoint_server_node
