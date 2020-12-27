@@ -20,8 +20,8 @@ def generate_launch_description():
     description = LaunchDescription([
         Node(
             package='hermite_path_planner',
-            node_executable='hermite_path_planner_node',
-            node_name='hermite_path_planner_node',
+            executable='hermite_path_planner_node',
+            name='hermite_path_planner_node',
             output='screen'),
     ])
     return description
