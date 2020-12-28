@@ -98,7 +98,7 @@ def generate_launch_description():
         ),
         Node(
             package='hermite_path_planner_bringup',
-            node_executable='hermite_path_planner_bringup_node',
+            executable='hermite_path_planner_bringup_node',
             parameters=[
                 planner_concatenator_param_file,
                 curve_planner_param_file,
