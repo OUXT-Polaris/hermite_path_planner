@@ -351,7 +351,8 @@ geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanni
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, point.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(point, point, transform_stamped);
-  } catch (tf2::ExtrapolationException) {
+  } catch (tf2::ExtrapolationException & ex) {
+    RCLCPP_ERROR(get_logger(), ex.what());
   }
   return point;
 }
@@ -369,7 +370,8 @@ geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlannin
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(pose, pose, transform_stamped);
-  } catch (tf2::ExtrapolationException) {
+  } catch (tf2::ExtrapolationException & ex) {
+    RCLCPP_ERROR(get_logger(), ex.what());
   }
   return pose;
 }

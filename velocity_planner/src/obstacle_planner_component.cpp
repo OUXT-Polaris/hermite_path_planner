@@ -102,7 +102,8 @@ geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
     geometry_msgs::msg::TransformStamped transform_stamped =
       buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(pose, pose, transform_stamped);
-  } catch (tf2::ExtrapolationException) {
+  } catch (tf2::ExtrapolationException & ex) {
+    RCLCPP_ERROR(get_logger(), ex.what());
   }
   return pose;
 }
@@ -120,7 +121,8 @@ geometry_msgs::msg::PointStamped ObstaclePlannerComponent::TransformToMapFrame(
     geometry_msgs::msg::TransformStamped transform_stamped =
       buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(point, point, transform_stamped);
-  } catch (tf2::ExtrapolationException) {
+  } catch (tf2::ExtrapolationException & ex) {
+    RCLCPP_ERROR(get_logger(), ex.what());
   }
   return point;
 }
@@ -141,7 +143,8 @@ ObstaclePlannerComponent::addObstacleConstraints()
       path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
       tf2::durationFromSec(1.0));
     tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
-  } catch (tf2::ExtrapolationException) {
+  } catch (tf2::ExtrapolationException & ex) {
+    RCLCPP_ERROR(get_logger(), ex.what());
     return boost::none;
   }
   auto current_t = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(
