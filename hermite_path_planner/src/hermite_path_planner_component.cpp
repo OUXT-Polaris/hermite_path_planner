@@ -55,7 +55,8 @@ geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanning
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(pose, pose, transform_stamped);
-  } catch (tf2::ExtrapolationException) {
+  } catch (tf2::ExtrapolationException & ex) {
+    RCLCPP_ERROR(get_logger(), ex.what());
   }
   return pose;
 }
