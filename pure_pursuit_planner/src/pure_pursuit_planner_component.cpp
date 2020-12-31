@@ -200,7 +200,8 @@ void PurePursuitPlannerComponent::currentPoseCallback(
         current_pose_->header.frame_id, path_->header.frame_id, time_point,
         tf2::durationFromSec(1.0));
       tf2::doTransform(*current_pose_, current_pose_transformed_.get(), transform_stamped);
-    } catch (tf2::ExtrapolationException e) {
+    } catch (tf2::ExtrapolationException & ex) {
+      RCLCPP_ERROR(get_logger(), ex.what());
       return;
     }
   } else {
