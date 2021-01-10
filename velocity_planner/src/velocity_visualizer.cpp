@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <color_names/color_names.h>
+#include <color_names/color_names.hpp>
 #include <velocity_planner/velocity_visualizer.hpp>
 #include <vector>
 #include <string>

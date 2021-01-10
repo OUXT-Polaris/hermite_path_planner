@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-#include <color_names/color_names.h>
+#include <color_names/color_names.hpp>
 #include <velocity_planner/velocity_graph.hpp>
 #include <velocity_planner/velocity_planner_component.hpp>
 #include <memory>

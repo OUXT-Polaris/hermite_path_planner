@@ -14,7 +14,7 @@
 
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <quaternion_operation/quaternion_operation.h>
-#include <color_names/color_names.h>
+#include <color_names/color_names.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 #include <algorithm>

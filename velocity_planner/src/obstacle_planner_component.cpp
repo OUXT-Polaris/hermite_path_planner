@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <color_names/color_names.h>
+#include <color_names/color_names.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <velocity_planner/obstacle_planner_component.hpp>
 #include <memory>

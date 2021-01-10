@@ -14,7 +14,7 @@
 
 #include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-#include <color_names/color_names.h>
+#include <color_names/color_names.hpp>
 #include <string>
 #include <memory>
 
