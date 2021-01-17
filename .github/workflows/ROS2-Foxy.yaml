@@ -1,6 +1,11 @@
+
 name: ROS2-Foxy
 
-on: [push, pull_request]
+on:
+  schedule:
+    - cron: 0 0 * * *
+  push:
+  workflow_dispatch:
 
 jobs:
     job1:
@@ -50,4 +55,3 @@ jobs:
                   cd ~/ros2_ws
                   colcon test
                   colcon test-result --verbose
-
