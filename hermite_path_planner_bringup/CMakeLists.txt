@@ -29,8 +29,6 @@ include_directories(include
 add_executable(hermite_path_planner_bringup_node src/hermite_path_planner_bringup.cpp)
 ament_target_dependencies(hermite_path_planner_bringup_node
   rclcpp
-  geometry_msgs_data_buffer
-  data_buffer
   hermite_path_msgs
   hermite_path_planner
   pure_pursuit_planner
