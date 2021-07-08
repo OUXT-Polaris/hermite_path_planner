@@ -107,9 +107,9 @@ void VelocityPlannerComponent::updatePath()
   auto plan = graph.getPlan();
   auto end_time = get_clock()->now();
   auto plannig_duration = end_time - start_time;
-  RCLCPP_INFO(
-    get_logger(), std::string("velocity planner takes ") + std::to_string(
-      plannig_duration.seconds()) + std::string(" seconts"));
+  std::stringstream ss;
+  ss << "velocity planner takes " << plannig_duration.seconds() << "velocity planning succeed";
+  RCLCPP_INFO(get_logger(), ss.str().c_str());
   if (plan) {
     RCLCPP_INFO(get_logger(), "velocity planning succeed");
     hermite_path_msgs::msg::HermitePathStamped path;
@@ -117,14 +117,12 @@ void VelocityPlannerComponent::updatePath()
     path.header = path_->header;
     path.reference_velocity = plan.get();
     hermite_path_pub_->publish(path);
-    RCLCPP_INFO(
-      get_logger(),
-      std::string("maximum acceleration is ") + std::to_string(
-        graph.getPlannedMaximumAcceleration()));
-    RCLCPP_INFO(
-      get_logger(),
-      std::string("minimum acceleration is ") + std::to_string(
-        graph.getPlannedMinimumAcceleration()));
+    ss = std::stringstream();
+    ss << "maximum acceleration is " << graph.getPlannedMaximumAcceleration();
+    RCLCPP_INFO(get_logger(), ss.str().c_str());
+    ss = std::stringstream();
+    ss << "minimum acceleration is " << graph.getPlannedMinimumAcceleration();
+    RCLCPP_INFO(get_logger(), ss.str().c_str());
     polygon_marker_pub_->publish(viz_.generateDeleteMarker());
     polygon_marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, 3.0));
     marker_pub_->publish(viz_.generateDeleteMarker());
@@ -134,7 +132,7 @@ void VelocityPlannerComponent::updatePath()
   } else {
     polygon_marker_pub_->publish(viz_.generateDeleteMarker());
     RCLCPP_INFO(get_logger(), "velocity planning failed");
-    RCLCPP_WARN(get_logger(), graph.getReason());
+    RCLCPP_WARN(get_logger(), graph.getReason().c_str());
   }
   mtx_.unlock();
 }
