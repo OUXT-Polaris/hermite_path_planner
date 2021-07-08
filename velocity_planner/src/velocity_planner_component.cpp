@@ -108,8 +108,8 @@ void VelocityPlannerComponent::updatePath()
   auto end_time = get_clock()->now();
   auto plannig_duration = end_time - start_time;
   RCLCPP_INFO(
-    get_logger(), "velocity planner takes " + std::to_string(
-      plannig_duration.seconds()) + " seconts");
+    get_logger(), std::string("velocity planner takes ") + std::to_string(
+      plannig_duration.seconds()) + std::string(" seconts"));
   if (plan) {
     RCLCPP_INFO(get_logger(), "velocity planning succeed");
     hermite_path_msgs::msg::HermitePathStamped path;
@@ -119,10 +119,12 @@ void VelocityPlannerComponent::updatePath()
     hermite_path_pub_->publish(path);
     RCLCPP_INFO(
       get_logger(),
-      "maximum acceleration is " + std::to_string(graph.getPlannedMaximumAcceleration()));
+      std::string("maximum acceleration is ") + std::to_string(
+        graph.getPlannedMaximumAcceleration()));
     RCLCPP_INFO(
       get_logger(),
-      "minimum acceleration is " + std::to_string(graph.getPlannedMinimumAcceleration()));
+      std::string("minimum acceleration is ") + std::to_string(
+        graph.getPlannedMinimumAcceleration()));
     polygon_marker_pub_->publish(viz_.generateDeleteMarker());
     polygon_marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, 3.0));
     marker_pub_->publish(viz_.generateDeleteMarker());
