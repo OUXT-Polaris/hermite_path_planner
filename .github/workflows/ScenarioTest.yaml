@@ -16,3 +16,12 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_REPO: OUXT-Polaris/robotx_setup
+    - uses: OUXT-Polaris/update-repos-action@0.0.1
+      with:
+        input_repos_file: packages.repos
+        output_repos_file: packages.repos
+        package_name: hermite_path_planner
+        target_version: ${{ github.sha }}
+    - name: check repos file
+      run: cat packages.repos
+
