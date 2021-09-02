@@ -61,6 +61,8 @@ def generate_launch_description():
             get_package_share_directory('hermite_path_planner'),
             'config', 'hermite_path_planner.yaml')
     )
+    launch_prefix = LaunchConfiguration(
+        'launch_prefix')
     return LaunchDescription([
         DeclareLaunchArgument(
             'planner_concatenator_param_file',
@@ -96,6 +98,11 @@ def generate_launch_description():
             default_value=local_waypoint_server_param_file,
             description='local waypoint server parameters'
         ),
+        DeclareLaunchArgument(
+            'launch_prefix',
+            default_value=launch_prefix,
+            description='launch prefix of hermite_path_planner'
+        ),
         Node(
             package='hermite_path_planner_bringup',
             executable='hermite_path_planner_bringup_node',
@@ -107,5 +114,6 @@ def generate_launch_description():
                 velocity_planner_param_file,
                 local_waypoint_server_param_file,
                 hermite_path_planner_parm_file],
+            prefix=[launch_prefix],
             output='screen'),
     ])

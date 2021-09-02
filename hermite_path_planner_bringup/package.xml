@@ -23,6 +23,7 @@
   <depend>quaternion_operation</depend>
   <depend>ament_cmake_auto</depend>
   <depend>color_names</depend>
+  <depend>util-linux</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
