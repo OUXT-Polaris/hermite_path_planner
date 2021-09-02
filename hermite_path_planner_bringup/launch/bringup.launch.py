@@ -101,7 +101,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'launch_prefix',
             default_value=launch_prefix,
-            description='cpu core you want to run hermite_path_planner'
+            description='launch prefix of hermite_path_planner'
         ),
         Node(
             package='hermite_path_planner_bringup',
