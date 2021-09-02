@@ -62,9 +62,7 @@ def generate_launch_description():
             'config', 'hermite_path_planner.yaml')
     )
     launch_prefix = LaunchConfiguration(
-        'launch_prefix',
-        default=1
-    )
+        'launch_prefix')
     return LaunchDescription([
         DeclareLaunchArgument(
             'planner_concatenator_param_file',
