@@ -107,5 +107,6 @@ def generate_launch_description():
                 velocity_planner_param_file,
                 local_waypoint_server_param_file,
                 hermite_path_planner_parm_file],
+            prefix=["taskset -c 1"],
             output='screen'),
     ])
