@@ -14,9 +14,9 @@
 
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
 #include <memory>
-#include <vector>
-#include <string>
 #include <set>
+#include <string>
+#include <vector>
 
 namespace local_waypoint_server
 {
@@ -39,12 +39,11 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   /**
    * Publishers
    */
-  local_waypoint_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
-    "~/local_waypoint",
-    1);
+  local_waypoint_pub_ =
+    this->create_publisher<geometry_msgs::msg::PoseStamped>("~/local_waypoint", 1);
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
-  marker_no_collision_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
-    "~/marker/no_collision", 1);
+  marker_no_collision_pub_ =
+    this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker/no_collision", 1);
   /**
    * Subscribers
    */
@@ -90,8 +89,7 @@ void LocalWaypointServerComponent::GoalPoseCallback(
 }
 
 bool LocalWaypointServerComponent::isSame(
-  geometry_msgs::msg::PoseStamped pose0,
-  geometry_msgs::msg::PoseStamped pose1)
+  geometry_msgs::msg::PoseStamped pose0, geometry_msgs::msg::PoseStamped pose1)
 {
   if (pose0.pose.position.x == pose1.pose.position.x) {
     if (pose0.pose.position.y == pose1.pose.position.y) {
@@ -112,9 +110,8 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   }
   geometry_msgs::msg::Pose p;
   p.position = generator_->getPointOnHermitePath(current_path_->path, obstacle_t);
-  geometry_msgs::msg::Vector3 tangent_vec = generator_->getTangentVector(
-    current_path_->path,
-    obstacle_t);
+  geometry_msgs::msg::Vector3 tangent_vec =
+    generator_->getTangentVector(current_path_->path, obstacle_t);
   double theta = std::atan2(tangent_vec.y, tangent_vec.x);
   geometry_msgs::msg::Vector3 orientation_vec;
   orientation_vec.x = 0.0;
@@ -128,16 +125,16 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   n.z = n.z / norm;
   for (int i = 0; (i * 2) < num_candidates_; i++) {
     geometry_msgs::msg::Pose p0 = p;
-    p0.position.x = p0.position.x +
-      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
-    p0.position.y = p0.position.y +
-      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
+    p0.position.x =
+      p0.position.x + (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
+    p0.position.y =
+      p0.position.y + (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
     ret.push_back(p0);
     geometry_msgs::msg::Pose p1 = p;
-    p1.position.x = p1.position.x -
-      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
-    p1.position.y = p1.position.y -
-      (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
+    p1.position.x =
+      p1.position.x - (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.x;
+    p1.position.y =
+      p1.position.y - (sampling_offset_ + static_cast<double>(i + 1) * sampling_interval_) * n.y;
     ret.push_back(p1);
   }
   return ret;
@@ -179,9 +176,8 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
     }
   } else {
     double dist_to_replaned_goal = std::sqrt(
-      std::pow(
-        current_pose_->pose.position.x - replaned_goalpose_->position.x, 2) + std::pow(
-        current_pose_->pose.position.y - replaned_goalpose_->position.y, 2));
+      std::pow(current_pose_->pose.position.x - replaned_goalpose_->position.x, 2) +
+      std::pow(current_pose_->pose.position.y - replaned_goalpose_->position.y, 2));
     if (dist_to_replaned_goal < 1.3) {
       replaned_goalpose_ = boost::none;
     }
@@ -238,15 +234,13 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
   }
   std::vector<double> distance_to_goal;
   for (auto itr = non_collision_goal_list.begin(); itr != non_collision_goal_list.end(); itr++) {
-    double dist =
-      std::sqrt(
-      std::pow(
-        goal_pose_->pose.position.x - itr->position.x,
-        2) + std::pow(goal_pose_->pose.position.y - itr->position.y, 2));
+    double dist = std::sqrt(
+      std::pow(goal_pose_->pose.position.x - itr->position.x, 2) +
+      std::pow(goal_pose_->pose.position.y - itr->position.y, 2));
     distance_to_goal.push_back(dist);
   }
-  std::vector<double>::iterator min_itr = std::min_element(
-    distance_to_goal.begin(), distance_to_goal.end());
+  std::vector<double>::iterator min_itr =
+    std::min_element(distance_to_goal.begin(), distance_to_goal.end());
   size_t min_index = std::distance(distance_to_goal.begin(), min_itr);
   return non_collision_goal_list[min_index];
 }
@@ -260,8 +254,8 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
   geometry_msgs::msg::PoseStamped pose_transformed = TransformToPlanningFrame(current_pose_.get());
   std::set<double> t_values;
   for (auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++) {
-    auto t_value = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
-      path, *points_itr);
+    auto t_value =
+      generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(path, *points_itr);
     if (t_value) {
       if (t_value.get() <= 1.3 && t_value.get() >= 0.0) {
         if (t_value.get() >= 1.0) {
@@ -270,9 +264,8 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
         geometry_msgs::msg::Point nearest_point =
           generator_->getPointOnHermitePath(path, t_value.get());
         double lat_dist = std::sqrt(
-          std::pow(
-            nearest_point.x - points_itr->x,
-            2) + std::pow(nearest_point.y - points_itr->y, 2));
+          std::pow(nearest_point.x - points_itr->x, 2) +
+          std::pow(nearest_point.y - points_itr->y, 2));
         if (lat_dist < std::fabs(robot_width_ * 0.5 + margin_)) {
           t_values.insert(t_value.get());
         }
@@ -302,12 +295,11 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPat
       geometry_msgs::msg::Point nearest_point =
         generator_->getPointOnHermitePath(current_path_->path, t_value.get());
       double lat_dist = std::sqrt(
-        std::pow(
-          nearest_point.x - points_itr->x,
-          2) + std::pow(nearest_point.y - points_itr->y, 2));
-      if (std::fabs(lat_dist) < std::fabs(robot_width_ * 0.5 + margin_) &&
-        t_value.get() > current_t.get())
-      {
+        std::pow(nearest_point.x - points_itr->x, 2) +
+        std::pow(nearest_point.y - points_itr->y, 2));
+      if (
+        std::fabs(lat_dist) < std::fabs(robot_width_ * 0.5 + margin_) &&
+        t_value.get() > current_t.get()) {
         t_values.insert(t_value.get());
       }
     }

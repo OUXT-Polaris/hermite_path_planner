@@ -13,15 +13,15 @@
 // limitations under the License.
 
 #include <hermite_path_planner/hermite_path_planner_component.hpp>
+#include <local_waypoint_server/local_waypoint_server_component.hpp>
+#include <memory>
 #include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <velocity_planner/curve_planner_component.hpp>
 #include <velocity_planner/obstacle_planner_component.hpp>
 #include <velocity_planner/planner_concatenator_component.hpp>
 #include <velocity_planner/stop_planner_component.hpp>
 #include <velocity_planner/velocity_planner_component.hpp>
-#include <local_waypoint_server/local_waypoint_server_component.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <memory>
 
 int main(int argc, char * argv[])
 {

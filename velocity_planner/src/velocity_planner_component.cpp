@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <color_names/color_names.hpp>
-#include <velocity_planner/velocity_graph.hpp>
-#include <velocity_planner/velocity_planner_component.hpp>
 #include <memory>
 #include <string>
+#include <velocity_planner/velocity_graph.hpp>
+#include <velocity_planner/velocity_planner_component.hpp>
 
 namespace velocity_planner
 {
 VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & options)
-: Node("velocity_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_),
+: Node("velocity_planner", "velocity_planner", options),
+  buffer_(get_clock()),
+  listener_(buffer_),
   viz_(get_name())
 {
   std::string current_twist_topic;
@@ -48,8 +49,8 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
 
   hermite_path_pub_ =
     this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>("~/hermite_path", 1);
-  polygon_marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
-    "~/marker/polygon", 1);
+  polygon_marker_pub_ =
+    this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker/polygon", 1);
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
 
   double robot_width;
@@ -102,8 +103,9 @@ void VelocityPlannerComponent::updatePath()
     return;
   }
   auto start_time = get_clock()->now();
-  VelocityGraph graph(path_.get(), velocity_resoluation_, maximum_accerelation_,
-    minimum_accerelation_, max_linear_velocity_);
+  VelocityGraph graph(
+    path_.get(), velocity_resoluation_, maximum_accerelation_, minimum_accerelation_,
+    max_linear_velocity_);
   auto plan = graph.getPlan();
   auto end_time = get_clock()->now();
   auto plannig_duration = end_time - start_time;

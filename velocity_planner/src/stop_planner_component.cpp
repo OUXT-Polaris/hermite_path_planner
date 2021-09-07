@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <color_names/color_names.hpp>
-#include <velocity_planner/stop_planner_component.hpp>
 #include <memory>
 #include <string>
+#include <velocity_planner/stop_planner_component.hpp>
 
 namespace velocity_planner
 {

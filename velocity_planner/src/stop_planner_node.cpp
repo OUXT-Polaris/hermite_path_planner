@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include <velocity_planner/stop_planner_component.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <velocity_planner/stop_planner_component.hpp>
 
 int main(int argc, char * argv[])
 {

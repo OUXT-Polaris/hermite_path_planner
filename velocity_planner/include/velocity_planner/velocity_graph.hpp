@@ -15,19 +15,19 @@
 #ifndef VELOCITY_PLANNER__VELOCITY_GRAPH_HPP_
 #define VELOCITY_PLANNER__VELOCITY_GRAPH_HPP_
 
-#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/astar_search.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <deque>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <hermite_path_msgs/msg/reference_velocity.hpp>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <map>
 #include <string>
 #include <vector>
-#include <deque>
 
 namespace velocity_planner
 {
@@ -63,29 +63,24 @@ class HeuristicFunc : public boost::astar_heuristic<VelocityGraphData, double>
 public:
   using Vertex = VelocityGraphData::vertex_descriptor;
 
-  explicit HeuristicFunc(Vertex goal, VelocityGraphData & g)
-  : goal_(goal), graph_(g)
-  {
-  }
+  explicit HeuristicFunc(Vertex goal, VelocityGraphData & g) : goal_(goal), graph_(g) {}
 
-  double operator()(Vertex u) const
-  {
-    return graph_[u].vel.linear_velocity;
-  }
+  double operator()(Vertex u) const { return graph_[u].vel.linear_velocity; }
 
 private:
   Vertex goal_;
   VelocityGraphData & graph_;
 };
 
-struct found_goal {};
+struct found_goal
+{
+};
 class AstarGoalVisitor : public boost::default_astar_visitor
 {
 public:
-  explicit AstarGoalVisitor(VelocityGraphData::vertex_descriptor goal)
-  : m_goal(goal) {}
+  explicit AstarGoalVisitor(VelocityGraphData::vertex_descriptor goal) : m_goal(goal) {}
 
-  template<class Graph>
+  template <class Graph>
   void examine_vertex(VelocityGraphData::vertex_descriptor u, Graph &)
   {
     if (u == m_goal) {
@@ -104,9 +99,9 @@ public:
     hermite_path_msgs::msg::HermitePathStamped data, double velocity_resoluation,
     double maximum_acceleration, double minimum_acceleration, double maximum_velocity);
   boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity>> getPlan();
-  std::string getReason() {return reason_;}
-  double getPlannedMaximumAcceleration() {return planned_maximum_acceleration_;}
-  double getPlannedMinimumAcceleration() {return planned_minimum_acceleration_;}
+  std::string getReason() { return reason_; }
+  double getPlannedMaximumAcceleration() { return planned_maximum_acceleration_; }
+  double getPlannedMinimumAcceleration() { return planned_minimum_acceleration_; }
 
 private:
   void plan();

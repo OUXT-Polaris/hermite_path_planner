@@ -16,14 +16,15 @@
 #define HERMITE_PATH_PLANNER__HERMITE_PATH_GENERATOR_HPP_
 
 #include <quaternion_operation/quaternion_operation.h>
+
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
 #include <iostream>
-#include <vector>
 #include <map>
+#include <vector>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace hermite_path_planner
 {
@@ -59,8 +60,8 @@ public:
 
 private:
   hermite_path_msgs::msg::HermitePath generateHermitePath(
-    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal,
-    double start_vector_magnitude, double end_vector_magnitude);
+    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal, double start_vector_magnitude,
+    double end_vector_magnitude);
   visualization_msgs::msg::Marker getBoundsPolygon(
     hermite_path_msgs::msg::HermitePathStamped path, int resolution, double z_offset);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);

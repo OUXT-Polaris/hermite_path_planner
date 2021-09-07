@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <hermite_path_planner/hermite_path_planner_component.hpp>
-#include <rclcpp_components/register_node_macro.hpp>
 #include <memory>
+#include <rclcpp_components/register_node_macro.hpp>
 
 namespace hermite_path_planner
 {
