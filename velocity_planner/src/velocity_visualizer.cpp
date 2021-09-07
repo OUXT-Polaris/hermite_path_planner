@@ -13,14 +13,13 @@
 // limitations under the License.
 
 #include <color_names/color_names.hpp>
-#include <velocity_planner/velocity_visualizer.hpp>
-#include <vector>
 #include <string>
+#include <vector>
+#include <velocity_planner/velocity_visualizer.hpp>
 
 namespace velocity_planner
 {
-VelocityVisualizer::VelocityVisualizer(std::string node_name)
-: generator_(0.0)
+VelocityVisualizer::VelocityVisualizer(std::string node_name) : generator_(0.0)
 {
   node_name_ = node_name;
 }
@@ -103,8 +102,8 @@ double VelocityVisualizer::getVelocity(
     if (vel[i].t > t && vel[i + 1].t) {
       double dist = (vel[i + 1].t - vel[i].t) * l;
       double a = (vel[i + 1].linear_velocity * vel[i + 1].linear_velocity -
-        vel[i].linear_velocity * vel[i].linear_velocity) /
-        (2 * dist);
+                  vel[i].linear_velocity * vel[i].linear_velocity) /
+                 (2 * dist);
       if (vel[i].linear_velocity * vel[i].linear_velocity > 2 * dist * a) {
         return std::sqrt(vel[i].linear_velocity * vel[i].linear_velocity + 2 * dist * a);
       } else {
@@ -185,7 +184,7 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
   visualization_msgs::msg::MarkerArray marker;
   std::sort(
     path.reference_velocity.begin(), path.reference_velocity.end(),
-    [](const auto & x, const auto & y) {return x.t < y.t;});
+    [](const auto & x, const auto & y) { return x.t < y.t; });
   for (auto itr = path.reference_velocity.begin(); itr != path.reference_velocity.end(); itr++) {
     visualization_msgs::msg::Marker box_marker;
     box_marker.header = path.header;

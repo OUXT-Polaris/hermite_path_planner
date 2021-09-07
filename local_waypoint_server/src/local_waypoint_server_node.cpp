@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char * argv[])
 {

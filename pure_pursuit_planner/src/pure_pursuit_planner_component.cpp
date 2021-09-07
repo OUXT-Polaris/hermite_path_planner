@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <color_names/color_names.hpp>
+#include <memory>
 #include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-#include <color_names/color_names.hpp>
 #include <string>
-#include <memory>
 
 namespace pure_pursuit_planner
 {
@@ -91,8 +91,8 @@ visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker
     text_marker.scale.y = 0.4;
     text_marker.scale.z = 0.4;
     if (twist) {
-      text_marker.text = "linear:" + std::to_string(twist->linear.x) + "(m/s)\nangular:" +
-        std::to_string(twist->angular.z) + "(rad/s)";
+      text_marker.text = "linear:" + std::to_string(twist->linear.x) +
+                         "(m/s)\nangular:" + std::to_string(twist->angular.z) + "(rad/s)";
       double ratio = std::fabs(twist->linear.x) / 0.8;
       text_marker.color = color_names::fromHsv(0.6 * ratio, 1.0, 1.0, 1.0);
     } else {
@@ -332,9 +332,9 @@ boost::optional<geometry_msgs::msg::Twist> PurePursuitPlannerComponent::getTarge
   auto rot_quat = quaternion_operation::getRotation(current_pose_->pose.orientation, diff_quat);
   double alpha = quaternion_operation::convertQuaternionToEulerAngle(rot_quat).z;
   double r = std::sqrt(
-    std::pow(target_position.x - current_pose_->pose.position.x, 2) +
-    std::pow(target_position.y - current_pose_->pose.position.y, 2)) /
-    (2 * std::sin(alpha));
+               std::pow(target_position.x - current_pose_->pose.position.x, 2) +
+               std::pow(target_position.y - current_pose_->pose.position.y, 2)) /
+             (2 * std::sin(alpha));
   double length = r * alpha;
   double linear_velocity = generator_->getReferenceVelocity(path_.get(), current_t_.get());
   double omega = 2 * linear_velocity * std::sin(alpha) / length;

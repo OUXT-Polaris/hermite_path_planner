@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 #include <pure_pursuit_planner/pure_pursuit_planner_component.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <memory>
 
 int main(int argc, char * argv[])
 {

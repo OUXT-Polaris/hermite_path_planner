@@ -59,17 +59,18 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include <rclcpp/rclcpp.hpp>
+#include <quaternion_operation/quaternion_operation.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
-#include <sensor_msgs/msg/laser_scan.hpp>
+#include <tf2_ros/transform_listener.h>
+
+#include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
-#include <quaternion_operation/quaternion_operation.h>
-#include <boost/optional.hpp>
-#include <string>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <string>
 #include <vector>
 
 namespace local_waypoint_server

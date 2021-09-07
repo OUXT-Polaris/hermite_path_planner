@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <velocity_planner/planner_concatenator_component.hpp>
-#include <memory>
 #include <algorithm>
-#include <set>
-#include <vector>
 #include <list>
 #include <map>
+#include <memory>
+#include <set>
 #include <string>
 #include <utility>
+#include <vector>
+#include <velocity_planner/planner_concatenator_component.hpp>
 
 namespace velocity_planner
 {
@@ -44,80 +44,66 @@ PlannerConcatenatorComponent::PlannerConcatenatorComponent(const rclcpp::NodeOpt
   if (num_input_ == 2) {
     sync2_ =
       std::make_shared<message_filters::TimeSynchronizer<HermitePathStamped, HermitePathStamped>>(
-      *sub_ptrs_[0], *sub_ptrs_[1], 10);
-    sync2_->registerCallback(
-      std::bind(
-        &PlannerConcatenatorComponent::callback2, this, std::placeholders::_1,
-        std::placeholders::_2));
+        *sub_ptrs_[0], *sub_ptrs_[1], 10);
+    sync2_->registerCallback(std::bind(
+      &PlannerConcatenatorComponent::callback2, this, std::placeholders::_1,
+      std::placeholders::_2));
   }
   if (num_input_ == 3) {
     sync3_ = std::make_shared<message_filters::TimeSynchronizer<
-          HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
+      HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], 10);
-    sync3_->registerCallback(
-      std::bind(
-        &PlannerConcatenatorComponent::callback3, this, std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3));
+    sync3_->registerCallback(std::bind(
+      &PlannerConcatenatorComponent::callback3, this, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3));
   }
   if (num_input_ == 4) {
     sync4_ = std::make_shared<message_filters::TimeSynchronizer<
-          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
+      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], 10);
-    sync4_->registerCallback(
-      std::bind(
-        &PlannerConcatenatorComponent::callback4, this, std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3, std::placeholders::_4));
+    sync4_->registerCallback(std::bind(
+      &PlannerConcatenatorComponent::callback4, this, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4));
   }
   if (num_input_ == 5) {
     sync5_ = std::make_shared<message_filters::TimeSynchronizer<
-          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-          HermitePathStamped>>(
+      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+      HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], 10);
-    sync5_->registerCallback(
-      std::bind(
-        &PlannerConcatenatorComponent::callback5, this, std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    sync5_->registerCallback(std::bind(
+      &PlannerConcatenatorComponent::callback5, this, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
   }
   if (num_input_ == 6) {
     sync6_ = std::make_shared<message_filters::TimeSynchronizer<
-          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-          HermitePathStamped, HermitePathStamped>>(
+      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+      HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5], 10);
-    sync6_->registerCallback(
-      std::bind(
-        &PlannerConcatenatorComponent::callback6, this, std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5,
-        std::placeholders::_6));
+    sync6_->registerCallback(std::bind(
+      &PlannerConcatenatorComponent::callback6, this, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
   }
   if (num_input_ == 7) {
     sync7_ = std::make_shared<message_filters::TimeSynchronizer<
-          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-          HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
+      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+      HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5],
       *sub_ptrs_[6], 10);
-    sync7_->registerCallback(
-      std::bind(
-        &PlannerConcatenatorComponent::callback7, this, std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
-        std::placeholders::_7));
+    sync7_->registerCallback(std::bind(
+      &PlannerConcatenatorComponent::callback7, this, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
+      std::placeholders::_7));
   }
   if (num_input_ == 8) {
     sync8_ = std::make_shared<message_filters::TimeSynchronizer<
-          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
-          HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
+      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped,
+      HermitePathStamped, HermitePathStamped, HermitePathStamped, HermitePathStamped>>(
       *sub_ptrs_[0], *sub_ptrs_[1], *sub_ptrs_[2], *sub_ptrs_[3], *sub_ptrs_[4], *sub_ptrs_[5],
       *sub_ptrs_[6], *sub_ptrs_[7], 10);
-    sync8_->registerCallback(
-      std::bind(
-        &PlannerConcatenatorComponent::callback8, this, std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
-        std::placeholders::_7, std::placeholders::_8));
+    sync8_->registerCallback(std::bind(
+      &PlannerConcatenatorComponent::callback8, this, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
+      std::placeholders::_7, std::placeholders::_8));
   }
   update_sub_ = create_subscription<hermite_path_msgs::msg::HermitePathStamped>(
     "~/update", 1,
@@ -376,8 +362,7 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
   for (auto itr = path_.reference_velocity.begin(); itr != path_.reference_velocity.end(); itr++) {
     bool is_update_target = false;
     for (auto target_itr = update_targets.begin(); target_itr != update_targets.end();
-      target_itr++)
-    {
+         target_itr++) {
       if (*target_itr == itr->from_node) {
         is_update_target = true;
       }
@@ -387,7 +372,7 @@ void PlannerConcatenatorComponent::updateCallback(const HermitePathStamped::Shar
     }
   }
   vel.insert(vel.end(), data->reference_velocity.begin(), data->reference_velocity.end());
-  std::sort(vel.begin(), vel.end(), [](const auto & a, const auto & b) {return a.t < b.t;});
+  std::sort(vel.begin(), vel.end(), [](const auto & a, const auto & b) { return a.t < b.t; });
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> filtered_vel;
   for (auto itr = vel.begin(); itr != vel.end(); itr++) {
     if (itr->t >= 0.0 && 1.0 >= itr->t) {

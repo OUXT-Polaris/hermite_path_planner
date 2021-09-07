@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include <velocity_planner/velocity_graph.hpp>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <vector>
+#include <velocity_planner/velocity_graph.hpp>
 
 namespace velocity_planner
 {
@@ -72,8 +71,9 @@ void VelocityGraph::plan()
     VelocityGraphData::vertex_descriptor from = vertex_dict_[*id_itr];
     VelocityGraphData::vertex_descriptor to = vertex_dict_[end_node_id_];
     auto visitor = boost::weight_map(boost::get(&Edge::weight, data_))
-      .predecessor_map(&parents[0])
-      .distance_map(&weights[0]).visitor(AstarGoalVisitor(to));
+                     .predecessor_map(&parents[0])
+                     .distance_map(&weights[0])
+                     .visitor(AstarGoalVisitor(to));
     try {
       boost::astar_search_tree(data_, from, HeuristicFunc(to, data_), visitor);
     } catch (found_goal fg) {
@@ -100,10 +100,9 @@ void VelocityGraph::plan()
   } else {
     planning_succeed_ = true;
     result_.clear();
-    std::sort(
-      plans.begin(), plans.end(), [](const auto & a, const auto & b) {
-        return a.total_weights < b.total_weights;
-      });
+    std::sort(plans.begin(), plans.end(), [](const auto & a, const auto & b) {
+      return a.total_weights < b.total_weights;
+    });
     Plan p = plans[0];
     for (auto itr = p.plan.begin(); itr != p.plan.end(); itr++) {
       result_.push_back(*itr);
@@ -121,9 +120,9 @@ void VelocityGraph::calculateAcceleration()
     double a = (v1 * v1 - v0 * v0) / (2 * path_length_);
     accels.push_back(a);
   }
-  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) {return a > b;});
+  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) { return a > b; });
   planned_maximum_acceleration_ = accels[0];
-  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) {return a < b;});
+  std::sort(accels.begin(), accels.end(), [](const auto & a, const auto & b) { return a < b; });
   planned_minimum_acceleration_ = accels[0];
 }
 
@@ -180,7 +179,7 @@ boost::optional<std::vector<Edge>> VelocityGraph::makeEdges(
   for (auto it = nodes.begin(); it != nodes.end(); it++) {
     t_values.push_back(it->first);
   }
-  std::sort(t_values.begin(), t_values.end(), [](const auto & a, const auto & b) {return a < b;});
+  std::sort(t_values.begin(), t_values.end(), [](const auto & a, const auto & b) { return a < b; });
   plan_length_ = t_values.size();
   for (int i = 0; i < (static_cast<int>(t_values.size()) - 1); i++) {
     bool connection_finded = false;
@@ -194,23 +193,21 @@ boost::optional<std::vector<Edge>> VelocityGraph::makeEdges(
         double a = (v1 * v1 - v0 * v0) / (2 * l);
         if (
           a > minimum_acceleration_ && a < maximum_acceleration_ &&
-          std::fabs(v0) <= maximum_velocity_ && std::fabs(v1) <= maximum_velocity_)
-        {
+          std::fabs(v0) <= maximum_velocity_ && std::fabs(v1) <= maximum_velocity_) {
           connection_finded = true;
           Edge edge;
           edge.before_node_id = before_itr->id;
           edge.after_node_id = after_itr->id;
           edge.linear_accerelation = a;
-          edge.weight =
-            std::fabs(std::fabs(v0) - maximum_velocity_) +
-            std::fabs(std::fabs(v1) - maximum_velocity_);
+          edge.weight = std::fabs(std::fabs(v0) - maximum_velocity_) +
+                        std::fabs(std::fabs(v1) - maximum_velocity_);
           edges.push_back(edge);
         }
       }
     }
     if (!connection_finded) {
       reason_ = "failed to build edge from t=" + std::to_string(t_values[i]) +
-        " to t=" + std::to_string(t_values[i + 1]);
+                " to t=" + std::to_string(t_values[i + 1]);
       return boost::none;
     }
   }

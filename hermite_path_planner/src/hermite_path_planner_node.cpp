@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <hermite_path_planner/hermite_path_planner_component.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char * argv[])
 {

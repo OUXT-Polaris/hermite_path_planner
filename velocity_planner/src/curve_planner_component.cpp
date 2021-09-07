@@ -13,10 +13,10 @@
 // limitations under the License.
 
 #include <color_names/color_names.hpp>
-#include <velocity_planner/curve_planner_component.hpp>
-#include <memory>
 #include <limits>
+#include <memory>
 #include <string>
+#include <velocity_planner/curve_planner_component.hpp>
 
 namespace velocity_planner
 {

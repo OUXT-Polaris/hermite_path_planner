@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <quaternion_operation/quaternion_operation.h>
+
+#include <algorithm>
 #include <color_names/color_names.hpp>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
-#include <algorithm>
 
 namespace hermite_path_planner
 {
-HermitePathGenerator::HermitePathGenerator(double robot_width) {robot_width_ = robot_width;}
+HermitePathGenerator::HermitePathGenerator(double robot_width) { robot_width_ = robot_width; }
 
 double HermitePathGenerator::getMaximumCurvature(
-  hermite_path_msgs::msg::HermitePath path,
-  int resolution)
+  hermite_path_msgs::msg::HermitePath path, int resolution)
 {
   std::vector<double> curvatures;
   double step_size = 1.0 / static_cast<double>(resolution);
@@ -58,12 +58,12 @@ double HermitePathGenerator::getReferenceVelocity(
   double l = getLength(path.path, 200);
   std::sort(
     path.reference_velocity.begin(), path.reference_velocity.end(),
-    [](const auto & a, const auto & b) {return a.t < b.t;});
+    [](const auto & a, const auto & b) { return a.t < b.t; });
   if (path.reference_velocity.begin()->t > t) {
     double diff_l = (path.reference_velocity[1].t - path.reference_velocity[0].t) * l;
     double a = (std::pow(path.reference_velocity[1].linear_velocity, 2) -
-      std::pow(path.reference_velocity[0].linear_velocity, 2)) /
-      (2 * diff_l);
+                std::pow(path.reference_velocity[0].linear_velocity, 2)) /
+               (2 * diff_l);
     double diff_l_target = (path.reference_velocity[0].t - t) * l;
     double v2 = std::pow(path.reference_velocity[1].linear_velocity, 2) - 2 * a * diff_l_target;
     if (v2 <= 0.0) {
@@ -95,8 +95,8 @@ double HermitePathGenerator::getReferenceVelocity(
     if (path.reference_velocity[i + 1].t >= t && t >= path.reference_velocity[i].t) {
       double diff_l = (path.reference_velocity[i + 1].t - path.reference_velocity[i].t) * l;
       double a = (std::pow(path.reference_velocity[i + 1].linear_velocity, 2) -
-        std::pow(path.reference_velocity[i].linear_velocity, 2)) /
-        (2 * diff_l);
+                  std::pow(path.reference_velocity[i].linear_velocity, 2)) /
+                 (2 * diff_l);
       double diff_l_target = (t - path.reference_velocity[i].t) * l;
       double v2 = std::pow(path.reference_velocity[i].linear_velocity, 2) + 2 * a * diff_l_target;
       if (v2 <= 0.0) {
@@ -154,9 +154,9 @@ boost::optional<double> HermitePathGenerator::getNormalizedLongitudinalDistanceI
       double x_term = std::pow(point.x - path.ax * t3 - path.bx * t2 - path.cx * t - path.dx, 2);
       double y_term = std::pow(point.y - path.ay * t3 - path.by * t2 - path.cy * t - path.dy, 2);
       double x_term_diff = 2 * (point.x - path.ax * t3 - path.bx * t2 - path.cx * t - path.dx) *
-        (-3 * path.ax * t2 - 2 * path.bx * t - path.cx);
+                           (-3 * path.ax * t2 - 2 * path.bx * t - path.cx);
       double y_term_diff = 2 * (point.y - path.ay * t3 - path.by * t2 - path.cy * t - path.dy) *
-        (-3 * path.ay * t2 - 2 * path.by * t - path.cy);
+                           (-3 * path.ay * t2 - 2 * path.by * t - path.cy);
       double ret = (x_term + y_term) / (x_term_diff + y_term_diff);
       return ret;
     };
@@ -213,12 +213,12 @@ double HermitePathGenerator::calculateNewtonMethodStepSize(
   double t3 = t * t * t;
   double t2 = t * t;
   double f = std::pow((path.ax * t3 + path.bx * t2 + path.cx * t + path.dx - center.x), 2) +
-    std::pow((path.ay * t3 + path.by * t2 + path.cy * t + path.dy - center.y), 2) -
-    radius * radius;
+             std::pow((path.ay * t3 + path.by * t2 + path.cy * t + path.dy - center.y), 2) -
+             radius * radius;
   double term_x = 2 * (path.ax * t3 + path.bx * t2 + path.cx * t + path.dx - center.x) *
-    (3 * path.ax * t2 + 2 * path.bx * t + path.cx);
+                  (3 * path.ax * t2 + 2 * path.bx * t + path.cx);
   double term_y = 2 * (path.ay * t3 + path.by * t2 + path.cy * t + path.dy - center.y) *
-    (3 * path.ay * t2 + 2 * path.by * t + path.cy);
+                  (3 * path.ay * t2 + 2 * path.by * t + path.cy);
   return f / (term_x + term_y);
 }
 
@@ -248,8 +248,7 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
 hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
   geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal)
 {
-  double goal_distance =
-    std::sqrt(
+  double goal_distance = std::sqrt(
     std::pow(goal.position.x - start.position.x, 2) +
     std::pow(goal.position.y - start.position.y, 2));
   /*
@@ -266,9 +265,8 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
     for (int m = 0; m < (resolution + 1); m++) {
       double ratio_start = step_size * static_cast<double>(i) + 0.5;
       double ratio_goal = step_size * static_cast<double>(i) + 0.5;
-      auto path = generateHermitePath(
-        start, goal,
-        ratio_start * goal_distance, ratio_goal * goal_distance);
+      auto path =
+        generateHermitePath(start, goal, ratio_start * goal_distance, ratio_goal * goal_distance);
       path_lengths.push_back(getLength(path, 100));
       // path_lengths.push_back(getMaximumCurvature(path,50));
       path_list.push_back(path);

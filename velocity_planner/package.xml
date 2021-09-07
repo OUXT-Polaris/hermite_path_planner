@@ -3,7 +3,7 @@
 <package format="3">
   <name>velocity_planner</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Velociy planner for hermite_path_planner</description>
   <maintainer email="ms.kataoka@gmail.com">masaya</maintainer>
   <license>Apache 2.0</license>
 
@@ -25,7 +25,7 @@
   <depend>sensor_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ouxt_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

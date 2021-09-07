@@ -14,15 +14,17 @@
 
 #include <color_names/color_names.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
-#include <velocity_planner/obstacle_planner_component.hpp>
 #include <memory>
 #include <set>
 #include <string>
+#include <velocity_planner/obstacle_planner_component.hpp>
 
 namespace velocity_planner
 {
 ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & options)
-: Node("obstacle_planner", "velocity_planner", options), buffer_(get_clock()), listener_(buffer_),
+: Node("obstacle_planner", "velocity_planner", options),
+  buffer_(get_clock()),
+  listener_(buffer_),
   viz_(get_name())
 {
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
@@ -33,8 +35,8 @@ ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & o
   std::string update_path_topic;
   declare_parameter("update_path_topic", "/planner_concatenator/update");
   get_parameter("update_path_topic", update_path_topic);
-  update_pub_ = this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>(
-    update_path_topic, 1);
+  update_pub_ =
+    this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>(update_path_topic, 1);
   std::string hermite_path_topic;
   declare_parameter("hermite_path_topic", "/hermite_path_planner/hermite_path");
   get_parameter("hermite_path_topic", hermite_path_topic);
@@ -159,9 +161,8 @@ ObstaclePlannerComponent::addObstacleConstraints()
       p.point.z = 0.0;
       p.header = scan_->header;
       p = TransformToMapFrame(p);
-      auto t_value = generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(
-        path_->path,
-        p.point);
+      auto t_value =
+        generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
       if (t_value) {
         geometry_msgs::msg::Point nearest_point =
           generator.getPointOnHermitePath(path_->path, t_value.get());
