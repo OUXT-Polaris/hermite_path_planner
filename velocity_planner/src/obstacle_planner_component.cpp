@@ -161,15 +161,17 @@ ObstaclePlannerComponent::addObstacleConstraints()
       p.point.z = 0.0;
       p.header = scan_->header;
       p = TransformToMapFrame(p);
-      auto t_value =
-        generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
-      if (t_value) {
-        geometry_msgs::msg::Point nearest_point =
-          generator.getPointOnHermitePath(path_->path, t_value.get());
-        double lat_dist = std::sqrt(
-          std::pow(nearest_point.x - p.point.x, 2) + std::pow(nearest_point.y - p.point.y, 2));
-        if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
-          t_values.insert(t_value.get());
+      if (p.header.frame_id == "map") {
+        auto t_value =
+          generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
+        if (t_value) {
+          geometry_msgs::msg::Point nearest_point =
+            generator.getPointOnHermitePath(path_->path, t_value.get());
+          double lat_dist = std::sqrt(
+            std::pow(nearest_point.x - p.point.x, 2) + std::pow(nearest_point.y - p.point.y, 2));
+          if (std::fabs(lat_dist) < std::fabs(robot_width_) && t_value.get() > current_t.get()) {
+            t_values.insert(t_value.get());
+          }
         }
       }
     }
