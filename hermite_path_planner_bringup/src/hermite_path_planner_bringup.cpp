@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <glog/logging.h>
+
 #include <hermite_path_planner/hermite_path_planner_component.hpp>
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
 #include <memory>
@@ -22,8 +24,6 @@
 #include <velocity_planner/planner_concatenator_component.hpp>
 #include <velocity_planner/stop_planner_component.hpp>
 #include <velocity_planner/velocity_planner_component.hpp>
-
-#include <glog/logging.h>
 
 int main(int argc, char * argv[])
 {

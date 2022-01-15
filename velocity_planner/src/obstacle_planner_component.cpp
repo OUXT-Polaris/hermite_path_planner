@@ -135,7 +135,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
   if (!path_ || !current_pose_ || !scan_) {
     return boost::none;
   }
-  if(scan_->header.frame_id == "") {
+  if (scan_->header.frame_id == "") {
     return boost::none;
   }
   hermite_path_planner::HermitePathGenerator generator(0.0);
