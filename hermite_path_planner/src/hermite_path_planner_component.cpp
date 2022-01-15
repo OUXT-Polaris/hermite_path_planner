@@ -70,6 +70,14 @@ void HermitePathPlannerComponent::GoalPoseCallback(
   }
   geometry_msgs::msg::PoseStamped goal_pose = TransformToPlanningFrame(*msg);
   geometry_msgs::msg::PoseStamped current_pose = TransformToPlanningFrame(*current_pose_);
+  if (goal_pose.header.frame_id != planning_frame_id_) {
+    RCLCPP_ERROR(
+      get_logger(), "Failed to transform goal_pose to planning frame, ignore goal pose.");
+  }
+  if (current_pose.header.frame_id != planning_frame_id_) {
+    RCLCPP_ERROR(
+      get_logger(), "Failed to transform current_pose to planning frame, ignore goal pose.");
+  }
   hermite_path_msgs::msg::HermitePathStamped path;
   path.path = generator_->generateHermitePath(current_pose.pose, goal_pose.pose);
   path.header.stamp = msg->header.stamp;

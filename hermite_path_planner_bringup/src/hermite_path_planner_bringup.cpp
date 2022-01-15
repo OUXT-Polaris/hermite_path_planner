@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <glog/logging.h>
+
 #include <hermite_path_planner/hermite_path_planner_component.hpp>
 #include <local_waypoint_server/local_waypoint_server_component.hpp>
 #include <memory>
@@ -25,8 +27,10 @@
 
 int main(int argc, char * argv[])
 {
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
   rclcpp::init(argc, argv);
-  rclcpp::executors::SingleThreadedExecutor exec;
+  rclcpp::executors::MultiThreadedExecutor exec;
   rclcpp::NodeOptions options;
   auto hermite_path_planner =
     std::make_shared<hermite_path_planner::HermitePathPlannerComponent>(options);

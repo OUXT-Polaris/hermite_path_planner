@@ -252,29 +252,31 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
     return boost::none;
   }
   geometry_msgs::msg::PoseStamped pose_transformed = TransformToPlanningFrame(current_pose_.get());
-  std::set<double> t_values;
-  for (auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++) {
-    auto t_value =
-      generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(path, *points_itr);
-    if (t_value) {
-      if (t_value.get() <= 1.3 && t_value.get() >= 0.0) {
-        if (t_value.get() >= 1.0) {
-          t_value.get() = 1.0;
-        }
-        geometry_msgs::msg::Point nearest_point =
-          generator_->getPointOnHermitePath(path, t_value.get());
-        double lat_dist = std::sqrt(
-          std::pow(nearest_point.x - points_itr->x, 2) +
-          std::pow(nearest_point.y - points_itr->y, 2));
-        if (lat_dist < std::fabs(robot_width_ * 0.5 + margin_)) {
-          t_values.insert(t_value.get());
+  if (pose_transformed.header.frame_id == planning_frame_id_) {
+    std::set<double> t_values;
+    for (auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++) {
+      auto t_value =
+        generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(path, *points_itr);
+      if (t_value) {
+        if (t_value.get() <= 1.3 && t_value.get() >= 0.0) {
+          if (t_value.get() >= 1.0) {
+            t_value.get() = 1.0;
+          }
+          geometry_msgs::msg::Point nearest_point =
+            generator_->getPointOnHermitePath(path, t_value.get());
+          double lat_dist = std::sqrt(
+            std::pow(nearest_point.x - points_itr->x, 2) +
+            std::pow(nearest_point.y - points_itr->y, 2));
+          if (lat_dist < std::fabs(robot_width_ * 0.5 + margin_)) {
+            t_values.insert(t_value.get());
+          }
         }
       }
     }
-  }
-  if (t_values.size() != 0) {
-    double t = *t_values.begin();
-    return t;
+    if (t_values.size() != 0) {
+      double t = *t_values.begin();
+      return t;
+    }
   }
   return boost::none;
 }
@@ -285,28 +287,30 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPat
     return boost::none;
   }
   geometry_msgs::msg::PoseStamped pose_transformed = TransformToPlanningFrame(current_pose_.get());
-  auto current_t = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
-    current_path_->path, pose_transformed.pose.position);
-  std::set<double> t_values;
-  for (auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++) {
-    auto t_value = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
-      current_path_->path, *points_itr);
-    if (t_value) {
-      geometry_msgs::msg::Point nearest_point =
-        generator_->getPointOnHermitePath(current_path_->path, t_value.get());
-      double lat_dist = std::sqrt(
-        std::pow(nearest_point.x - points_itr->x, 2) +
-        std::pow(nearest_point.y - points_itr->y, 2));
-      if (
-        std::fabs(lat_dist) < std::fabs(robot_width_ * 0.5 + margin_) &&
-        t_value.get() > current_t.get()) {
-        t_values.insert(t_value.get());
+  if (pose_transformed.header.frame_id == planning_frame_id_) {
+    auto current_t = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
+      current_path_->path, pose_transformed.pose.position);
+    std::set<double> t_values;
+    for (auto points_itr = scan_points_.begin(); points_itr != scan_points_.end(); points_itr++) {
+      auto t_value = generator_->getNormalizedLongitudinalDistanceInFrenetCoordinate(
+        current_path_->path, *points_itr);
+      if (t_value) {
+        geometry_msgs::msg::Point nearest_point =
+          generator_->getPointOnHermitePath(current_path_->path, t_value.get());
+        double lat_dist = std::sqrt(
+          std::pow(nearest_point.x - points_itr->x, 2) +
+          std::pow(nearest_point.y - points_itr->y, 2));
+        if (
+          std::fabs(lat_dist) < std::fabs(robot_width_ * 0.5 + margin_) &&
+          t_value.get() > current_t.get()) {
+          t_values.insert(t_value.get());
+        }
       }
     }
-  }
-  if (t_values.size() != 0) {
-    double t = *t_values.begin();
-    return t;
+    if (t_values.size() != 0) {
+      double t = *t_values.begin();
+      return t;
+    }
   }
   return boost::none;
 }
@@ -324,7 +328,9 @@ std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
       p.point.z = 0.0;
       p.header = scan.header;
       p = TransformToPlanningFrame(p);
-      ret.push_back(p.point);
+      if (p.header.frame_id == planning_frame_id_) {
+        ret.push_back(p.point);
+      }
     }
   }
   return ret;
