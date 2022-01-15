@@ -105,7 +105,7 @@ geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
       buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(pose, pose, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
-    RCLCPP_ERROR(get_logger(), ex.what());
+    RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__ << "," << ex.what());
   }
   return pose;
 }
@@ -124,7 +124,7 @@ geometry_msgs::msg::PointStamped ObstaclePlannerComponent::TransformToMapFrame(
       buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(point, point, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
-    RCLCPP_ERROR(get_logger(), ex.what());
+    RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__ << "," << ex.what());
   }
   return point;
 }
@@ -133,6 +133,9 @@ boost::optional<hermite_path_msgs::msg::HermitePathStamped>
 ObstaclePlannerComponent::addObstacleConstraints()
 {
   if (!path_ || !current_pose_ || !scan_) {
+    return boost::none;
+  }
+  if(scan_->header.frame_id == "") {
     return boost::none;
   }
   hermite_path_planner::HermitePathGenerator generator(0.0);

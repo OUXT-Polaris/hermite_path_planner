@@ -23,10 +23,14 @@
 #include <velocity_planner/stop_planner_component.hpp>
 #include <velocity_planner/velocity_planner_component.hpp>
 
+#include <glog/logging.h>
+
 int main(int argc, char * argv[])
 {
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
   rclcpp::init(argc, argv);
-  rclcpp::executors::SingleThreadedExecutor exec;
+  rclcpp::executors::MultiThreadedExecutor exec;
   rclcpp::NodeOptions options;
   auto hermite_path_planner =
     std::make_shared<hermite_path_planner::HermitePathPlannerComponent>(options);

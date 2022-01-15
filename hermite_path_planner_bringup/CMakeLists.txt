@@ -41,6 +41,7 @@ ament_target_dependencies(hermite_path_planner_bringup_node
   visualization_msgs
   color_names
   tf2_geometry_msgs)
+target_link_libraries(hermite_path_planner_bringup_node glog)
 
 install(TARGETS
   hermite_path_planner_bringup_node
