@@ -33,13 +33,13 @@ jobs:
         if: steps.check_rosdistro_repos_files.outputs.files_exists == 'true'
         with:
           ros2-distro: ${{ matrix.rosdistro }}
-          external-repos: dependency-${{ matrix.rosdistro }}.repos
+          repos-filepath: dependency-${{ matrix.rosdistro }}.repos
       - name: Run OUXT-Polaris/ros2-ci@master with dependency.repos
         uses: OUXT-Polaris/ros2-ci@master
         if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'true'
         with:
           ros2-distro: ${{ matrix.rosdistro }}
-          external-repos: dependency.repos
+          repos-filepath: dependency.repos
       - name: Run OUXT-Polaris/ros2-ci@master without repos
         uses: OUXT-Polaris/ros2-ci@master
         if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'false'
