@@ -300,7 +300,8 @@ std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getPointsOnHermiteP
 {
   std::vector<geometry_msgs::msg::Point> p;
   double step_size = max_t / static_cast<double>(resolution);
-  for (int i = 0; i < (resolution + 1); i++) { double t = step_size * static_cast<double>(i);
+  for (int i = 0; i < (resolution + 1); i++) {
+    double t = step_size * static_cast<double>(i);
     p.push_back(getPointOnHermitePath(path, t));
   }
   return p;
