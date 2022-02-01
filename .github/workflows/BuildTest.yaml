@@ -28,20 +28,20 @@ jobs:
         with:
           files: dependency.repos
           allow_failure: false
-      - name: Run ichiro-its/ros2-ci@v1.0.0 with dependency-${{ matrix.rosdistro }}.repos
-        uses: ichiro-its/ros2-ci@v1.0.0
+      - name: Run OUXT-Polaris/ros2-ci@master with dependency-${{ matrix.rosdistro }}.repos
+        uses: OUXT-Polaris/ros2-ci@master
         if: steps.check_rosdistro_repos_files.outputs.files_exists == 'true'
         with:
           ros2-distro: ${{ matrix.rosdistro }}
           external-repos: dependency-${{ matrix.rosdistro }}.repos
-      - name: Run ichiro-its/ros2-ci@v1.0.0 with dependency.repos
-        uses: ichiro-its/ros2-ci@v1.0.0
+      - name: Run OUXT-Polaris/ros2-ci@master with dependency.repos
+        uses: OUXT-Polaris/ros2-ci@master
         if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'true'
         with:
           ros2-distro: ${{ matrix.rosdistro }}
           external-repos: dependency.repos
-      - name: Run ichiro-its/ros2-ci@v1.0.0 without repos
-        uses: ichiro-its/ros2-ci@v1.0.0
+      - name: Run OUXT-Polaris/ros2-ci@master without repos
+        uses: OUXT-Polaris/ros2-ci@master
         if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'false'
         with:
           ros2-distro: ${{ matrix.rosdistro }}
