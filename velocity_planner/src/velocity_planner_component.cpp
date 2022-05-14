@@ -26,13 +26,21 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
   listener_(buffer_),
   viz_(get_name())
 {
+  declare_parameter("change_twist_stamped", false);
+  get_parameter("change_twist_stamped", change_twist_stamped_);
   std::string current_twist_topic;
   declare_parameter("current_twist_topic", "current_twist");
   get_parameter("current_twist_topic", current_twist_topic);
-  current_twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-    current_twist_topic, 1,
-    std::bind(&VelocityPlannerComponent::currentTwistCallback, this, std::placeholders::_1));
-
+  if (change_twist_stamped_) {
+    current_twist_stamped_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
+      current_twist_topic, 1,
+      std::bind(
+        &VelocityPlannerComponent::currentTwistStampedCallback, this, std::placeholders::_1));
+  } else {
+    current_twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
+      current_twist_topic, 1,
+      std::bind(&VelocityPlannerComponent::currentTwistCallback, this, std::placeholders::_1));
+  }
   std::string hermite_path_topic;
   declare_parameter("hermite_path_topic", "/planner_concatenator/hermite_path");
   get_parameter("hermite_path_topic", hermite_path_topic);
@@ -74,9 +82,16 @@ bool VelocityPlannerComponent::checkTopics()
     RCLCPP_INFO(get_logger(), "path was not calculated");
     return false;
   }
-  if (current_twist_ == boost::none) {
-    RCLCPP_INFO(get_logger(), "current_twist did not published");
-    return false;
+  if (change_twist_stamped_) {
+    if (current_twist_stamped_ == boost::none) {
+      RCLCPP_INFO(get_logger(), "current_twist_stamped did not published");
+      return false;
+    }
+  } else {
+    if (current_twist_ == boost::none) {
+      RCLCPP_INFO(get_logger(), "current_twist did not published");
+      return false;
+    }
   }
   if (current_pose_ == boost::none) {
     RCLCPP_INFO(get_logger(), "current_pose did not published");
@@ -149,6 +164,12 @@ void VelocityPlannerComponent::hermitePathCallback(
 void VelocityPlannerComponent::currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data)
 {
   current_twist_ = *data;
+}
+
+void VelocityPlannerComponent::currentTwistStampedCallback(
+  const geometry_msgs::msg::TwistStamped::SharedPtr data)
+{
+  current_twist_stamped_ = *data;
 }
 
 void VelocityPlannerComponent::currentPoseCallback(
