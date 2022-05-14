@@ -67,6 +67,7 @@ extern "C" {
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -83,10 +84,13 @@ public:
 private:
   boost::optional<geometry_msgs::msg::Twist> getTargetTwist(double target_t);
   void currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data);
+  void currentTwistStampedCallback(const geometry_msgs::msg::TwistStamped::SharedPtr data);
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr current_twist_stamped_sub_;
   void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
   rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
   boost::optional<geometry_msgs::msg::Twist> current_twist_;
+  boost::optional<geometry_msgs::msg::TwistStamped> current_twist_stamped_;
   void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
   boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
   boost::optional<geometry_msgs::msg::PoseStamped> current_pose_transformed_;
@@ -96,6 +100,7 @@ private:
   double lookahead_distance_;
   double minimum_lookahead_distance_;
   double lookahead_ratio_;
+  bool change_twist_stamped_;
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;

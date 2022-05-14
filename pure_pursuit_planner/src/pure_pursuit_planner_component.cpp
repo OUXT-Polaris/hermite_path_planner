@@ -33,13 +33,25 @@ PurePursuitPlannerComponent::PurePursuitPlannerComponent(const rclcpp::NodeOptio
   declare_parameter("lookahead_ratio", 1.5);
   get_parameter("lookahead_ratio", lookahead_ratio_);
 
+  declare_parameter("change_twist_stamped", false);
+  get_parameter("change_twist_stamped", change_twist_stamped_);
+
   std::string current_twist_topic;
   declare_parameter("current_twist_topic", "current_twist");
   get_parameter("current_twist_topic", current_twist_topic);
-  current_twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-    current_twist_topic, 1,
-    std::bind(&PurePursuitPlannerComponent::currentTwistCallback, this, std::placeholders::_1));
-
+  if (change_twist_stamped_) {
+    current_twist_stamped_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
+      current_twist_topic, 1,
+      std::bind(
+        &PurePursuitPlannerComponent::currentTwistStampedCallback, this, std::placeholders::_1));
+    current_twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
+      current_twist_topic, 1,
+      std::bind(&PurePursuitPlannerComponent::currentTwistCallback, this, std::placeholders::_1));
+  } else {
+    current_twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
+      current_twist_topic, 1,
+      std::bind(&PurePursuitPlannerComponent::currentTwistCallback, this, std::placeholders::_1));
+  }
   std::string current_pose_topic;
   declare_parameter("current_pose_topic", "current_pose");
   get_parameter("current_pose_topic", current_pose_topic);
@@ -66,6 +78,17 @@ void PurePursuitPlannerComponent::currentTwistCallback(
     lookahead_distance_ = minimum_lookahead_distance_;
   } else {
     lookahead_distance_ = lookahead_ratio_ * data->linear.x;
+  }
+}
+
+void PurePursuitPlannerComponent::currentTwistStampedCallback(
+  const geometry_msgs::msg::TwistStamped::SharedPtr data)
+{
+  current_twist_stamped_ = *data;
+  if (lookahead_ratio_ * data->twist.linear.x < minimum_lookahead_distance_) {
+    lookahead_distance_ = minimum_lookahead_distance_;
+  } else {
+    lookahead_distance_ = lookahead_ratio_ * data->twist.linear.x;
   }
 }
 

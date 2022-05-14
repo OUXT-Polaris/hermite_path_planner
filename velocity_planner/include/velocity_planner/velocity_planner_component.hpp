@@ -65,6 +65,7 @@ extern "C" {
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <memory>
@@ -90,8 +91,11 @@ private:
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr current_twist_stamped_sub_;
   boost::optional<geometry_msgs::msg::Twist> current_twist_;
+  boost::optional<geometry_msgs::msg::TwistStamped> current_twist_stamped_;
   void currentTwistCallback(const geometry_msgs::msg::Twist::SharedPtr data);
+  void currentTwistStampedCallback(const geometry_msgs::msg::TwistStamped::SharedPtr data);
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
   boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
   void currentPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr data);
@@ -102,6 +106,7 @@ private:
   void updatePath();
   void checkCurrentPath();
   bool checkTopics();
+  bool change_twist_stamped_;
   std::mutex mtx_;
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
   double maximum_accerelation_ = 0.3;
