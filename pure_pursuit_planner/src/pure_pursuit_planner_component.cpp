@@ -44,9 +44,6 @@ PurePursuitPlannerComponent::PurePursuitPlannerComponent(const rclcpp::NodeOptio
       current_twist_topic, 1,
       std::bind(
         &PurePursuitPlannerComponent::currentTwistStampedCallback, this, std::placeholders::_1));
-    current_twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-      current_twist_topic, 1,
-      std::bind(&PurePursuitPlannerComponent::currentTwistCallback, this, std::placeholders::_1));
   } else {
     current_twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
       current_twist_topic, 1,
