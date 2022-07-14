@@ -197,7 +197,7 @@ boost::optional<double> HermitePathGenerator::getNormalizedLongitudinalDistanceI
 double HermitePathGenerator::getLength(hermite_path_msgs::msg::HermitePath path, int resolution)
 {
   double ret = 0.0;
-  std::vector<geometry_msgs::msg::Point> points = getPointsOnHermitePath(path, resolution,1.0);
+  std::vector<geometry_msgs::msg::Point> points = getPointsOnHermitePath(path, resolution, 1.0);
   for (int i = 0; i < (resolution - 1); i++) {
     double length_segment = std::sqrt(
       std::pow(points[i].x - points[i + 1].x, 2) + std::pow(points[i].y - points[i + 1].y, 2));
