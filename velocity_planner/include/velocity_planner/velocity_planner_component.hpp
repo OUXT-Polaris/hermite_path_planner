@@ -108,6 +108,7 @@ private:
   bool checkTopics();
   bool change_twist_stamped_;
   std::mutex mtx_;
+  double robot_width;
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
   double maximum_accerelation_ = 0.3;
   double minimum_accerelation_ = -0.1;

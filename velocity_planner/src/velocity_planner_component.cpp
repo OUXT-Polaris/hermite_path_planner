@@ -141,7 +141,7 @@ void VelocityPlannerComponent::updatePath()
     ss << "minimum acceleration is " << graph.getPlannedMinimumAcceleration();
     RCLCPP_INFO(get_logger(), ss.str().c_str());
     polygon_marker_pub_->publish(viz_.generateDeleteMarker());
-    polygon_marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, 3.0));
+    polygon_marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, robot_width));
     marker_pub_->publish(viz_.generateDeleteMarker());
     auto color = color_names::makeColorMsg("deepskyblue", 1.0);
     marker_pub_->publish(viz_.generateMarker(path, color));
