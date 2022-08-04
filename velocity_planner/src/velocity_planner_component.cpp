@@ -61,7 +61,6 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
     this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker/polygon", 1);
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
 
-  double robot_width;
   declare_parameter("robot_width", 3.0);
   get_parameter("robot_width", robot_width);
   generator_ = std::make_shared<hermite_path_planner::HermitePathGenerator>(robot_width);
