@@ -32,6 +32,7 @@ find_package(tf2_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(color_names REQUIRED)
+find_package(grid_map_msgs REQUIRED)
 
 include_directories(
   include
@@ -80,12 +81,19 @@ ament_target_dependencies(velocity_planner_node
 # Costmap Planner
 add_library(costmap_planner_component SHARED
   src/costmap_planner_component.cpp
+  src/velocity_visualizer.cpp
 )
 target_compile_definitions(costmap_planner_component
   PRIVATE "VELOCITY_PLANNER_COSTMAP_PLANNER_COMPONENT_BUILDING_DLL")
 ament_target_dependencies(costmap_planner_component
   rclcpp
-  rclcpp_components)
+  rclcpp_components
+  visualization_msgs
+  color_names
+  hermite_path_planner
+  hermite_path_msgs
+  grid_map_msgs
+  )
 rclcpp_components_register_nodes(costmap_planner_component
   "velocity_planner::CostmapPlannerComponent")
 
@@ -95,7 +103,13 @@ add_executable(costmap_planner_node
 target_link_libraries(costmap_planner_node costmap_planner_component)
 ament_target_dependencies(costmap_planner_node
   rclcpp
-  rclcpp_components)
+  rclcpp_components
+  visualization_msgs
+  color_names
+  hermite_path_planner
+  hermite_path_msgs
+  grid_map_msgs
+  )
 
 # Curve Planner
 add_library(curve_planner_component SHARED

@@ -58,7 +58,11 @@ extern "C" {
 
 #include <boost/algorithm/clamp.hpp>
 #include <boost/optional.hpp>
+#include <grid_map_msgs/msg/grid_map.hpp>
+#include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
+#include <hermite_path_planner/hermite_path_generator.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <velocity_planner/velocity_visualizer.hpp>
 
 namespace velocity_planner
 {
@@ -70,8 +74,12 @@ public:
 
 private:
   rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
+  rclcpp::Subscription<grid_map_msgs::msg::GridMap>::SharedPtr grid_map_sub_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
+  void gridmapCallback(const grid_map_msgs::msg::GridMap::SharedPtr data);
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> path_;
+  boost::optional<grid_map_msgs::msg::GridMap> grid_map_;
   hermite_path_planner::HermitePathGenerator generator_;
   VelocityVisualizer viz_;
 };

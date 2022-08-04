@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 #include <limits>
 #include <memory>
 #include <string>
@@ -22,20 +23,31 @@ namespace velocity_planner
 CostmapPlannerComponent::CostmapPlannerComponent(const rclcpp::NodeOptions & options)
 : Node("costmap_planner", "velocity_planner", options), generator_(0.0), viz_(get_name())
 {
+  marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   std::string hermite_path_topic;
   std::string costmap_topic;
   declare_parameter("hermite_path_topic", "/hermite_path_planner/hermite_path");
   get_parameter("hermite_path_topic", hermite_path_topic);
-  declare_parameter("costmap_topic", "/perception/") hermite_path_sub_ =
-    this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>(
-      hermite_path_topic, 1,
-      std::bind(&CostmapPlannerComponent::hermitePathCallback, this, std::placeholders::_1));
+  declare_parameter("costmap_topic", "/perception/combined_gridmap");
+  get_parameter("costmap_topic", costmap_topic);
+  hermite_path_sub_ = this->create_subscription<hermite_path_msgs::msg::HermitePathStamped>(
+    hermite_path_topic, 1,
+    std::bind(&CostmapPlannerComponent::hermitePathCallback, this, std::placeholders::_1));
+  grid_map_sub_ = this->create_subscription<grid_map_msgs::msg::GridMap>(
+    costmap_topic, 1,
+    std::bind(&CostmapPlannerComponent::gridmapCallback, this, std::placeholders::_1));
 }
 
 void CostmapPlannerComponent::hermitePathCallback(
   const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
 {
   path_ = *data;
+  marker_pub_->publish(viz_.generateDeleteMarker());
+}
+
+void CostmapPlannerComponent::gridmapCallback(const grid_map_msgs::msg::GridMap::SharedPtr data)
+{
+  grid_map_ = *data;
 }
 
 }  // namespace velocity_planner
