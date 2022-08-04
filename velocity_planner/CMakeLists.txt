@@ -76,6 +76,27 @@ ament_target_dependencies(velocity_planner_node
   hermite_path_planner
   hermite_path_msgs)
 
+
+# Costmap Planner
+add_library(costmap_planner_component SHARED
+  src/costmap_planner_component.cpp
+)
+target_compile_definitions(costmap_planner_component
+  PRIVATE "VELOCITY_PLANNER_COSTMAP_PLANNER_COMPONENT_BUILDING_DLL")
+ament_target_dependencies(costmap_planner_component
+  rclcpp
+  rclcpp_components)
+rclcpp_components_register_nodes(costmap_planner_component
+  "velocity_planner::CostmapPlannerComponent")
+
+add_executable(costmap_planner_node
+  src/costmap_planner_node.cpp
+)
+target_link_libraries(costmap_planner_node costmap_planner_component)
+ament_target_dependencies(costmap_planner_node
+  rclcpp
+  rclcpp_components)
+
 # Curve Planner
 add_library(curve_planner_component SHARED
   src/curve_planner_component.cpp
