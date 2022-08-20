@@ -36,6 +36,10 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   get_parameter("sampling_offset", sampling_offset_);
   declare_parameter("margin", 0.5);
   get_parameter("margin", margin_);
+  declare_parameter("goalpose_x_offset", 1.0);
+  get_parameter("goalpose_x_offset", goalpose_x_offset_);
+  declare_parameter("goalpose_y_offset", 1.0);
+  get_parameter("goalpose_y_offset", goalpose_y_offset_);
   /**
    * Publishers
    */
@@ -140,31 +144,46 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   return ret;
 }
 
+bool LocalWaypointServerComponent::checkObstacleInGoal()
+{
+  std::vector<geometry_msgs::msg::Point32> obj_coordinate;
+  float x = static_cast<float>(goal_pose_->pose.position.x);
+  float y = static_cast<float>(goal_pose_->pose.position.y);
+  float obj_x = 0.0;
+  float obj_y = 0.0;
+
+  for (int i = 0; i < static_cast<int>(scan_->ranges.size()); i++) {
+    double theta = scan_->angle_min + scan_->angle_increment * static_cast<double>(i);
+    geometry_msgs::msg::Point32 p;
+    p.x = scan_->ranges[i] * std::cos(theta);
+    p.y = scan_->ranges[i] * std::sin(theta);
+    p.z = 0.0;
+    obj_coordinate.push_back(p);
+  }
+
+  for (int i = 0; i < static_cast<int>(obj_coordinate.size()); i++) {
+    obj_x = obj_coordinate[i].x;
+    obj_y = obj_coordinate[i].y;
+    if (obj_x <= (x + goalpose_x_offset_) || obj_y <= (y + goalpose_y_offset_)) {
+      if (obj_x >= (x - goalpose_x_offset_) || obj_y >= (y - goalpose_y_offset_)) {
+        return false;
+      }
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void LocalWaypointServerComponent::updateLocalWaypoint()
 {
-  std::vector<geometry_msgs::msg::Point32> ret;
-
   if (!scan_ || !current_pose_ || !goal_pose_) {
     return;
   }
 
-  for(int i = 0; i < static_cast<int>(scan_->ranges.size()); i++){
-      double theta = scan_->angle_min + scan_->angle_increment * static_cast<double>(i);
-      geometry_msgs::msg::Point32 p;
-      p.x = scan->ranges[i] * std::cos(theta);
-      p.y = scan->ranges[i] * std::sin(theta);
-      p.z = 0.0;
-      ret.push_back(p);
-    }
-
-  for (int i = 0; i < static_cast<int>(ret.size()); i++){
-    //test value 2.0 m? mm?
-    if(ret[i].x <= (static_cast<float>(goal_pose_->pose.position.x) + 2.0) || ret[i].y <= (static_cast<float>(goal_pose_->pose.position.y) + 2.0)) {
-      if(ret[i].x >= (static_cast<float>(goal_pose_->pose.position.x) - 2.0) || ret[i].y >= (static_cast<float>(goal_pose_->pose.position.y) - 2.0)){
-        return;
-      }
-      return;
-    }
+  bool checkgoal_flag = checkObstacleInGoal();
+  if (checkgoal_flag == false) {
+    return;
   }
 
   auto result = checkCollisionToCurrentPath();
