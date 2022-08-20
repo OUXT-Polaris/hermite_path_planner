@@ -65,6 +65,7 @@ extern "C" {
 #include <tf2_ros/transform_listener.h>
 
 #include <boost/optional.hpp>
+#include <geometry_msgs/msg/point32.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <memory>
@@ -112,12 +113,15 @@ private:
   boost::optional<double> checkCollisionToCurrentPath();
   boost::optional<double> checkCollisionToPath(hermite_path_msgs::msg::HermitePath path);
   std::vector<geometry_msgs::msg::Pose> getLocalWaypointCandidates(double obstacle_t);
+  bool checkObstacleInGoal();
   boost::optional<geometry_msgs::msg::Pose> evaluateCandidates(
     std::vector<geometry_msgs::msg::Pose> candidates);
   int num_candidates_;
   double sampling_interval_;
   double sampling_offset_;
   double margin_;
+  float goalpose_x_offset_;
+  float goalpose_y_offset_;
   boost::optional<geometry_msgs::msg::Pose> replaned_goalpose_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_no_collision_pub_;
