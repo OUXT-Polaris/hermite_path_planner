@@ -66,6 +66,7 @@ extern "C" {
 
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msgs/point32.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>

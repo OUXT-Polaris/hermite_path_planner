@@ -142,9 +142,31 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
 
 void LocalWaypointServerComponent::updateLocalWaypoint()
 {
+  std::vector<geometry_msgs::msg::Point32> ret;
+
   if (!scan_ || !current_pose_ || !goal_pose_) {
     return;
   }
+
+  for(int i = 0; i < static_cast<int>(scan_->ranges.size()); i++){
+      double theta = scan_->angle_min + scan_->angle_increment * static_cast<double>(i);
+      geometry_msgs::msg::Point32 p;
+      p.x = scan->ranges[i] * std::cos(theta);
+      p.y = scan->ranges[i] * std::sin(theta);
+      p.z = 0.0;
+      ret.push_back(p);
+    }
+
+  for (int i = 0; i < static_cast<int>(ret.size()); i++){
+    //test value 2.0 m? mm?
+    if(ret[i].x <= (static_cast<float>(goal_pose_->pose.position.x) + 2.0) || ret[i].y <= (static_cast<float>(goal_pose_->pose.position.y) + 2.0)) {
+      if(ret[i].x >= (static_cast<float>(goal_pose_->pose.position.x) - 2.0) || ret[i].y >= (static_cast<float>(goal_pose_->pose.position.y) - 2.0)){
+        return;
+      }
+      return;
+    }
+  }
+
   auto result = checkCollisionToCurrentPath();
   if (result) {
     if (result.get() <= 1.0) {
