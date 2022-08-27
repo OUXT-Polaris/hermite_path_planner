@@ -36,10 +36,14 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   get_parameter("sampling_offset", sampling_offset_);
   declare_parameter("margin", 0.5);
   get_parameter("margin", margin_);
+  /*
   declare_parameter("goalpose_x_offset", 1.0);
   get_parameter("goalpose_x_offset", goalpose_x_offset_);
   declare_parameter("goalpose_y_offset", 1.0);
   get_parameter("goalpose_y_offset", goalpose_y_offset_);
+  */
+  declare_parameter("goal_obstacle_check_distance", 1.0);
+  get_parameter("goal_obstacle_check_distance", goal_obstacle_check_distance_);
   /**
    * Publishers
    */
@@ -152,27 +156,23 @@ bool LocalWaypointServerComponent::checkObstacleInGoal()
   float obj_x = 0.0;
   float obj_y = 0.0;
 
-  for (int i = 0; i < static_cast<int>(scan_->ranges.size()); i++) {
+  for (size_t i = 0; i < scan_->ranges.size(); i++) {
     double theta = scan_->angle_min + scan_->angle_increment * static_cast<double>(i);
     geometry_msgs::msg::Point32 p;
     p.x = scan_->ranges[i] * std::cos(theta);
     p.y = scan_->ranges[i] * std::sin(theta);
     p.z = 0.0;
-    obj_coordinate.push_back(p);
+    obj_coordinate.emplace_back(p);
   }
 
-  for (int i = 0; i < static_cast<int>(obj_coordinate.size()); i++) {
+  for (size_t i = 0; i < obj_coordinate.size(); i++) {
     obj_x = obj_coordinate[i].x;
     obj_y = obj_coordinate[i].y;
-    if (obj_x <= (x + goalpose_x_offset_) || obj_y <= (y + goalpose_y_offset_)) {
-      if (obj_x >= (x - goalpose_x_offset_) || obj_y >= (y - goalpose_y_offset_)) {
-        return false;
-      }
-      return false;
+    if (goal_obstacle_check_distance_ > std::hypot(x - obj_x, y - obj_y)) {
+      return true;
     }
   }
-
-  return true;
+  return false;
 }
 
 void LocalWaypointServerComponent::updateLocalWaypoint()
@@ -181,8 +181,7 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
     return;
   }
 
-  bool checkgoal_flag = checkObstacleInGoal();
-  if (checkgoal_flag == false) {
+  if (checkObstacleInGoal()) {
     return;
   }
 

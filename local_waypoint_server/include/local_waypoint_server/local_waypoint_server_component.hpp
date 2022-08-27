@@ -120,8 +120,7 @@ private:
   double sampling_interval_;
   double sampling_offset_;
   double margin_;
-  float goalpose_x_offset_;
-  float goalpose_y_offset_;
+  double goal_obstacle_check_distance_;
   boost::optional<geometry_msgs::msg::Pose> replaned_goalpose_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_no_collision_pub_;
