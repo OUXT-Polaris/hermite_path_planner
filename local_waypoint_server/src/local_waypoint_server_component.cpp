@@ -153,24 +153,15 @@ bool LocalWaypointServerComponent::checkObstacleInGoal()
   std::vector<geometry_msgs::msg::Point32> obj_coordinate;
   float x = static_cast<float>(goal_pose_->pose.position.x);
   float y = static_cast<float>(goal_pose_->pose.position.y);
-  float obj_x = 0.0;
-  float obj_y = 0.0;
 
-  for (size_t i = 0; i < scan_->ranges.size(); i++) {
-    double theta = scan_->angle_min + scan_->angle_increment * static_cast<double>(i);
-    geometry_msgs::msg::Point32 p;
-    p.x = scan_->ranges[i] * std::cos(theta);
-    p.y = scan_->ranges[i] * std::sin(theta);
-    p.z = 0.0;
-    obj_coordinate.emplace_back(p);
-  }
-
-  for (size_t i = 0; i < obj_coordinate.size(); i++) {
-    obj_x = obj_coordinate[i].x;
-    obj_y = obj_coordinate[i].y;
-    if (goal_obstacle_check_distance_ > std::hypot(x - obj_x, y - obj_y)) {
+  double theta = scan_->angle_min;
+  for (const auto & range : scan_->ranges) {
+    if (
+      goal_obstacle_check_distance_ >
+      std::hypot(x - range * std::cos(theta), y - range * std::sin(theta))) {
       return true;
     }
+    theta = theta + scan_->angle_increment;
   }
   return false;
 }
