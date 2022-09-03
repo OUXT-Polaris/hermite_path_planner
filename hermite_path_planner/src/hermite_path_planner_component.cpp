@@ -35,10 +35,10 @@ HermitePathPlannerComponent::HermitePathPlannerComponent(const rclcpp::NodeOptio
     this->create_publisher<hermite_path_msgs::msg::HermitePathStamped>("~/hermite_path", 1);
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   goal_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
-    goal_pose_topic_, 1,
+    goal_pose_topic_, rclcpp::QoS(1).reliable().transient_local(),
     std::bind(&HermitePathPlannerComponent::GoalPoseCallback, this, std::placeholders::_1));
   current_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
-    current_pose_topic_, rclcpp::QoS(1).reliable().transient_local(),
+    current_pose_topic_, 1,
     std::bind(&HermitePathPlannerComponent::CurrentPoseCallback, this, std::placeholders::_1));
 }
 
