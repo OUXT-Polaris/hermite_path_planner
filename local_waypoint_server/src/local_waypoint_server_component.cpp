@@ -71,7 +71,7 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   declare_parameter("current_pose_topic", "/current_pose");
   get_parameter("current_pose_topic", current_pose_topic);
   current_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
-    current_pose_topic, 1,
+    current_pose_topic, rclcpp::QoS(1).reliable().transient_local(),
     std::bind(&LocalWaypointServerComponent::currentPoseCallback, this, std::placeholders::_1));
   std::string obstacle_scan_topic;
   declare_parameter("obstacle_scan_topic", "/obstacle_scan");

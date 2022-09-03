@@ -38,7 +38,7 @@ HermitePathPlannerComponent::HermitePathPlannerComponent(const rclcpp::NodeOptio
     goal_pose_topic_, 1,
     std::bind(&HermitePathPlannerComponent::GoalPoseCallback, this, std::placeholders::_1));
   current_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
-    current_pose_topic_, 1,
+    current_pose_topic_, rclcpp::QoS(1).reliable().transient_local(),
     std::bind(&HermitePathPlannerComponent::CurrentPoseCallback, this, std::placeholders::_1));
 }
 
