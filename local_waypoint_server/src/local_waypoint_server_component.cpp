@@ -47,8 +47,8 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   /**
    * Publishers
    */
-  local_waypoint_pub_ =
-    this->create_publisher<geometry_msgs::msg::PoseStamped>("~/local_waypoint", 1);
+  local_waypoint_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
+    "~/local_waypoint", rclcpp::QoS(1).reliable().transient_local());
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
   marker_no_collision_pub_ =
     this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker/no_collision", 1);
