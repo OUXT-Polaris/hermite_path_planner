@@ -64,7 +64,6 @@ geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanning
 void HermitePathPlannerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
-  RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
   if (!current_pose_) {
     RCLCPP_ERROR(this->get_logger(), "Current Pose does not recieved yet");
     return;
