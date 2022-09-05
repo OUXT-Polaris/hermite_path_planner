@@ -46,14 +46,23 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   get_parameter("goal_obstacle_check_distance", goal_obstacle_check_distance_);
   declare_parameter("goal_reached_threshold", 0.3);
   get_parameter("goal_reached_threshold", goal_reached_threshold_);
+  planner_status_.status = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL;
   /**
    * Publishers
    */
   local_waypoint_pub_ =
     this->create_publisher<geometry_msgs::msg::PoseStamped>("~/local_waypoint", 1);
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
+  status_pub_ =
+    this->create_publisher<hermite_path_msgs::msg::PlannerStatus>("~/planner_status", 1);
   marker_no_collision_pub_ =
     this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker/no_collision", 1);
+  /**
+   * timer
+   */
+  using namespace std::chrono_literals;
+  timer_ = this->create_wall_timer(
+    50ms, std::bind(&LocalWaypointServerComponent::updatePlannerStatus, this));
   /**
    * Subscribers
    */
@@ -83,6 +92,23 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
     std::bind(&LocalWaypointServerComponent::scanCallback, this, std::placeholders::_1));
 }
 
+void LocalWaypointServerComponent::updatePlannerStatus()
+{
+  planner_status_.stamp = get_clock()->now();
+  if (!goal_pose_) {
+    planner_status_.status = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL;
+    // planner_status_.goal_pose = geometry_msgs::msg::PointStamped();
+  } else if (planner_status_.status != hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL) {
+    if (checkGoalReached()) {
+      planner_status_.status = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL;
+      planner_status_.goal_pose = goal_pose_.get();
+    } else {
+      planner_status_.goal_pose = goal_pose_.get();
+    }
+  }
+  status_pub_->publish(planner_status_);
+}
+
 void LocalWaypointServerComponent::hermitePathCallback(
   const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
 {
@@ -93,13 +119,15 @@ void LocalWaypointServerComponent::hermitePathCallback(
 void LocalWaypointServerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
+  planner_status_.status = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL;
   goal_pose_ = *msg;
   replaned_goalpose_ = boost::none;
   updateLocalWaypoint();
 }
 
 bool LocalWaypointServerComponent::isSame(
-  geometry_msgs::msg::PoseStamped pose0, geometry_msgs::msg::PoseStamped pose1)
+  const geometry_msgs::msg::PoseStamped & pose0,
+  const geometry_msgs::msg::PoseStamped & pose1) const
 {
   if (pose0.pose.position.x == pose1.pose.position.x) {
     if (pose0.pose.position.y == pose1.pose.position.y) {
@@ -166,6 +194,9 @@ bool LocalWaypointServerComponent::checkGoalReached() const
 
 bool LocalWaypointServerComponent::checkObstacleInGoal() const
 {
+  if (!goal_pose_) {
+    return false;
+  }
   std::vector<geometry_msgs::msg::Point32> obj_coordinate;
   float x = static_cast<float>(goal_pose_->pose.position.x);
   float y = static_cast<float>(goal_pose_->pose.position.y);
@@ -204,6 +235,7 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
         p.header.stamp = get_clock()->now();
         previous_local_waypoint_ = p;
         local_waypoint_pub_->publish(p);
+        planner_status_.status = hermite_path_msgs::msg::PlannerStatus::AVOIDING;
         return;
       }
     }
@@ -214,11 +246,13 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
     if (!previous_local_waypoint_) {
       previous_local_waypoint_ = current_goal_pose;
       local_waypoint_pub_->publish(current_goal_pose);
+      planner_status_.status = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL;
     } else {
       auto previous_local_waypoint = previous_local_waypoint_.get();
       if (!isSame(previous_local_waypoint, current_goal_pose)) {
         previous_local_waypoint_ = current_goal_pose;
         local_waypoint_pub_->publish(current_goal_pose);
+        planner_status_.status = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL;
       }
     }
   } else {

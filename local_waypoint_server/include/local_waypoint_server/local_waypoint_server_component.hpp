@@ -109,7 +109,9 @@ private:
   bool checkCollision(geometry_msgs::msg::PoseStamped goal_pose, double & longitudinal_distance);
   double robot_width_;
   boost::optional<geometry_msgs::msg::PoseStamped> previous_local_waypoint_;
-  bool isSame(geometry_msgs::msg::PoseStamped pose0, geometry_msgs::msg::PoseStamped pose1);
+  bool isSame(
+    const geometry_msgs::msg::PoseStamped & pose0,
+    const geometry_msgs::msg::PoseStamped & pose1) const;
   rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
   void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> current_path_;
@@ -130,6 +132,9 @@ private:
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_no_collision_pub_;
   rclcpp::Publisher<hermite_path_msgs::msg::PlannerStatus>::SharedPtr status_pub_;
+  hermite_path_msgs::msg::PlannerStatus planner_status_;
+  rclcpp::TimerBase::SharedPtr timer_;
+  void updatePlannerStatus();
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_
