@@ -116,7 +116,8 @@ private:
   boost::optional<double> checkCollisionToCurrentPath();
   boost::optional<double> checkCollisionToPath(const hermite_path_msgs::msg::HermitePath & path);
   std::vector<geometry_msgs::msg::Pose> getLocalWaypointCandidates(double obstacle_t);
-  bool checkObstacleInGoal();
+  bool checkObstacleInGoal() const;
+  bool checkGoalReached() const;
   boost::optional<geometry_msgs::msg::Pose> evaluateCandidates(
     const std::vector<geometry_msgs::msg::Pose> & candidates);
   int num_candidates_;
@@ -128,6 +129,7 @@ private:
   boost::optional<geometry_msgs::msg::Pose> replaned_goalpose_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_no_collision_pub_;
+  rclcpp::Publisher<hermite_path_msgs::msg::PlannerStatus>::SharedPtr status_pub_;
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_

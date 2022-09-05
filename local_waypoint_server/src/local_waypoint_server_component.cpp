@@ -150,7 +150,21 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   return ret;
 }
 
-bool LocalWaypointServerComponent::checkObstacleInGoal()
+bool LocalWaypointServerComponent::checkGoalReached() const
+{
+  if (!current_pose_ || !goal_pose_) {
+    return false;
+  }
+  if (
+    std::hypot(
+      goal_pose_->pose.position.x - current_pose_->pose.position.x,
+      goal_pose_->pose.position.y - current_pose_->pose.position.y) < goal_reached_threshold_) {
+    return true;
+  }
+  return false;
+}
+
+bool LocalWaypointServerComponent::checkObstacleInGoal() const
 {
   std::vector<geometry_msgs::msg::Point32> obj_coordinate;
   float x = static_cast<float>(goal_pose_->pose.position.x);
