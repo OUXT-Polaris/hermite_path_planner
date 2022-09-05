@@ -44,14 +44,25 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   */
   declare_parameter("goal_obstacle_check_distance", 1.0);
   get_parameter("goal_obstacle_check_distance", goal_obstacle_check_distance_);
+  declare_parameter("goal_reached_threshold", 0.3);
+  get_parameter("goal_reached_threshold", goal_reached_threshold_);
+  planner_status_.status = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL;
   /**
    * Publishers
    */
   local_waypoint_pub_ =
     this->create_publisher<geometry_msgs::msg::PoseStamped>("~/local_waypoint", 1);
   marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker", 1);
+  status_pub_ =
+    this->create_publisher<hermite_path_msgs::msg::PlannerStatus>("~/planner_status", 1);
   marker_no_collision_pub_ =
     this->create_publisher<visualization_msgs::msg::MarkerArray>("~/marker/no_collision", 1);
+  /**
+   * timer
+   */
+  using namespace std::chrono_literals;
+  timer_ = this->create_wall_timer(
+    50ms, std::bind(&LocalWaypointServerComponent::updatePlannerStatus, this));
   /**
    * Subscribers
    */
@@ -81,6 +92,23 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
     std::bind(&LocalWaypointServerComponent::scanCallback, this, std::placeholders::_1));
 }
 
+void LocalWaypointServerComponent::updatePlannerStatus()
+{
+  planner_status_.stamp = get_clock()->now();
+  if (!goal_pose_) {
+    planner_status_.status = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL;
+    // planner_status_.goal_pose = geometry_msgs::msg::PointStamped();
+  } else if (planner_status_.status != hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL) {
+    if (checkGoalReached()) {
+      planner_status_.status = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL;
+      planner_status_.goal_pose = goal_pose_.get();
+    } else {
+      planner_status_.goal_pose = goal_pose_.get();
+    }
+  }
+  status_pub_->publish(planner_status_);
+}
+
 void LocalWaypointServerComponent::hermitePathCallback(
   const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data)
 {
@@ -91,13 +119,15 @@ void LocalWaypointServerComponent::hermitePathCallback(
 void LocalWaypointServerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
+  planner_status_.status = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL;
   goal_pose_ = *msg;
   replaned_goalpose_ = boost::none;
   updateLocalWaypoint();
 }
 
 bool LocalWaypointServerComponent::isSame(
-  geometry_msgs::msg::PoseStamped pose0, geometry_msgs::msg::PoseStamped pose1)
+  const geometry_msgs::msg::PoseStamped & pose0,
+  const geometry_msgs::msg::PoseStamped & pose1) const
 {
   if (pose0.pose.position.x == pose1.pose.position.x) {
     if (pose0.pose.position.y == pose1.pose.position.y) {
@@ -148,8 +178,25 @@ std::vector<geometry_msgs::msg::Pose> LocalWaypointServerComponent::getLocalWayp
   return ret;
 }
 
-bool LocalWaypointServerComponent::checkObstacleInGoal()
+bool LocalWaypointServerComponent::checkGoalReached() const
 {
+  if (!current_pose_ || !goal_pose_) {
+    return false;
+  }
+  if (
+    std::hypot(
+      goal_pose_->pose.position.x - current_pose_->pose.position.x,
+      goal_pose_->pose.position.y - current_pose_->pose.position.y) < goal_reached_threshold_) {
+    return true;
+  }
+  return false;
+}
+
+bool LocalWaypointServerComponent::checkObstacleInGoal() const
+{
+  if (!goal_pose_) {
+    return false;
+  }
   std::vector<geometry_msgs::msg::Point32> obj_coordinate;
   float x = static_cast<float>(goal_pose_->pose.position.x);
   float y = static_cast<float>(goal_pose_->pose.position.y);
@@ -188,6 +235,7 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
         p.header.stamp = get_clock()->now();
         previous_local_waypoint_ = p;
         local_waypoint_pub_->publish(p);
+        planner_status_.status = hermite_path_msgs::msg::PlannerStatus::AVOIDING;
         return;
       }
     }
@@ -198,11 +246,13 @@ void LocalWaypointServerComponent::updateLocalWaypoint()
     if (!previous_local_waypoint_) {
       previous_local_waypoint_ = current_goal_pose;
       local_waypoint_pub_->publish(current_goal_pose);
+      planner_status_.status = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL;
     } else {
       auto previous_local_waypoint = previous_local_waypoint_.get();
       if (!isSame(previous_local_waypoint, current_goal_pose)) {
         previous_local_waypoint_ = current_goal_pose;
         local_waypoint_pub_->publish(current_goal_pose);
+        planner_status_.status = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL;
       }
     }
   } else {
@@ -230,7 +280,7 @@ void LocalWaypointServerComponent::currentPoseCallback(
 }
 
 boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluateCandidates(
-  std::vector<geometry_msgs::msg::Pose> candidates)
+  const std::vector<geometry_msgs::msg::Pose> & candidates)
 {
   if (!current_pose_ || !goal_pose_) {
     return boost::none;
@@ -277,7 +327,7 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
 }
 
 boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
-  hermite_path_msgs::msg::HermitePath path)
+  const hermite_path_msgs::msg::HermitePath & path)
 {
   if (!current_pose_) {
     return boost::none;
@@ -368,8 +418,9 @@ std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
 }
 
 geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanningFrame(
-  geometry_msgs::msg::PointStamped point)
+  const geometry_msgs::msg::PointStamped & point)
 {
+  geometry_msgs::msg::PointStamped point_transformed;
   if (point.header.frame_id == planning_frame_id_) {
     return point;
   }
@@ -379,16 +430,17 @@ geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanni
   try {
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, point.header.frame_id, time_point, tf2::durationFromSec(1.0));
-    tf2::doTransform(point, point, transform_stamped);
+    tf2::doTransform(point, point_transformed, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR(get_logger(), ex.what());
   }
-  return point;
+  return point_transformed;
 }
 
 geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlanningFrame(
-  geometry_msgs::msg::PoseStamped pose)
+  const geometry_msgs::msg::PoseStamped & pose)
 {
+  geometry_msgs::msg::PoseStamped pose_transformed;
   if (pose.header.frame_id == planning_frame_id_) {
     return pose;
   }
@@ -398,10 +450,10 @@ geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlannin
   try {
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-    tf2::doTransform(pose, pose, transform_stamped);
+    tf2::doTransform(pose, pose_transformed, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR(get_logger(), ex.what());
   }
-  return pose;
+  return pose_transformed;
 }
 }  // namespace local_waypoint_server

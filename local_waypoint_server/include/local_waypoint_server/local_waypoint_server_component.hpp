@@ -67,6 +67,7 @@ extern "C" {
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/point32.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <hermite_path_msgs/msg/planner_status.hpp>
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -98,32 +99,42 @@ private:
   void updateLocalWaypoint();
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
   std::string planning_frame_id_;
-  geometry_msgs::msg::PoseStamped TransformToPlanningFrame(geometry_msgs::msg::PoseStamped pose);
-  geometry_msgs::msg::PointStamped TransformToPlanningFrame(geometry_msgs::msg::PointStamped pose);
+  geometry_msgs::msg::PoseStamped TransformToPlanningFrame(
+    const geometry_msgs::msg::PoseStamped & pose);
+  geometry_msgs::msg::PointStamped TransformToPlanningFrame(
+    const geometry_msgs::msg::PointStamped & pose);
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
   std::vector<geometry_msgs::msg::Point> getPoints(sensor_msgs::msg::LaserScan scan);
   bool checkCollision(geometry_msgs::msg::PoseStamped goal_pose, double & longitudinal_distance);
   double robot_width_;
   boost::optional<geometry_msgs::msg::PoseStamped> previous_local_waypoint_;
-  bool isSame(geometry_msgs::msg::PoseStamped pose0, geometry_msgs::msg::PoseStamped pose1);
+  bool isSame(
+    const geometry_msgs::msg::PoseStamped & pose0,
+    const geometry_msgs::msg::PoseStamped & pose1) const;
   rclcpp::Subscription<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_sub_;
   void hermitePathCallback(const hermite_path_msgs::msg::HermitePathStamped::SharedPtr data);
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> current_path_;
   boost::optional<double> checkCollisionToCurrentPath();
-  boost::optional<double> checkCollisionToPath(hermite_path_msgs::msg::HermitePath path);
+  boost::optional<double> checkCollisionToPath(const hermite_path_msgs::msg::HermitePath & path);
   std::vector<geometry_msgs::msg::Pose> getLocalWaypointCandidates(double obstacle_t);
-  bool checkObstacleInGoal();
+  bool checkObstacleInGoal() const;
+  bool checkGoalReached() const;
   boost::optional<geometry_msgs::msg::Pose> evaluateCandidates(
-    std::vector<geometry_msgs::msg::Pose> candidates);
+    const std::vector<geometry_msgs::msg::Pose> & candidates);
   int num_candidates_;
   double sampling_interval_;
   double sampling_offset_;
   double margin_;
   double goal_obstacle_check_distance_;
+  double goal_reached_threshold_;
   boost::optional<geometry_msgs::msg::Pose> replaned_goalpose_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_no_collision_pub_;
+  rclcpp::Publisher<hermite_path_msgs::msg::PlannerStatus>::SharedPtr status_pub_;
+  hermite_path_msgs::msg::PlannerStatus planner_status_;
+  rclcpp::TimerBase::SharedPtr timer_;
+  void updatePlannerStatus();
 };
 }  // namespace local_waypoint_server
 #endif  // LOCAL_WAYPOINT_SERVER__LOCAL_WAYPOINT_SERVER_COMPONENT_HPP_
