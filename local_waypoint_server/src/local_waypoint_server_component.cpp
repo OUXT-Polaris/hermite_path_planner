@@ -44,6 +44,8 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   */
   declare_parameter("goal_obstacle_check_distance", 1.0);
   get_parameter("goal_obstacle_check_distance", goal_obstacle_check_distance_);
+  declare_parameter("goal_reached_threshold", 0.3);
+  get_parameter("goal_reached_threshold", goal_reached_threshold_);
   /**
    * Publishers
    */
@@ -230,7 +232,7 @@ void LocalWaypointServerComponent::currentPoseCallback(
 }
 
 boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluateCandidates(
-  std::vector<geometry_msgs::msg::Pose> candidates)
+  const std::vector<geometry_msgs::msg::Pose> & candidates)
 {
   if (!current_pose_ || !goal_pose_) {
     return boost::none;
@@ -277,7 +279,7 @@ boost::optional<geometry_msgs::msg::Pose> LocalWaypointServerComponent::evaluate
 }
 
 boost::optional<double> LocalWaypointServerComponent::checkCollisionToPath(
-  hermite_path_msgs::msg::HermitePath path)
+  const hermite_path_msgs::msg::HermitePath & path)
 {
   if (!current_pose_) {
     return boost::none;
@@ -368,8 +370,9 @@ std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
 }
 
 geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanningFrame(
-  geometry_msgs::msg::PointStamped point)
+  const geometry_msgs::msg::PointStamped & point)
 {
+  geometry_msgs::msg::PointStamped point_transformed;
   if (point.header.frame_id == planning_frame_id_) {
     return point;
   }
@@ -379,16 +382,17 @@ geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanni
   try {
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, point.header.frame_id, time_point, tf2::durationFromSec(1.0));
-    tf2::doTransform(point, point, transform_stamped);
+    tf2::doTransform(point, point_transformed, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR(get_logger(), ex.what());
   }
-  return point;
+  return point_transformed;
 }
 
 geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlanningFrame(
-  geometry_msgs::msg::PoseStamped pose)
+  const geometry_msgs::msg::PoseStamped & pose)
 {
+  geometry_msgs::msg::PoseStamped pose_transformed;
   if (pose.header.frame_id == planning_frame_id_) {
     return pose;
   }
@@ -398,10 +402,10 @@ geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlannin
   try {
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-    tf2::doTransform(pose, pose, transform_stamped);
+    tf2::doTransform(pose, pose_transformed, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR(get_logger(), ex.what());
   }
-  return pose;
+  return pose_transformed;
 }
 }  // namespace local_waypoint_server

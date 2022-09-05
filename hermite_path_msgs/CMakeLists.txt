@@ -25,6 +25,7 @@ set(msg_files
   "msg/HermitePath.msg"
   "msg/HermitePathStamped.msg"
   "msg/ReferenceVelocity.msg"
+  "msg/PlannerStatus.msg"
 )
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}

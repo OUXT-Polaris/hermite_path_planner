@@ -81,7 +81,8 @@ public:
   explicit HermitePathPlannerComponent(const rclcpp::NodeOptions & options);
 
 private:
-  geometry_msgs::msg::PoseStamped TransformToPlanningFrame(geometry_msgs::msg::PoseStamped pose);
+  geometry_msgs::msg::PoseStamped TransformToPlanningFrame(
+    const geometry_msgs::msg::PoseStamped & pose);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Publisher<hermite_path_msgs::msg::HermitePathStamped>::SharedPtr hermite_path_pub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pose_sub_;

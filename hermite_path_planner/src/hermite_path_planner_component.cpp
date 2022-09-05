@@ -43,8 +43,9 @@ HermitePathPlannerComponent::HermitePathPlannerComponent(const rclcpp::NodeOptio
 }
 
 geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanningFrame(
-  geometry_msgs::msg::PoseStamped pose)
+  const geometry_msgs::msg::PoseStamped & pose)
 {
+  geometry_msgs::msg::PoseStamped pose_transformed;
   if (pose.header.frame_id == planning_frame_id_) {
     return pose;
   }
@@ -54,17 +55,16 @@ geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanning
   try {
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
-    tf2::doTransform(pose, pose, transform_stamped);
+    tf2::doTransform(pose, pose_transformed, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR(get_logger(), ex.what());
   }
-  return pose;
+  return pose_transformed;
 }
 
 void HermitePathPlannerComponent::GoalPoseCallback(
   const geometry_msgs::msg::PoseStamped::SharedPtr msg)
 {
-  RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
   if (!current_pose_) {
     RCLCPP_ERROR(this->get_logger(), "Current Pose does not recieved yet");
     return;
