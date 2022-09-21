@@ -21,7 +21,7 @@
 namespace velocity_planner
 {
 VelocityGraph::VelocityGraph(
-  hermite_path_msgs::msg::HermitePathStamped data, double velocity_resoluation,
+  const hermite_path_msgs::msg::HermitePathStamped & data, double velocity_resoluation,
   double maximum_accerelation, double minimum_accerelation, double maximum_velocity)
 : generator_(0.0)
 {
@@ -55,6 +55,7 @@ VelocityGraph::VelocityGraph(
 }
 
 boost::optional<std::vector<hermite_path_msgs::msg::ReferenceVelocity>> VelocityGraph::getPlan()
+  const
 {
   if (!planning_succeed_) {
     return boost::none;
@@ -151,7 +152,7 @@ std::vector<Node> VelocityGraph::makeEndNode(double t)
 }
 
 void VelocityGraph::buildVelocityGraph(
-  std::map<double, std::vector<Node>> nodes, std::vector<Edge> edges)
+  const std::map<double, std::vector<Node>> & nodes, const std::vector<Edge> & edges)
 {
   vertex_dict_.clear();
   data_.clear();
@@ -214,7 +215,7 @@ boost::optional<std::vector<Edge>> VelocityGraph::makeEdges(
   return edges;
 }
 
-std::vector<Node> VelocityGraph::makeNodes(hermite_path_msgs::msg::ReferenceVelocity vel)
+std::vector<Node> VelocityGraph::makeNodes(const hermite_path_msgs::msg::ReferenceVelocity & vel)
 {
   std::vector<Node> ret;
   double v = 0.0;
