@@ -33,15 +33,15 @@ class HermitePathGenerator
 public:
   explicit HermitePathGenerator(double robot_width);
   hermite_path_msgs::msg::HermitePath generateHermitePath(
-    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal);
+    const geometry_msgs::msg::Pose & start, const geometry_msgs::msg::Pose & goal);
   geometry_msgs::msg::Point getPointOnHermitePath(
-    hermite_path_msgs::msg::HermitePath path, double t);
+    const hermite_path_msgs::msg::HermitePath & path, double t);
   std::vector<geometry_msgs::msg::Point> getPointsOnHermitePath(
-    hermite_path_msgs::msg::HermitePath path, int resolution, double max_t = 1.0);
+    const hermite_path_msgs::msg::HermitePath & path, int resolution, double max_t = 1.0);
   boost::optional<double> checkFirstCollisionWithCircle(
     hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point center, double radius);
-  double getLength(hermite_path_msgs::msg::HermitePath path, int resolution);
-  double getCurvature(hermite_path_msgs::msg::HermitePath path, double t);
+  double getLength(const hermite_path_msgs::msg::HermitePath & path, int resolution);
+  double getCurvature(const hermite_path_msgs::msg::HermitePath & path, double t);
   boost::optional<double> getNormalizedLongitudinalDistanceInFrenetCoordinate(
     hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p);
   boost::optional<double> getLongitudinalDistanceInFrenetCoordinate(

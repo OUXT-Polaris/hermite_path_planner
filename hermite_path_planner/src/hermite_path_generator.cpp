@@ -36,7 +36,7 @@ double HermitePathGenerator::getMaximumCurvature(
   return *std::max_element(curvatures.begin(), curvatures.end());
 }
 
-double HermitePathGenerator::getCurvature(hermite_path_msgs::msg::HermitePath path, double t)
+double HermitePathGenerator::getCurvature(const hermite_path_msgs::msg::HermitePath & path, double t)
 {
   double t2 = t * t;
   double x_dot = 3 * path.ax * t2 + 2 * path.bx * t + path.cx;
@@ -194,7 +194,7 @@ boost::optional<double> HermitePathGenerator::getNormalizedLongitudinalDistanceI
   return ret;
 }
 
-double HermitePathGenerator::getLength(hermite_path_msgs::msg::HermitePath path, int resolution)
+double HermitePathGenerator::getLength(const hermite_path_msgs::msg::HermitePath & path, int resolution)
 {
   double ret = 0.0;
   std::vector<geometry_msgs::msg::Point> points = getPointsOnHermitePath(path, resolution, 1.0);
@@ -246,7 +246,7 @@ boost::optional<double> HermitePathGenerator::checkFirstCollisionWithCircle(
 }
 
 hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
-  geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal)
+  const geometry_msgs::msg::Pose & start, const geometry_msgs::msg::Pose & goal)
 {
   double goal_distance = std::sqrt(
     std::pow(goal.position.x - start.position.x, 2) +
@@ -296,7 +296,7 @@ hermite_path_msgs::msg::HermitePath HermitePathGenerator::generateHermitePath(
 }
 
 std::vector<geometry_msgs::msg::Point> HermitePathGenerator::getPointsOnHermitePath(
-  hermite_path_msgs::msg::HermitePath path, int resolution, double max_t)
+  const hermite_path_msgs::msg::HermitePath & path, int resolution, double max_t)
 {
   std::vector<geometry_msgs::msg::Point> p;
   double step_size = max_t / static_cast<double>(resolution);
@@ -383,7 +383,7 @@ visualization_msgs::msg::Marker HermitePathGenerator::getBoundsPolygon(
 }
 
 geometry_msgs::msg::Point HermitePathGenerator::getPointOnHermitePath(
-  hermite_path_msgs::msg::HermitePath path, double t)
+  const hermite_path_msgs::msg::HermitePath & path, double t)
 {
   geometry_msgs::msg::Point p;
   p.z = 0;
