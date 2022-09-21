@@ -397,7 +397,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPat
 }
 
 std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
-  sensor_msgs::msg::LaserScan scan)
+  const sensor_msgs::msg::LaserScan & scan) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (int i = 0; i < static_cast<int>(scan.ranges.size()); i++) {

@@ -105,7 +105,7 @@ private:
     const geometry_msgs::msg::PointStamped & pose) const;
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
-  std::vector<geometry_msgs::msg::Point> getPoints(sensor_msgs::msg::LaserScan scan);
+  std::vector<geometry_msgs::msg::Point> getPoints(const sensor_msgs::msg::LaserScan & scan) const;
   bool checkCollision(geometry_msgs::msg::PoseStamped goal_pose, double & longitudinal_distance);
   double robot_width_;
   boost::optional<geometry_msgs::msg::PoseStamped> previous_local_waypoint_;
