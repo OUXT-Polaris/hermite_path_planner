@@ -100,9 +100,9 @@ private:
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;
   std::string planning_frame_id_;
   geometry_msgs::msg::PoseStamped TransformToPlanningFrame(
-    const geometry_msgs::msg::PoseStamped & pose);
+    const geometry_msgs::msg::PoseStamped & pose) const;
   geometry_msgs::msg::PointStamped TransformToPlanningFrame(
-    const geometry_msgs::msg::PointStamped & pose);
+    const geometry_msgs::msg::PointStamped & pose) const;
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
   std::vector<geometry_msgs::msg::Point> getPoints(sensor_msgs::msg::LaserScan scan);

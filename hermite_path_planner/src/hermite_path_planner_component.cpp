@@ -43,7 +43,7 @@ HermitePathPlannerComponent::HermitePathPlannerComponent(const rclcpp::NodeOptio
 }
 
 geometry_msgs::msg::PoseStamped HermitePathPlannerComponent::TransformToPlanningFrame(
-  const geometry_msgs::msg::PoseStamped & pose)
+  const geometry_msgs::msg::PoseStamped & pose) const
 {
   geometry_msgs::msg::PoseStamped pose_transformed;
   if (pose.header.frame_id == planning_frame_id_) {
