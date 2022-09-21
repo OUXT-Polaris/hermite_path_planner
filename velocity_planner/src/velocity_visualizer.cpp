@@ -24,7 +24,7 @@ VelocityVisualizer::VelocityVisualizer(std::string node_name) : generator_(0.0)
   node_name_ = node_name;
 }
 
-visualization_msgs::msg::MarkerArray VelocityVisualizer::generateDeleteMarker()
+visualization_msgs::msg::MarkerArray VelocityVisualizer::generateDeleteMarker() const
 {
   visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker marker;
@@ -34,8 +34,8 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generateDeleteMarker()
 }
 
 visualization_msgs::msg::MarkerArray VelocityVisualizer::generateObstacleMarker(
-  double t, hermite_path_msgs::msg::HermitePathStamped path, std_msgs::msg::ColorRGBA color,
-  double width)
+  double t, const hermite_path_msgs::msg::HermitePathStamped & path,
+  const std_msgs::msg::ColorRGBA & color, double width) const
 {
   visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker polygon;
@@ -90,7 +90,7 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generateObstacleMarker(
 }
 
 double VelocityVisualizer::getVelocity(
-  std::vector<hermite_path_msgs::msg::ReferenceVelocity> vel, double t, double l)
+  const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & vel, double t, double l) const
 {
   if (vel[0].t > t) {
     return vel[0].linear_velocity;
@@ -115,7 +115,7 @@ double VelocityVisualizer::getVelocity(
 }
 
 visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
-  hermite_path_msgs::msg::HermitePathStamped path, double ratio, double width)
+  const hermite_path_msgs::msg::HermitePathStamped & path, double ratio, double width) const
 {
   constexpr int num_segment = 100;
   constexpr double segment_length = 1 / static_cast<double>(num_segment);
@@ -172,14 +172,15 @@ visualization_msgs::msg::MarkerArray VelocityVisualizer::generatePolygonMarker(
 }
 
 visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
-  hermite_path_msgs::msg::HermitePathStamped path)
+  const hermite_path_msgs::msg::HermitePathStamped & path) const
 {
   std_msgs::msg::ColorRGBA default_ref_color = color_names::makeColorMsg("lime", 1.0);
   return generateMarker(path, default_ref_color);
 }
 
 visualization_msgs::msg::MarkerArray VelocityVisualizer::generateMarker(
-  hermite_path_msgs::msg::HermitePathStamped path, std_msgs::msg::ColorRGBA color_ref_velocity)
+  hermite_path_msgs::msg::HermitePathStamped path,
+  const std_msgs::msg::ColorRGBA & color_ref_velocity) const
 {
   visualization_msgs::msg::MarkerArray marker;
   std::sort(

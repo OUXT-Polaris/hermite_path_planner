@@ -31,21 +31,23 @@ class VelocityVisualizer
 public:
   explicit VelocityVisualizer(std::string node_name);
   visualization_msgs::msg::MarkerArray generateMarker(
-    hermite_path_msgs::msg::HermitePathStamped path);
+    const hermite_path_msgs::msg::HermitePathStamped & path) const;
   visualization_msgs::msg::MarkerArray generateMarker(
-    hermite_path_msgs::msg::HermitePathStamped path, std_msgs::msg::ColorRGBA color_ref_velocity);
-  visualization_msgs::msg::MarkerArray generateDeleteMarker();
+    hermite_path_msgs::msg::HermitePathStamped path,
+    const std_msgs::msg::ColorRGBA & color_ref_velocity) const;
+  visualization_msgs::msg::MarkerArray generateDeleteMarker() const;
   visualization_msgs::msg::MarkerArray generatePolygonMarker(
-    hermite_path_msgs::msg::HermitePathStamped path, double ratio = 0.0, double width = 1.0);
+    const hermite_path_msgs::msg::HermitePathStamped & path, double ratio = 0.0,
+    double width = 1.0) const;
   visualization_msgs::msg::MarkerArray generateObstacleMarker(
-    double t, hermite_path_msgs::msg::HermitePathStamped path, std_msgs::msg::ColorRGBA color,
-    double width = 5.0);
+    double t, const hermite_path_msgs::msg::HermitePathStamped & path,
+    const std_msgs::msg::ColorRGBA & color, double width = 5.0) const;
 
 private:
   std::string node_name_;
   hermite_path_planner::HermitePathGenerator generator_;
   double getVelocity(
-    std::vector<hermite_path_msgs::msg::ReferenceVelocity> vel, double t, double l);
+    const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & vel, double t, double l) const;
 };
 }  // namespace velocity_planner
 
