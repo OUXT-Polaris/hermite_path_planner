@@ -108,7 +108,7 @@ private:
   boost::optional<double> current_t_, target_t_;
   boost::optional<geometry_msgs::msg::Point> target_position_;
   visualization_msgs::msg::MarkerArray generateMarker(
-    boost::optional<geometry_msgs::msg::Twist> twist);
+    const boost::optional<geometry_msgs::msg::Twist> & twist) const;
 };
 }  // namespace pure_pursuit_planner
 
