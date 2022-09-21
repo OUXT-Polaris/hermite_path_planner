@@ -90,7 +90,7 @@ void PurePursuitPlannerComponent::currentTwistStampedCallback(
 }
 
 visualization_msgs::msg::MarkerArray PurePursuitPlannerComponent::generateMarker(
-  boost::optional<geometry_msgs::msg::Twist> twist)
+  const boost::optional<geometry_msgs::msg::Twist> & twist) const
 {
   visualization_msgs::msg::MarkerArray marker;
   // draw text marker

@@ -397,7 +397,7 @@ boost::optional<double> LocalWaypointServerComponent::checkCollisionToCurrentPat
 }
 
 std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
-  sensor_msgs::msg::LaserScan scan)
+  const sensor_msgs::msg::LaserScan & scan) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (int i = 0; i < static_cast<int>(scan.ranges.size()); i++) {
@@ -418,7 +418,7 @@ std::vector<geometry_msgs::msg::Point> LocalWaypointServerComponent::getPoints(
 }
 
 geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanningFrame(
-  const geometry_msgs::msg::PointStamped & point)
+  const geometry_msgs::msg::PointStamped & point) const
 {
   geometry_msgs::msg::PointStamped point_transformed;
   if (point.header.frame_id == planning_frame_id_) {
@@ -438,7 +438,7 @@ geometry_msgs::msg::PointStamped LocalWaypointServerComponent::TransformToPlanni
 }
 
 geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlanningFrame(
-  const geometry_msgs::msg::PoseStamped & pose)
+  const geometry_msgs::msg::PoseStamped & pose) const
 {
   geometry_msgs::msg::PoseStamped pose_transformed;
   if (pose.header.frame_id == planning_frame_id_) {
