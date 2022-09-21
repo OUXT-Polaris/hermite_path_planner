@@ -43,36 +43,41 @@ public:
   double getLength(const hermite_path_msgs::msg::HermitePath & path, int resolution);
   double getCurvature(const hermite_path_msgs::msg::HermitePath & path, double t);
   boost::optional<double> getNormalizedLongitudinalDistanceInFrenetCoordinate(
-    hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p);
+    const hermite_path_msgs::msg::HermitePath & path, const geometry_msgs::msg::Point & p);
   boost::optional<double> getLongitudinalDistanceInFrenetCoordinate(
-    hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p, int resolution);
+    const hermite_path_msgs::msg::HermitePath & path, const geometry_msgs::msg::Point & p,
+    int resolution);
   boost::optional<double> getLateralDistanceInFrenetCoordinate(
-    hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point p);
-  geometry_msgs::msg::Vector3 getTangentVector(hermite_path_msgs::msg::HermitePath path, double t);
-  geometry_msgs::msg::Vector3 getNormalVector(hermite_path_msgs::msg::HermitePath path, double t);
+    const hermite_path_msgs::msg::HermitePath & path, const geometry_msgs::msg::Point & p);
+  geometry_msgs::msg::Vector3 getTangentVector(
+    const hermite_path_msgs::msg::HermitePath & path, double t);
+  geometry_msgs::msg::Vector3 getNormalVector(
+    const hermite_path_msgs::msg::HermitePath & path, double t);
   double getReferenceVelocity(hermite_path_msgs::msg::HermitePathStamped path, double t);
   visualization_msgs::msg::MarkerArray generateDeleteMarker();
   visualization_msgs::msg::MarkerArray generateMarker(
-    hermite_path_msgs::msg::HermitePathStamped path, int resolution, bool with_polygon = true);
+    const hermite_path_msgs::msg::HermitePathStamped & path, int resolution,
+    bool with_polygon = true);
   visualization_msgs::msg::MarkerArray generateMarker(
-    std::vector<hermite_path_msgs::msg::HermitePathStamped> path, int resolution);
-  double getMaximumCurvature(hermite_path_msgs::msg::HermitePath path, int resolution);
+    const std::vector<hermite_path_msgs::msg::HermitePathStamped> & path, int resolution);
+  double getMaximumCurvature(const hermite_path_msgs::msg::HermitePath & path, int resolution);
 
 private:
   hermite_path_msgs::msg::HermitePath generateHermitePath(
-    geometry_msgs::msg::Pose start, geometry_msgs::msg::Pose goal, double start_vector_magnitude,
-    double end_vector_magnitude);
+    const geometry_msgs::msg::Pose & start, const geometry_msgs::msg::Pose & goal,
+    double start_vector_magnitude, double end_vector_magnitude);
   visualization_msgs::msg::Marker getBoundsPolygon(
-    hermite_path_msgs::msg::HermitePathStamped path, int resolution, double z_offset);
-  geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
+    const hermite_path_msgs::msg::HermitePathStamped & path, int resolution, double z_offset);
+  geometry_msgs::msg::Vector3 getVectorFromPose(
+    const geometry_msgs::msg::Pose & pose, double magnitude);
   std::vector<geometry_msgs::msg::Point> getLeftBounds(
-    hermite_path_msgs::msg::HermitePath path, int resolution);
+    const hermite_path_msgs::msg::HermitePath & path, int resolution);
   std::vector<geometry_msgs::msg::Point> getRightBounds(
-    hermite_path_msgs::msg::HermitePath path, int resolution);
+    const hermite_path_msgs::msg::HermitePath & path, int resolution);
   double robot_width_;
   double calculateNewtonMethodStepSize(
-    hermite_path_msgs::msg::HermitePath path, geometry_msgs::msg::Point center, double radius,
-    double t);
+    const hermite_path_msgs::msg::HermitePath & path, const geometry_msgs::msg::Point & center,
+    double radius, double t);
   inline double sigmoid(double gain, double x, double offset = 0.0)
   {
     return 1.0 / (1.0 + exp(-gain * (x - offset)));
