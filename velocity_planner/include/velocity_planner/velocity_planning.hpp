@@ -18,6 +18,8 @@
 #include <limits>
 #include <vector>
 
+namespace velocity_planning
+{
 class VelocityConstraint
 {
 public:
@@ -48,3 +50,4 @@ void updateAdjacentVelocity(
 size_t getMinimumIndex(const std::vector<VelocityConstraint> & constraints);
 std::vector<VelocityConstraint> getVelocityConstraint(
   std::vector<VelocityConstraint> constraints, double acceleration_limit, double velocity_limit);
+}  // namespace velocity_planning
