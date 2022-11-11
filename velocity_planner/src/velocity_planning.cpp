@@ -18,23 +18,8 @@
 #include <limits>
 #include <vector>
 
-class VelocityConstraint
+namespace velocity_planning
 {
-public:
-  VelocityConstraint(double t, double v_limit)
-  : t(t), v_limit(v_limit), v(v_limit), is_checked_(false)
-  {
-  }
-  const double t;        // position in frenet coordinage
-  const double v_limit;  // velocity constraint
-  double v;
-  void check() { is_checked_ = true; }
-  bool isChecked() const { return is_checked_; }
-
-private:
-  bool is_checked_;
-};
-
 bool isAllConstraintsIsChecked(const std::vector<VelocityConstraint> & constraints)
 {
   for (const auto & constraint : constraints) {
@@ -173,3 +158,4 @@ std::vector<VelocityConstraint> getVelocityConstraint(
   }
   return constraints;
 }
+}  // namespace velocity_planning
