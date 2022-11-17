@@ -17,14 +17,15 @@
 #include <iostream>
 #include <limits>
 #include <vector>
+#include <hermite_path_msgs/msg/reference_velocity.hpp>
 
 namespace velocity_planning
 {
 class VelocityConstraint
 {
 public:
-  VelocityConstraint(double t, double v_limit)
-  : t(t), v_limit(v_limit), v(v_limit), is_checked_(false)
+  VelocityConstraint(const hermite_path_msgs::msg::ReferenceVelocity & ref)
+  : t(ref.t), v_limit(ref.linear_velocity), v(ref.linear_velocity), is_checked_(false)
   {
   }
   const double t;        // position in frenet coordinage

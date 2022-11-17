@@ -17,6 +17,7 @@
 #include <iostream>
 #include <limits>
 #include <vector>
+#include <velocity_planner/velocity_planning.hpp>
 
 namespace velocity_planning
 {
@@ -113,6 +114,16 @@ double getSatisfiedVelocity(
     return std::sqrt(
       to.v * to.v -
       2 * std::min(std::abs(acceleration), std::abs(acceleration_limit)) * (from.t - to.t));
+  }
+}
+
+void clampVelocityConstraint(
+  std::vector<VelocityConstraint> & constraints, double velocity_limit)
+{
+  for (auto & constraint : constraints) {
+    if (constraint.v > velocity_limit) {
+      constraint.v = velocity_limit;
+    }
   }
 }
 
