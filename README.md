@@ -1,3 +1,3 @@
-# hermite_path_planner ![ROS2-Foxy](https://github.com/OUXT-Polaris/hermite_path_planner/workflows/ROS2-Foxy/badge.svg)
+# hermite_path_planner [![BuildTest](https://github.com/OUXT-Polaris/hermite_path_planner/actions/workflows/BuildTest.yaml/badge.svg)](https://github.com/OUXT-Polaris/hermite_path_planner/actions/workflows/BuildTest.yaml)
 
 Path Planner Packages for Maritime RobotX Challenge
