@@ -14,10 +14,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <hermite_path_msgs/msg/reference_velocity.hpp>
 #include <iostream>
 #include <limits>
 #include <vector>
-#include <hermite_path_msgs/msg/reference_velocity.hpp>
 
 namespace velocity_planning
 {
@@ -25,7 +25,12 @@ class VelocityConstraint
 {
 public:
   VelocityConstraint(const hermite_path_msgs::msg::ReferenceVelocity & ref)
-  : t(ref.t), v_limit(ref.linear_velocity), v(ref.linear_velocity), is_checked_(false)
+  : t(ref.t),
+    v_limit(ref.linear_velocity),
+    v(ref.linear_velocity),
+    from_node(ref.from_node),
+    stop_flag(ref.stop_flag),
+    is_checked_(false)
   {
   }
   const double t;        // position in frenet coordinage
@@ -33,11 +38,13 @@ public:
   double v;
   void check() { is_checked_ = true; }
   bool isChecked() const { return is_checked_; }
+  hermite_path_msgs::msg::ReferenceVelocity toRos() const;
+  const std::string from_node;
+  const bool stop_flag;
 
 private:
   bool is_checked_;
 };
-
 bool isAllConstraintsIsChecked(const std::vector<VelocityConstraint> & constraints);
 size_t getMinimumVelocityLimitIndex(const std::vector<VelocityConstraint> & constraints);
 std::vector<size_t> getAdjacentIndex(
@@ -49,6 +56,11 @@ void updateAdjacentVelocity(
   std::vector<VelocityConstraint> & constraints, const double acceleration_limit,
   size_t target_index);
 size_t getMinimumIndex(const std::vector<VelocityConstraint> & constraints);
-std::vector<VelocityConstraint> getVelocityConstraint(
+std::vector<VelocityConstraint> planVelocity(
   std::vector<VelocityConstraint> constraints, double acceleration_limit, double velocity_limit);
+std::vector<hermite_path_msgs::msg::ReferenceVelocity>::iterator locateStopFlag(
+  const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & constraints);
+std::vector<hermite_path_msgs::msg::ReferenceVelocity> planVelocity(
+  const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & constraints,
+  double acceleration_limit, double velocity_limit);
 }  // namespace velocity_planning

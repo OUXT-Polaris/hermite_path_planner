@@ -21,6 +21,14 @@
 
 namespace velocity_planning
 {
+hermite_path_msgs::msg::ReferenceVelocity VelocityConstraint::toRos() const
+{
+  hermite_path_msgs::msg::ReferenceVelocity new_constraint;
+  new_constraint.t = t;
+  new_constraint.linear_velocity = v_limit;
+  return new_constraint;
+}
+
 bool isAllConstraintsIsChecked(const std::vector<VelocityConstraint> & constraints)
 {
   for (const auto & constraint : constraints) {
@@ -82,43 +90,20 @@ double getAcceleration(const VelocityConstraint & v1, const VelocityConstraint &
 double getSatisfiedVelocity(
   const double acceleration_limit, const VelocityConstraint & from, const VelocityConstraint & to)
 {
-  //std::cout << acceleration_limit << "," << from.t << "," << from.v_limit << "," << to.t << "," << to.v_limit << std::endl;
   double acceleration = (to.v * to.v - from.v * from.v) / (2 * (to.t - from.t));
-  std::cout << "from.t:" << from.t << std::endl;
-  std::cout << "from.v:" << from.v << std::endl;
-  std::cout << "to.v:" << to.v << std::endl;
-  std::cout << "acceleration:" << acceleration << std::endl;
-  std::cout << "acceleration_limit:" << acceleration_limit << std::endl;
-  std::cout << "to.t:" << to.t << ","
-            << "from.t:" << from.t << std::endl;
   if (acceleration > 0) {
-    //std::cout << std::sqrt(from.v_limit * from.v_limit + 2 * std::min(std::abs(acceleration), std::abs(acceleration_limit)) * (to.t - from.t)) << std::endl;
-    std::cout << "return(a>0):"
-              << std::sqrt(
-                   from.v * from.v +
-                   2 * std::min(std::abs(acceleration), std::abs(acceleration_limit)) *
-                     (to.t - from.t))
-              << std::endl;
     return std::sqrt(
       from.v * from.v +
       2 * std::min(std::abs(acceleration), std::abs(acceleration_limit)) * (to.t - from.t));
 
   } else {
-    //std::cout << std::sqrt(from.v_limit * from.v_limit - 2 * std::min(std::abs(acceleration), std::abs(acceleration_limit)) * (to.t - from.t)) << std::endl;
-    std::cout << "return(a<0):"
-              << std::sqrt(
-                   to.v * to.v - 2 *
-                                   std::min(std::abs(acceleration), std::abs(acceleration_limit)) *
-                                   (from.t - to.t))
-              << std::endl;
     return std::sqrt(
       to.v * to.v -
       2 * std::min(std::abs(acceleration), std::abs(acceleration_limit)) * (from.t - to.t));
   }
 }
 
-void clampVelocityConstraint(
-  std::vector<VelocityConstraint> & constraints, double velocity_limit)
+void clampVelocityConstraint(std::vector<VelocityConstraint> & constraints, double velocity_limit)
 {
   for (auto & constraint : constraints) {
     if (constraint.v > velocity_limit) {
@@ -134,7 +119,6 @@ void updateAdjacentVelocity(
   constraints[target_index].check();
   for (const auto index : getAdjacentIndex(constraints, target_index)) {
     if (!constraints[index].isChecked()) {
-      //std::cout << index << std::endl;
       constraints[index].v = getSatisfiedVelocity(
         acceleration_limit, constraints[std::min(index, target_index)],
         constraints[std::max(index, target_index)]);
@@ -155,18 +139,53 @@ size_t getMinimumIndex(const std::vector<VelocityConstraint> & constraints)
       min_index = i;
     }
   }
-  std::cout << min_index << std::endl;
   return min_index;
 }
 
-std::vector<VelocityConstraint> getVelocityConstraint(
+std::vector<VelocityConstraint> planVelocity(
   std::vector<VelocityConstraint> constraints, double acceleration_limit, double velocity_limit)
 {
+  clampVelocityConstraint(constraints, velocity_limit);
   updateAdjacentVelocity(constraints, acceleration_limit, constraints.size() - 1);
   while (!isAllConstraintsIsChecked(constraints)) {
-    std::cout << '.' << std::endl;
     updateAdjacentVelocity(constraints, acceleration_limit, getMinimumIndex(constraints));
   }
   return constraints;
+}
+
+std::vector<VelocityConstraint> fromRos(
+  const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & constraints)
+{
+  std::vector<VelocityConstraint> converted_constraints;
+  std::transform(
+    constraints.begin(), constraints.end(), std::back_inserter(converted_constraints),
+    [](const hermite_path_msgs::msg::ReferenceVelocity & constraint) {
+      return VelocityConstraint(constraint);
+    });
+  return converted_constraints;
+}
+
+std::vector<hermite_path_msgs::msg::ReferenceVelocity> toRos(
+  const std::vector<VelocityConstraint> & constraints)
+{
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> converted_velocity;
+  std::transform(
+    constraints.begin(), constraints.end(), std::back_inserter(converted_velocity),
+    [](const VelocityConstraint & constraint) { return constraint.toRos(); });
+  return converted_velocity;
+}
+
+std::vector<hermite_path_msgs::msg::ReferenceVelocity> planVelocity(
+  const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & constraints,
+  double acceleration_limit, double velocity_limit)
+{
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> filtered_constraints;
+  for (const auto & constraint : constraints) {
+    filtered_constraints.emplace_back(constraint);
+    if (constraint.stop_flag) {
+      break;
+    };
+  }
+  return toRos(planVelocity(fromRos(filtered_constraints), acceleration_limit, velocity_limit));
 }
 }  // namespace velocity_planning
