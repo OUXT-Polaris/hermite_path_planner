@@ -114,6 +114,7 @@ private:
   double minimum_accerelation_ = -0.1;
   double max_linear_velocity_ = 1.0;
   double velocity_resoluation_ = 0.2;
+  bool use_velocity_graph_;
   VelocityVisualizer viz_;
 };
 }  // namespace velocity_planner
