@@ -17,6 +17,7 @@
 #include <string>
 #include <velocity_planner/velocity_graph.hpp>
 #include <velocity_planner/velocity_planner_component.hpp>
+#include <velocity_planner/velocity_planning.hpp>
 
 namespace velocity_planner
 {
@@ -154,6 +155,14 @@ void VelocityPlannerComponent::updatePath()
       RCLCPP_WARN(get_logger(), graph.getReason().c_str());
     }
   } else {
+    hermite_path_msgs::msg::HermitePathStamped path;
+    path.path = path_->path;
+    path.header = path_->header;
+    path.reference_velocity = velocity_planning::planVelocity(
+      path_->reference_velocity, maximum_accerelation_, max_linear_velocity_);
+    hermite_path_pub_->publish(path);
+    polygon_marker_pub_->publish(viz_.generateDeleteMarker());
+    polygon_marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, robot_width));
   }
 
   mtx_.unlock();
