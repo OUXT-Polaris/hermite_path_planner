@@ -51,16 +51,18 @@ std::vector<size_t> getAdjacentIndex(
   const std::vector<VelocityConstraint> & constraints, size_t index);
 double getAcceleration(const VelocityConstraint & v1, const VelocityConstraint & v2);
 double getSatisfiedVelocity(
-  const double acceleration_limit, const VelocityConstraint & from, const VelocityConstraint & to);
+  const double acceleration_limit, const double deceleration_limit, const VelocityConstraint & from,
+  const VelocityConstraint & to);
 void updateAdjacentVelocity(
   std::vector<VelocityConstraint> & constraints, const double acceleration_limit,
-  size_t target_index);
+  const double deceleration_limit, size_t target_index);
 size_t getMinimumIndex(const std::vector<VelocityConstraint> & constraints);
 std::vector<VelocityConstraint> planVelocity(
-  std::vector<VelocityConstraint> constraints, double acceleration_limit, double velocity_limit);
+  std::vector<VelocityConstraint> constraints, double acceleration_limit, double deceleration_limit,
+  double velocity_limit);
 std::vector<hermite_path_msgs::msg::ReferenceVelocity>::iterator locateStopFlag(
   const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & constraints);
 std::vector<hermite_path_msgs::msg::ReferenceVelocity> planVelocity(
   const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & constraints,
-  double acceleration_limit, double velocity_limit);
+  double acceleration_limit, double deceleration_limit, double velocity_limit);
 }  // namespace velocity_planning
