@@ -73,6 +73,24 @@ TEST(TestSuite, testCase1)
   EXPECT_EQ(converted_constraints[3].t , 0);
   EXPECT_EQ(converted_constraints[3].linear_velocity , 0);
   EXPECT_EQ(converted_constraints[3].stop_flag , 0);
+
+    /*
+  geometry_msgs::msg::Quaternion ans, q1, q2;
+  q1.x = 0;
+  q1.y = 1;
+  q1.z = 0;
+  q1.w = 1;
+  q2.x = 0;
+  q2.y = 1;
+  q2.z = 0;
+  
+  q2.w = 1;
+  ans = q1 + q2;
+  EXPECT_EQ(ans.x, 0);
+  EXPECT_EQ(ans.y, 2);
+  EXPECT_EQ(ans.z, 0);
+  EXPECT_EQ(ans.w, 2);
+  */
 }
 
 /**
