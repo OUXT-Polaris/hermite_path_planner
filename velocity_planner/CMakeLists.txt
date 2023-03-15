@@ -259,6 +259,11 @@ if(BUILD_TESTING)
   # uncomment the line when this package is not in a git repo
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_velocity_planning 
+    test/src/test_velocity_planning.cpp
+    src/velocity_planning.cpp)
+  ament_target_dependencies(test_velocity_planning hermite_path_msgs)
 endif()
 
 ament_export_include_directories(include)

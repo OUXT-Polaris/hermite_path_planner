@@ -1,4 +1,4 @@
-// Copyright (c) 2019 OUXT Polaris
+// Copyright (c) 2023 OUXT Polaris
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 /**
  * @file test_velocity_planning.cpp
  * @author Kento Hirogaki hkt8g2r6kin@gmail.com
- * @brief test code for Quaternion Operation
+ * @brief test code for Velocity Planning
  * @version 0.1
- * @date 2019-04-21
+ * @date 2023-03-15
  *
- * @copyright Copyright (c) 2019
+ * @copyright Copyright (c) 2023
  *
  */
 
@@ -27,12 +27,8 @@
 #include <gtest/gtest.h>
 
 // headers in this package
-#include <velocity_planner/velocityplanning.hpp>
+#include <velocity_planner/velocity_planning.hpp>
 
-/**
- * @brief test for + operator
- *
- */
 TEST(TestSuite, testCase1)
 {
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> constraints;
@@ -40,57 +36,158 @@ TEST(TestSuite, testCase1)
   double deceleration_limit = -10;
   double velocity_limit = 10;
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> converted_constraints;
-  
+
   constraints[0].t = 1;
   constraints[0].linear_velocity = 1;
   constraints[0].stop_flag = false;
 
-  constraints[1].t = 1;
-  constraints[1].linear_velocity = 1;
+  constraints[1].t = 2;
+  constraints[1].linear_velocity = 2;
   constraints[1].stop_flag = false;
 
-  constraints[2].t = 1;
+  constraints[2].t = 3;
   constraints[2].linear_velocity = 1;
   constraints[2].stop_flag = false;
 
-  constraints[3].t = 1;
+  constraints[3].t = 4;
+  constraints[3].linear_velocity = 0;
+  constraints[3].stop_flag = true;
+
+  converted_constraints = velocity_planning::planVelocity(
+    constraints, acceleration_limit, deceleration_limit, velocity_limit);
+  EXPECT_DOUBLE_EQ(converted_constraints[0].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[0].linear_velocity, 0);
+  EXPECT_EQ(converted_constraints[0].stop_flag, false);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[1].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[1].linear_velocity, false);
+  EXPECT_EQ(converted_constraints[1].stop_flag, 0);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[2].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[2].linear_velocity, false);
+  EXPECT_EQ(converted_constraints[2].stop_flag, 0);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[3].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[3].linear_velocity, 0);
+  EXPECT_EQ(converted_constraints[3].stop_flag, true);
+}
+
+TEST(TestSuite, testCase2)
+{
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> constraints;
+  double acceleration_limit = 10.0;
+  double deceleration_limit = -10.0;
+  double velocity_limit = 2.0;
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> converted_constraints;
+
+  constraints[0].t = 1;
+  constraints[0].linear_velocity = 1;
+  constraints[0].stop_flag = false;
+
+  constraints[1].t = 2;
+  constraints[1].linear_velocity = 2;
+  constraints[1].stop_flag = false;
+
+  constraints[2].t = 3;
+  constraints[2].linear_velocity = 3;
+  constraints[2].stop_flag = false;
+
+  constraints[3].t = 4;
+  constraints[3].linear_velocity = 4;
+  constraints[3].stop_flag = false;
+
+  constraints[3].t = 5;
+  constraints[3].linear_velocity = 3;
+  constraints[3].stop_flag = false;
+
+  constraints[3].t = 6;
+  constraints[3].linear_velocity = 2;
+  constraints[3].stop_flag = false;
+
+  constraints[3].t = 7;
   constraints[3].linear_velocity = 1;
   constraints[3].stop_flag = false;
 
-  converted_constraints = planVelocity(constraints, acceleration_limit, deceleration_limit, velocity_limit);
-  EXPECT_EQ(converted_constraints[0].t , 0);
-  EXPECT_EQ(converted_constraints[0].linear_velocity , 0);
-  EXPECT_EQ(converted_constraints[0].stop_flag , 0);
-  
-  EXPECT_EQ(converted_constraints[1].t , 0);
-  EXPECT_EQ(converted_constraints[1].linear_velocity , 0);
-  EXPECT_EQ(converted_constraints[1].stop_flag , 0);
-  
-  EXPECT_EQ(converted_constraints[2].t , 0);
-  EXPECT_EQ(converted_constraints[2].linear_velocity , 0);
-  EXPECT_EQ(converted_constraints[2].stop_flag , 0);
+  constraints[3].t = 8;
+  constraints[3].linear_velocity = 0;
+  constraints[3].stop_flag = true;
 
-  EXPECT_EQ(converted_constraints[3].t , 0);
-  EXPECT_EQ(converted_constraints[3].linear_velocity , 0);
-  EXPECT_EQ(converted_constraints[3].stop_flag , 0);
+  converted_constraints = velocity_planning::planVelocity(
+    constraints, acceleration_limit, deceleration_limit, velocity_limit);
+  EXPECT_DOUBLE_EQ(converted_constraints[0].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[0].linear_velocity, 0);
+  EXPECT_EQ(converted_constraints[0].stop_flag, false);
 
-    /*
-  geometry_msgs::msg::Quaternion ans, q1, q2;
-  q1.x = 0;
-  q1.y = 1;
-  q1.z = 0;
-  q1.w = 1;
-  q2.x = 0;
-  q2.y = 1;
-  q2.z = 0;
-  
-  q2.w = 1;
-  ans = q1 + q2;
-  EXPECT_EQ(ans.x, 0);
-  EXPECT_EQ(ans.y, 2);
-  EXPECT_EQ(ans.z, 0);
-  EXPECT_EQ(ans.w, 2);
-  */
+  EXPECT_DOUBLE_EQ(converted_constraints[1].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[1].linear_velocity, false);
+  EXPECT_EQ(converted_constraints[1].stop_flag, 0);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[2].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[2].linear_velocity, false);
+  EXPECT_EQ(converted_constraints[2].stop_flag, 0);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[3].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[3].linear_velocity, 0);
+  EXPECT_EQ(converted_constraints[3].stop_flag, true);
+}
+
+TEST(TestSuite, testCase3)
+{
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> constraints;
+  double acceleration_limit = 10.0;
+  double deceleration_limit = -10.0;
+  double velocity_limit = 2.0;
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> converted_constraints;
+
+  constraints[0].t = 1;
+  constraints[0].linear_velocity = 1;
+  constraints[0].stop_flag = false;
+
+  constraints[1].t = 2;
+  constraints[1].linear_velocity = 2;
+  constraints[1].stop_flag = false;
+
+  constraints[2].t = 3;
+  constraints[2].linear_velocity = 3;
+  constraints[2].stop_flag = false;
+
+  constraints[3].t = 4;
+  constraints[3].linear_velocity = 4;
+  constraints[3].stop_flag = false;
+
+  constraints[3].t = 5;
+  constraints[3].linear_velocity = 3;
+  constraints[3].stop_flag = false;
+
+  constraints[3].t = 6;
+  constraints[3].linear_velocity = 2;
+  constraints[3].stop_flag = false;
+
+  constraints[3].t = 7;
+  constraints[3].linear_velocity = 1;
+  constraints[3].stop_flag = false;
+
+  constraints[3].t = 8;
+  constraints[3].linear_velocity = 0;
+  constraints[3].stop_flag = true;
+
+  converted_constraints = velocity_planning::planVelocity(
+    constraints, acceleration_limit, deceleration_limit, velocity_limit);
+  EXPECT_DOUBLE_EQ(converted_constraints[0].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[0].linear_velocity, 0);
+  EXPECT_EQ(converted_constraints[0].stop_flag, false);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[1].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[1].linear_velocity, false);
+  EXPECT_EQ(converted_constraints[1].stop_flag, 0);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[2].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[2].linear_velocity, false);
+  EXPECT_EQ(converted_constraints[2].stop_flag, 0);
+
+  EXPECT_DOUBLE_EQ(converted_constraints[3].t, 0);
+  EXPECT_DOUBLE_EQ(converted_constraints[3].linear_velocity, 0);
+  EXPECT_EQ(converted_constraints[3].stop_flag, true);
 }
 
 /**

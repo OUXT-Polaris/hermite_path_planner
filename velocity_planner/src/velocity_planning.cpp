@@ -148,9 +148,11 @@ std::vector<VelocityConstraint> planVelocity(
   double velocity_limit)
 {
   clampVelocityConstraint(constraints, velocity_limit);
-  updateAdjacentVelocity(constraints, acceleration_limit, deceleration_limit, constraints.size() - 1);
+  updateAdjacentVelocity(
+    constraints, acceleration_limit, deceleration_limit, constraints.size() - 1);
   while (!isAllConstraintsIsChecked(constraints)) {
-    updateAdjacentVelocity(constraints, acceleration_limit, deceleration_limit, getMinimumIndex(constraints));
+    updateAdjacentVelocity(
+      constraints, acceleration_limit, deceleration_limit, getMinimumIndex(constraints));
   }
   return constraints;
 }
