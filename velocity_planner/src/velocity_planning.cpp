@@ -26,6 +26,7 @@ hermite_path_msgs::msg::ReferenceVelocity VelocityConstraint::toRos() const
   hermite_path_msgs::msg::ReferenceVelocity new_constraint;
   new_constraint.t = t;
   new_constraint.linear_velocity = v_limit;
+  new_constraint.stop_flag = stop_flag;
   return new_constraint;
 }
 
