@@ -122,7 +122,6 @@ TEST(TestSuite, testCase3)
   constraints[2].stop_flag = true;
   converted_constraints = velocity_planning::planVelocity(
     constraints, acceleration_limit, deceleration_limit, velocity_limit);
-
   // Verify that the converted_constraints have been modified by velocity_limit
   EXPECT_DOUBLE_EQ(converted_constraints[0].t, 1);
   EXPECT_DOUBLE_EQ(converted_constraints[0].linear_velocity, 0);
