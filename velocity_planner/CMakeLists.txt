@@ -222,6 +222,7 @@ add_executable(time_measurement
 )
 target_link_libraries(time_measurement velocity_planner_component)
 ament_target_dependencies(time_measurement
+  hermite_path_planner
   hermite_path_msgs)
 
 # install
