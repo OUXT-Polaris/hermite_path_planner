@@ -100,8 +100,8 @@ double getSatisfiedVelocity(
 
   } else {
     return std::sqrt(
-      to.v * to.v -
-      2 * std::min(std::abs(acceleration), std::abs(deceleration_limit)) * (from.t - to.t));
+      to.v * to.v +
+      2 * std::min(std::abs(acceleration), std::abs(deceleration_limit)) * (to.t - from.t));
   }
 }
 

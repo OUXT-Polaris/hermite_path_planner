@@ -39,12 +39,14 @@ include_directories(
   ${CERESS_INCLUDE_DIRS}
 )
 
+
 # Velocity Planner
 add_library(velocity_planner_component SHARED
   src/velocity_planner_component.cpp
   src/velocity_visualizer.cpp
   src/velocity_graph.cpp
-  src/velocity_planning.cpp)
+  src/velocity_planning.cpp
+  src/time_measurement.cpp)
 target_compile_definitions(velocity_planner_component
   PRIVATE "VELOCITY_PLANNER_VELOCITY_PLANNER_COMPONENT_BUILDING_DLL")
 target_link_libraries(velocity_planner_component ${CERES_LIBRARIES})
@@ -214,6 +216,14 @@ ament_target_dependencies(planner_concatenator_node
   hermite_path_planner
   hermite_path_msgs)
 
+# Time Measurement
+add_executable(time_measurement
+  src/time_measurement.cpp
+)
+target_link_libraries(time_measurement velocity_planner_component)
+ament_target_dependencies(time_measurement
+  hermite_path_msgs)
+
 # install
 install(TARGETS
   obstacle_planner_node
@@ -221,6 +231,7 @@ install(TARGETS
   curve_planner_node
   stop_planner_node
   planner_concatenator_node
+  time_measurement
   DESTINATION lib/velocity_planner
 )
 install(TARGETS
