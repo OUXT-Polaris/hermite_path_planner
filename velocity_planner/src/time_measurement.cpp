@@ -31,7 +31,7 @@ int main()
       path_stamped, 0.1, acceleration_limit, deceleration_limit, velocity_limit);
     graph.getPlan();
     end = std::chrono::system_clock::now();
-    std::cout << "A* method, elapsed:"
+    std::cout << "A* method, elapsed : "
               << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "us"
               << std::endl;
   }
@@ -41,7 +41,7 @@ int main()
     velocity_planning::planVelocity(
       constraints, acceleration_limit, deceleration_limit, velocity_limit);
     end = std::chrono::system_clock::now();
-    std::cout << "Non A* method, elapsed:"
+    std::cout << "Non A* method, elapsed : "
               << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "us"
               << std::endl;
   }
