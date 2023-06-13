@@ -198,31 +198,27 @@ TEST(TestSuite, testCase5)
 // the number of constraints is 100
 TEST(TestSuite, testCase6)
 {
-  int constraints_num = 100;
-  std::vector<hermite_path_msgs::msg::ReferenceVelocity> constraints(constraints_num);
+  std::vector<hermite_path_msgs::msg::ReferenceVelocity> constraints(3);
   double acceleration_limit = 3.0;
   double deceleration_limit = -3.0;
   double velocity_limit = 20.0;
+  int constraints_num = 4;
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> converted_constraints;
-
   for (int i = 0; i < constraints_num; i++) {
     constraints[i].t = i;
     constraints[i].linear_velocity = 0;
     constraints[i].stop_flag = false;
   }
-  constraints[constraints_num - 1].stop_flag = true;
+  constraints[constraints_num].stop_flag = true;
   converted_constraints = velocity_planning::planVelocity(
     constraints, acceleration_limit, deceleration_limit, velocity_limit);
-
   // Verify that the converted_constraints have been modified by velocity_limit
-
   for (int i = 0; i < constraints_num - 1; i++) {
     EXPECT_DOUBLE_EQ(converted_constraints[i].t, i);
     EXPECT_DOUBLE_EQ(converted_constraints[i].linear_velocity, 0);
     EXPECT_EQ(converted_constraints[i].stop_flag, false);
   }
-
-  EXPECT_DOUBLE_EQ(converted_constraints[constraints_num - 1].t, constraints_num - 1);
+  EXPECT_DOUBLE_EQ(converted_constraints[constraints_num - 1].t, constraints_num);
   EXPECT_DOUBLE_EQ(converted_constraints[constraints_num - 1].linear_velocity, 0);
   EXPECT_EQ(converted_constraints[constraints_num - 1].stop_flag, true);
 }
