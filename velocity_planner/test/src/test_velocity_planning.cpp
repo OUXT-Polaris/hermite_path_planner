@@ -267,7 +267,7 @@ TEST(TestSuite, testCase7)
   EXPECT_EQ(
     std::abs(converted_constraints[4].linear_velocity - std::sqrt(6 + 2 * acceleration_limit * 1)) <
       0.0001,
-    true);  // Expected value modified by acceleration_limit from 5.0 to 3.464102
+    true);  // Expected value modified by acceleration_limit from 5.0 to 3.46410
   EXPECT_EQ(
     std::abs(converted_constraints[5].linear_velocity - std::sqrt(6)) < 0.0001,
     true);  // Expected value modified by acceleration_limit from 5.0 to 2.44949
