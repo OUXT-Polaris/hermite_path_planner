@@ -228,20 +228,57 @@ TEST(TestSuite, testCase7)
 {
   int constraints_num = 26;
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> constraints(constraints_num);
-  std::vector<double> linear_velocity = {0,3,4,6,2,8,6,6,4,0,0,1,1,0,7,8,4,8,9,4,3.0,9.0,4.0,5.0,7.0,0.0};
-  double acceleration_limit = 10;
-  double deceleration_limit = -10;
-  double velocity_limit = 2.0;
+  std::vector<double> linear_velocity = {0.0, 3.0, 4.0, 6.0, 2.0, 8.0, 6.0, 6.0, 4.0,
+                                         0.0, 0.0, 1.0, 1.0, 0.0, 7.0, 8.0, 4.0, 8.0,
+                                         9.0, 4.0, 3.0, 9.0, 4.0, 5.0, 7.0, 0.0};
+  double acceleration_limit = 10.0;
+  double deceleration_limit = -10.0;
+  double velocity_limit = 8.0;
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> converted_constraints;
 
   for (int i = 0; i < constraints_num; i++) {
     constraints[i].t = i;
-    constraints[i].linear_velocity = 0;
+    constraints[i].linear_velocity = linear_velocity[i];
     constraints[i].stop_flag = false;
   }
   constraints[constraints_num].stop_flag = true;
   converted_constraints = velocity_planning::planVelocity(
     constraints, acceleration_limit, deceleration_limit, velocity_limit);
+
+  for (int i = 0; i < constraints_num; i++) {
+    EXPECT_EQ(converted_constraints[i].linear_velocity <= velocity_limit, true);
+  }
+  for (int i = 0; i < constraints_num - 1; i++) {
+    EXPECT_EQ(
+      std::abs(
+        converted_constraints[i + 1].linear_velocity *
+          converted_constraints[i + 1].linear_velocity -
+        converted_constraints[i].linear_velocity * converted_constraints[i].linear_velocity) /
+          (2 * (converted_constraints[i + 1].t - converted_constraints[i].t)) <=
+        acceleration_limit + 0.000001,
+      true);
+  }
+
+  // print linear_velocity and acceleration
+  // std::stringbuf buf;
+  // std::streambuf * prev = std::cout.rdbuf(&buf);
+  // std::cout << "linear_velocity";
+  // for (int i = 0; i < constraints_num; i++) {
+  //   std::cout << converted_constraints[i].linear_velocity << ",";
+  // }
+  // std::cout << "acceleration";
+  // for (int i = 0; i < constraints_num; i++) {
+  //   std::cout << std::abs(
+  //                  converted_constraints[i + 1].linear_velocity *
+  //                    converted_constraints[i + 1].linear_velocity -
+  //                  converted_constraints[i].linear_velocity *
+  //                    converted_constraints[i].linear_velocity) /
+  //                  (2 * (converted_constraints[i + 1].t - converted_constraints[i].t))
+  //             << ",";
+  // }
+  // std::cout << std::flush;
+  // std::cout.rdbuf(prev);
+  // ASSERT_EQ("hoge", buf.str());
 }
 
 /**
