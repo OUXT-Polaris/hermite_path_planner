@@ -23,6 +23,7 @@
  *
  */
 #include <gtest/gtest.h>
+
 #include <velocity_planner/velocity_planning.hpp>
 
 TEST(TestSuite, testCase1)
@@ -113,8 +114,7 @@ TEST(TestSuite, testCase3)
   EXPECT_DOUBLE_EQ(converted_constraints[0].linear_velocity, 0);
   EXPECT_EQ(converted_constraints[0].stop_flag, false);
   EXPECT_DOUBLE_EQ(converted_constraints[1].t, 2);
-  EXPECT_DOUBLE_EQ(
-    converted_constraints[1].linear_velocity, 2);
+  EXPECT_DOUBLE_EQ(converted_constraints[1].linear_velocity, 2);
   EXPECT_EQ(converted_constraints[1].stop_flag, false);
   EXPECT_DOUBLE_EQ(converted_constraints[2].t, 3);
   EXPECT_DOUBLE_EQ(converted_constraints[2].linear_velocity, 0);
@@ -143,9 +143,7 @@ TEST(TestSuite, testCase4)
   EXPECT_DOUBLE_EQ(converted_constraints[0].linear_velocity, 0);
   EXPECT_EQ(converted_constraints[0].stop_flag, false);
   EXPECT_DOUBLE_EQ(converted_constraints[1].t, 2);
-  EXPECT_EQ(
-    std::abs(converted_constraints[1].linear_velocity - std::sqrt(6)) < 0.0001,
-    true);
+  EXPECT_EQ(std::abs(converted_constraints[1].linear_velocity - std::sqrt(6)) < 0.0001, true);
   EXPECT_EQ(converted_constraints[1].stop_flag, false);
   EXPECT_DOUBLE_EQ(converted_constraints[2].t, 3);
   EXPECT_DOUBLE_EQ(converted_constraints[2].linear_velocity, 0);
@@ -171,9 +169,7 @@ TEST(TestSuite, testCase5)
   converted_constraints = velocity_planning::planVelocity(
     constraints, acceleration_limit, deceleration_limit, velocity_limit);
   EXPECT_DOUBLE_EQ(converted_constraints[0].t, 1);
-  EXPECT_EQ(
-    std::abs(converted_constraints[0].linear_velocity - std::sqrt(6)) < 0.0001,
-    true);
+  EXPECT_EQ(std::abs(converted_constraints[0].linear_velocity - std::sqrt(6)) < 0.0001, true);
   EXPECT_EQ(converted_constraints[0].stop_flag, false);
   EXPECT_DOUBLE_EQ(converted_constraints[1].t, 2);
   EXPECT_DOUBLE_EQ(converted_constraints[1].linear_velocity, 0);
