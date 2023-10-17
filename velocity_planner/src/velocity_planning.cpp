@@ -25,7 +25,8 @@ hermite_path_msgs::msg::ReferenceVelocity VelocityConstraint::toRos() const
 {
   hermite_path_msgs::msg::ReferenceVelocity new_constraint;
   new_constraint.t = t;
-  new_constraint.linear_velocity = v_limit;
+  new_constraint.linear_velocity = v;
+  new_constraint.stop_flag = stop_flag;
   return new_constraint;
 }
 
@@ -88,7 +89,8 @@ double getAcceleration(const VelocityConstraint & v1, const VelocityConstraint &
 }
 
 double getSatisfiedVelocity(
-  const double acceleration_limit, const VelocityConstraint & from, const VelocityConstraint & to)
+  const double acceleration_limit, const double deceleration_limit, const VelocityConstraint & from,
+  const VelocityConstraint & to)
 {
   double acceleration = (to.v * to.v - from.v * from.v) / (2 * (to.t - from.t));
   if (acceleration > 0) {
@@ -98,8 +100,8 @@ double getSatisfiedVelocity(
 
   } else {
     return std::sqrt(
-      to.v * to.v -
-      2 * std::min(std::abs(acceleration), std::abs(acceleration_limit)) * (from.t - to.t));
+      to.v * to.v +
+      2 * std::min(std::abs(acceleration), std::abs(deceleration_limit)) * (to.t - from.t));
   }
 }
 
@@ -114,13 +116,13 @@ void clampVelocityConstraint(std::vector<VelocityConstraint> & constraints, doub
 
 void updateAdjacentVelocity(
   std::vector<VelocityConstraint> & constraints, const double acceleration_limit,
-  size_t target_index)
+  const double deceleration_limit, size_t target_index)
 {
   constraints[target_index].check();
   for (const auto index : getAdjacentIndex(constraints, target_index)) {
     if (!constraints[index].isChecked()) {
       constraints[index].v = getSatisfiedVelocity(
-        acceleration_limit, constraints[std::min(index, target_index)],
+        acceleration_limit, deceleration_limit, constraints[std::min(index, target_index)],
         constraints[std::max(index, target_index)]);
       if (std::isnan(constraints[index].v)) {
         throw std::runtime_error("The velocity is none.");
@@ -143,12 +145,15 @@ size_t getMinimumIndex(const std::vector<VelocityConstraint> & constraints)
 }
 
 std::vector<VelocityConstraint> planVelocity(
-  std::vector<VelocityConstraint> constraints, double acceleration_limit, double velocity_limit)
+  std::vector<VelocityConstraint> constraints, double acceleration_limit, double deceleration_limit,
+  double velocity_limit)
 {
   clampVelocityConstraint(constraints, velocity_limit);
-  updateAdjacentVelocity(constraints, acceleration_limit, constraints.size() - 1);
+  updateAdjacentVelocity(
+    constraints, acceleration_limit, deceleration_limit, constraints.size() - 1);
   while (!isAllConstraintsIsChecked(constraints)) {
-    updateAdjacentVelocity(constraints, acceleration_limit, getMinimumIndex(constraints));
+    updateAdjacentVelocity(
+      constraints, acceleration_limit, deceleration_limit, getMinimumIndex(constraints));
   }
   return constraints;
 }
@@ -177,7 +182,7 @@ std::vector<hermite_path_msgs::msg::ReferenceVelocity> toRos(
 
 std::vector<hermite_path_msgs::msg::ReferenceVelocity> planVelocity(
   const std::vector<hermite_path_msgs::msg::ReferenceVelocity> & constraints,
-  double acceleration_limit, double velocity_limit)
+  double acceleration_limit, double deceleration_limit, double velocity_limit)
 {
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> filtered_constraints;
   for (const auto & constraint : constraints) {
@@ -186,6 +191,7 @@ std::vector<hermite_path_msgs::msg::ReferenceVelocity> planVelocity(
       break;
     };
   }
-  return toRos(planVelocity(fromRos(filtered_constraints), acceleration_limit, velocity_limit));
+  return toRos(planVelocity(
+    fromRos(filtered_constraints), acceleration_limit, deceleration_limit, velocity_limit));
 }
 }  // namespace velocity_planning

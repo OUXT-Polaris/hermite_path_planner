@@ -56,7 +56,6 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
 
@@ -65,6 +64,7 @@ extern "C" {
 #include <hermite_path_msgs/msg/hermite_path_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <velocity_planner/velocity_visualizer.hpp>
 
 namespace velocity_planner

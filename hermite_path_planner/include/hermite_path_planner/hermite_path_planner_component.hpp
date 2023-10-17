@@ -59,7 +59,6 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
 
@@ -70,6 +69,7 @@ extern "C" {
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 namespace hermite_path_planner

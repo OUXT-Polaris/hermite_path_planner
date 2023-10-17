@@ -159,7 +159,8 @@ void VelocityPlannerComponent::updatePath()
     path.path = path_->path;
     path.header = path_->header;
     path.reference_velocity = velocity_planning::planVelocity(
-      path_->reference_velocity, maximum_accerelation_, max_linear_velocity_);
+      path_->reference_velocity, maximum_accerelation_, minimum_accerelation_,
+      max_linear_velocity_);
     hermite_path_pub_->publish(path);
     polygon_marker_pub_->publish(viz_.generateDeleteMarker());
     polygon_marker_pub_->publish(viz_.generatePolygonMarker(path, 0.0, robot_width));

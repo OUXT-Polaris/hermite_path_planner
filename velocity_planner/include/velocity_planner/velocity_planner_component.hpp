@@ -58,7 +58,6 @@ extern "C" {
 
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
 
@@ -70,6 +69,7 @@ extern "C" {
 #include <hermite_path_planner/hermite_path_generator.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <velocity_planner/velocity_visualizer.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
