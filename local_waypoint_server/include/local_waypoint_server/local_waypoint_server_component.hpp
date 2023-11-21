@@ -59,8 +59,6 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include "obstracle_waypoint/obstracle_waypoint.hpp"
-
 #include <quaternion_operation/quaternion_operation.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
@@ -76,6 +74,8 @@ extern "C" {
 #include <string>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <vector>
+
+#include "obstracle_waypoint/obstracle_waypoint.hpp"
 
 namespace local_waypoint_server
 {

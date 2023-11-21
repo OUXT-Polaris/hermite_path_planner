@@ -47,8 +47,8 @@ LocalWaypointServerComponent::LocalWaypointServerComponent(const rclcpp::NodeOpt
   declare_parameter("goal_reached_threshold", 0.3);
   get_parameter("goal_reached_threshold", goal_reached_threshold_);
   planner_status_.status = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL;
-  this->param_listener_ = std::make_shared<obstracle_waypoint::ParamListener>(
-    this->get_node_parameters_interface());
+  this->param_listener_ =
+    std::make_shared<obstracle_waypoint::ParamListener>(this->get_node_parameters_interface());
   this->params_ = param_listener_->get_params();
   /**
    * Publishers
@@ -111,8 +111,7 @@ void LocalWaypointServerComponent::updatePlannerStatus()
   }
   status_pub_->publish(planner_status_);
   RCLCPP_INFO_STREAM(
-  rclcpp::get_logger("dynamixel_hardware_interface"),
-  "Obstracle waypoint param  = " << param_);
+    rclcpp::get_logger("dynamixel_hardware_interface"), "Obstracle waypoint param  = " << param_);
 }
 
 void LocalWaypointServerComponent::hermitePathCallback(
