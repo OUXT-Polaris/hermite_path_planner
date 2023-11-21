@@ -20,10 +20,16 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 find_package(Eigen3 REQUIRED)
+find_package(generate_parameter_library REQUIRED)
+
 
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIR}
+)
+
+generate_parameter_library(obstracle_waypoint
+  config/obstracle_waypoint.yaml
 )
 
 add_library(local_waypoint_server_component SHARED

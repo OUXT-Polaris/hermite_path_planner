@@ -59,6 +59,8 @@ extern "C" {
 }  // extern "C"
 #endif
 
+#include "obstracle_waypoint/obstracle_waypoint.hpp"
+
 #include <quaternion_operation/quaternion_operation.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
@@ -118,6 +120,8 @@ private:
   boost::optional<double> checkCollisionToCurrentPath();
   boost::optional<double> checkCollisionToPath(const hermite_path_msgs::msg::HermitePath & path);
   std::vector<geometry_msgs::msg::Pose> getLocalWaypointCandidates(double obstacle_t);
+  std::shared_ptr<obstracle_waypoint::ParamListener> param_listener_;
+  obstracle_waypoint::Params obstracle_waypoint_params_;
   bool checkObstacleInGoal() const;
   bool checkGoalReached() const;
   boost::optional<geometry_msgs::msg::Pose> evaluateCandidates(
