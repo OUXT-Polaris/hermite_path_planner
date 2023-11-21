@@ -111,7 +111,8 @@ void LocalWaypointServerComponent::updatePlannerStatus()
   }
   status_pub_->publish(planner_status_);
   RCLCPP_INFO_STREAM(
-    rclcpp::get_logger("interpreter"), "Obstacle waypoint param  = " << obstacle_waypoint_params_.obstacle_distance);
+    rclcpp::get_logger("interpreter"),
+    "Obstacle waypoint param  = " << obstacle_waypoint_params_.obstacle_distance);
 }
 
 void LocalWaypointServerComponent::hermitePathCallback(
