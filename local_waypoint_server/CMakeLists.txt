@@ -28,8 +28,8 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
-generate_parameter_library(obstracle_waypoint
-  config/obstracle_waypoint.yaml
+generate_parameter_library(obstacle_waypoint
+  config/obstacle_waypoint.yaml
 )
 
 add_library(local_waypoint_server_component SHARED
@@ -54,7 +54,7 @@ rclcpp_components_register_nodes(local_waypoint_server_component
 add_executable(local_waypoint_server_node
   src/local_waypoint_server_node.cpp
 )
-target_link_libraries(local_waypoint_server_node local_waypoint_server_component)
+target_link_libraries(local_waypoint_server_node obstacle_waypoint local_waypoint_server_component)
 ament_target_dependencies(local_waypoint_server_node
   rclcpp
   rclcpp_components
@@ -95,4 +95,5 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+ament_export_include_directories(include)
 ament_auto_package()

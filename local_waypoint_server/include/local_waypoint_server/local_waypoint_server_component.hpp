@@ -75,7 +75,7 @@ extern "C" {
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <vector>
 
-#include "obstracle_waypoint/obstracle_waypoint.hpp"
+#include "obstacle_waypoint.hpp"
 
 namespace local_waypoint_server
 {

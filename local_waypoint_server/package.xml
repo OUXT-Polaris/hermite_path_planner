@@ -29,7 +29,8 @@
 
   <depend>generate_parameter_library</depend>
   <depend>parameter_traits</depend>
-
+  <depend>rclcpp_lifecycle</depend>
+  
   <export>
     <build_type>ament_cmake</build_type>
   </export>
