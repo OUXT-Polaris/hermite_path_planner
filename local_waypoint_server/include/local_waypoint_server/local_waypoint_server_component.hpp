@@ -120,8 +120,8 @@ private:
   boost::optional<double> checkCollisionToCurrentPath();
   boost::optional<double> checkCollisionToPath(const hermite_path_msgs::msg::HermitePath & path);
   std::vector<geometry_msgs::msg::Pose> getLocalWaypointCandidates(double obstacle_t);
-  std::shared_ptr<obstracle_waypoint::ParamListener> param_listener_;
-  obstracle_waypoint::Params obstracle_waypoint_params_;
+  std::shared_ptr<obstacle_waypoint::ParamListener> param_listener_;
+  obstacle_waypoint::Params obstacle_waypoint_params_;
   bool checkObstacleInGoal() const;
   bool checkGoalReached() const;
   boost::optional<geometry_msgs::msg::Pose> evaluateCandidates(
