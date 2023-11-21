@@ -16,11 +16,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 find_package(Eigen3 REQUIRED)
-find_package(generate_parameter_library REQUIRED)
 
 
 include_directories(
@@ -32,58 +30,18 @@ generate_parameter_library(obstacle_waypoint
   config/obstacle_waypoint.yaml
 )
 
-add_library(local_waypoint_server_component SHARED
+ament_auto_add_library(local_waypoint_server_component SHARED
   src/local_waypoint_server_component.cpp)
 target_compile_definitions(local_waypoint_server_component
   PRIVATE "LOCAL_WAYPOINT_SERVER_LOCAL_WAYPOINT_SERVER_COMPONENT_BUILDING_DLL")
-ament_target_dependencies(local_waypoint_server_component
-  rclcpp
-  rclcpp_components
-  geometry_msgs
-  hermite_path_planner
-  hermite_path_msgs
-  sensor_msgs
-  quaternion_operation
-  tf2_ros
-  tf2_geometry_msgs
-  visualization_msgs
-  color_names)
 rclcpp_components_register_nodes(local_waypoint_server_component
   "local_waypoint_server::LocalWaypointServerComponent")
+target_link_libraries(local_waypoint_server_component obstacle_waypoint)
 
-add_executable(local_waypoint_server_node
+ament_auto_add_executable(local_waypoint_server_node
   src/local_waypoint_server_node.cpp
 )
 target_link_libraries(local_waypoint_server_node obstacle_waypoint local_waypoint_server_component)
-ament_target_dependencies(local_waypoint_server_node
-  rclcpp
-  rclcpp_components
-  geometry_msgs
-  hermite_path_planner
-  hermite_path_msgs
-  sensor_msgs
-  quaternion_operation
-  tf2_ros
-  tf2_geometry_msgs
-  visualization_msgs
-  color_names)
-
-install(TARGETS
-  local_waypoint_server_node
-  DESTINATION lib/local_waypoint_server
-)
-install(TARGETS local_waypoint_server_component
-EXPORT export_obstacle_avoid_action
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
-ament_export_libraries(local_waypoint_server_component)
-
-# Install header files
-install(
-  DIRECTORY "include/"
-  DESTINATION include
-)
 
 # launch/conifg file
 install(DIRECTORY config
@@ -95,5 +53,4 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_export_include_directories(include)
 ament_auto_package()
