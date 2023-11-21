@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
   google::InstallFailureSignalHandler();
   rclcpp::init(argc, argv);
   rclcpp::executors::MultiThreadedExecutor exec;
-  rclcpp::NodeOptions options;
+  rclcpp::NodeOptions options = rclcpp::NodeOptions().use_intra_process_comms(true);
   auto hermite_path_planner =
     std::make_shared<hermite_path_planner::HermitePathPlannerComponent>(options);
   auto pure_pursuit_planner =
