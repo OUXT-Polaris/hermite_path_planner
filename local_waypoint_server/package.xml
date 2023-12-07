@@ -27,6 +27,10 @@
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ouxt_lint_common</test_depend>
 
+  <depend>generate_parameter_library</depend>
+  <depend>parameter_traits</depend>
+  <depend>rclcpp_lifecycle</depend>
+  
   <export>
     <build_type>ament_cmake</build_type>
   </export>
