@@ -96,6 +96,7 @@ private:
   boost::optional<geometry_msgs::msg::PoseStamped> current_pose_;
   boost::optional<sensor_msgs::msg::LaserScan> scan_;
   boost::optional<hermite_path_msgs::msg::HermitePathStamped> addObstacleConstraints();
+  std::string planning_frame_id_;
   double stop_margin_;
   double section_length_;
   double max_linear_velocity_;

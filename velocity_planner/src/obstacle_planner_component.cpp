@@ -44,6 +44,8 @@ ObstaclePlannerComponent::ObstaclePlannerComponent(const rclcpp::NodeOptions & o
     hermite_path_topic, 1,
     std::bind(&ObstaclePlannerComponent::hermitePathCallback, this, std::placeholders::_1));
   std::string obstacle_scan_topic;
+  declare_parameter("planning_frame_id", "map");
+  get_parameter("planning_frame_id", planning_frame_id_);
   declare_parameter("obstacle_scan_topic", "/obstacle_scan");
   get_parameter("obstacle_scan_topic", obstacle_scan_topic);
   declare_parameter("robot_width", 1.5);
@@ -93,7 +95,7 @@ void ObstaclePlannerComponent::hermitePathCallback(
 geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
   geometry_msgs::msg::PoseStamped pose)
 {
-  if (pose.header.frame_id == "map") {
+  if (pose.header.frame_id == planning_frame_id_) {
     return pose;
   }
   tf2::TimePoint time_point = tf2::TimePoint(
@@ -101,8 +103,8 @@ geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
 
   try {
-    geometry_msgs::msg::TransformStamped transform_stamped =
-      buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(pose, pose, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__ << "," << ex.what());
@@ -113,15 +115,15 @@ geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
 geometry_msgs::msg::PointStamped ObstaclePlannerComponent::TransformToMapFrame(
   geometry_msgs::msg::PointStamped point)
 {
-  if (point.header.frame_id == "map") {
+  if (point.header.frame_id == planning_frame_id_) {
     return point;
   }
   tf2::TimePoint time_point = tf2::TimePoint(
     std::chrono::seconds(point.header.stamp.sec) +
     std::chrono::nanoseconds(point.header.stamp.nanosec));
   try {
-    geometry_msgs::msg::TransformStamped transform_stamped =
-      buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
+    geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
+      planning_frame_id_, point.header.frame_id, time_point, tf2::durationFromSec(1.0));
     tf2::doTransform(point, point, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__ << "," << ex.what());
@@ -164,7 +166,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
       p.point.z = 0.0;
       p.header = scan_->header;
       p = TransformToMapFrame(p);
-      if (p.header.frame_id == "map") {
+      if (p.header.frame_id == planning_frame_id_) {
         auto t_value =
           generator.getNormalizedLongitudinalDistanceInFrenetCoordinate(path_->path, p.point);
         if (t_value) {

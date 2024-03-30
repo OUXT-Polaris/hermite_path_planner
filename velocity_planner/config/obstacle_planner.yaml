@@ -8,3 +8,4 @@
     t_upper_threashold: 1.2
     update_path_topic : "/velocity_planner/planner_concatenator/update"
     obstacle_scan_topic : "/perception/pointcloud_to_laserscan_node/output"
+    planning_frame_id : "map"
