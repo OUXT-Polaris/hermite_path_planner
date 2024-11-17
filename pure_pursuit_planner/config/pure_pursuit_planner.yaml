@@ -1,0 +1,6 @@
+pure_pursuit_planner:
+  ros__parameters:
+    robot_width : 3.0
+    minimum_lookahead_distance : 2.0
+    lookahead_ratio : 1.5
+    twist_stamped : true

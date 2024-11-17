@@ -33,13 +33,13 @@ PurePursuitPlannerComponent::PurePursuitPlannerComponent(const rclcpp::NodeOptio
   declare_parameter("lookahead_ratio", 1.5);
   get_parameter("lookahead_ratio", lookahead_ratio_);
 
-  declare_parameter("change_twist_stamped", false);
-  get_parameter("change_twist_stamped", change_twist_stamped_);
+  declare_parameter("twist_stamped", true);
+  get_parameter("twist_stamped", twist_stamped_);
 
   std::string current_twist_topic;
   declare_parameter("current_twist_topic", "current_twist");
   get_parameter("current_twist_topic", current_twist_topic);
-  if (change_twist_stamped_) {
+  if (twist_stamped_) {
     current_twist_stamped_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
       current_twist_topic, 1,
       std::bind(

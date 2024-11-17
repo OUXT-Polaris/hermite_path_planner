@@ -8,3 +8,4 @@
     minimum_accerelation : -0.2
     velocity_resoluation : 0.1
     use_velocity_graph : true
+    twist_stamped_ : true

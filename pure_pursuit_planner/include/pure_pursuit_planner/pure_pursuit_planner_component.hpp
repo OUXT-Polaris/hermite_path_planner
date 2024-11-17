@@ -100,7 +100,7 @@ private:
   double lookahead_distance_;
   double minimum_lookahead_distance_;
   double lookahead_ratio_;
-  bool change_twist_stamped_;
+  bool twist_stamped_;
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;

@@ -59,6 +59,13 @@ def generate_launch_description():
             get_package_share_directory('local_waypoint_server'),
             'config', 'local_waypoint_server.yaml')
     )
+    pure_pursuit_planner_param_file = LaunchConfiguration(
+        'pure_pursuit_planner_param_file',
+        default=os.path.join(
+            get_package_share_directory('pure_pursuit_planner'),
+            'config', 'pure_pursuit_planner.yaml')
+    )
+    
     hermite_path_planner_parm_file = LaunchConfiguration(
         'hermite_path_planner_parm_file',
         default=os.path.join(
@@ -99,6 +106,11 @@ def generate_launch_description():
             'local_waypoint_server_param_file',
             default_value=local_waypoint_server_param_file,
             description='local waypoint server parameters'
+        ),
+        DeclareLaunchArgument(
+            'pure_pursuit_planner_param_file',
+            default_value=pure_pursuit_planner_param_file,
+            description='pure pursuit planner parameters'
         ),
         Node(
             package='hermite_path_planner_bringup',

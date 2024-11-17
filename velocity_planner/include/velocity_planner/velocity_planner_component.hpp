@@ -106,7 +106,7 @@ private:
   void updatePath();
   void checkCurrentPath();
   bool checkTopics();
-  bool change_twist_stamped_;
+  bool twist_stamped_;
   std::mutex mtx_;
   double robot_width;
   std::shared_ptr<hermite_path_planner::HermitePathGenerator> generator_;

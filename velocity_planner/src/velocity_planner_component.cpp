@@ -27,12 +27,12 @@ VelocityPlannerComponent::VelocityPlannerComponent(const rclcpp::NodeOptions & o
   listener_(buffer_),
   viz_(get_name())
 {
-  declare_parameter("change_twist_stamped", false);
-  get_parameter("change_twist_stamped", change_twist_stamped_);
+  declare_parameter("twist_stamped", true);
+  get_parameter("twist_stamped", twist_stamped_);
   std::string current_twist_topic;
   declare_parameter("current_twist_topic", "current_twist");
   get_parameter("current_twist_topic", current_twist_topic);
-  if (change_twist_stamped_) {
+  if (twist_stamped_) {
     current_twist_stamped_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
       current_twist_topic, 1,
       std::bind(
@@ -84,7 +84,7 @@ bool VelocityPlannerComponent::checkTopics()
     RCLCPP_INFO(get_logger(), "path was not calculated");
     return false;
   }
-  if (change_twist_stamped_) {
+  if (twist_stamped_) {
     if (current_twist_stamped_ == boost::none) {
       RCLCPP_INFO(get_logger(), "current_twist_stamped did not published");
       return false;
