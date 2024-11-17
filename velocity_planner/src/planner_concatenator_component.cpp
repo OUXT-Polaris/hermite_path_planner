@@ -165,6 +165,7 @@ void PlannerConcatenatorComponent::callback3(
   const HermitePathStamped::ConstSharedPtr in0, const HermitePathStamped::ConstSharedPtr in1,
   const HermitePathStamped::ConstSharedPtr in2)
 {
+  RCLCPP_INFO_STREAM(get_logger(), "HogeHogeFugaFuga");
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> reference_vels;
 
   std::vector<hermite_path_msgs::msg::ReferenceVelocity> r0 = in0->reference_velocity;

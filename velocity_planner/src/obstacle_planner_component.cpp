@@ -102,7 +102,7 @@ geometry_msgs::msg::PoseStamped ObstaclePlannerComponent::TransformToMapFrame(
 
   try {
     geometry_msgs::msg::TransformStamped transform_stamped =
-      buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+      buffer_.lookupTransform("map", pose.header.frame_id, time_point, tf2::durationFromSec(3.0));
     tf2::doTransform(pose, pose, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__ << "," << ex.what());
@@ -121,7 +121,7 @@ geometry_msgs::msg::PointStamped ObstaclePlannerComponent::TransformToMapFrame(
     std::chrono::nanoseconds(point.header.stamp.nanosec));
   try {
     geometry_msgs::msg::TransformStamped transform_stamped =
-      buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(1.0));
+      buffer_.lookupTransform("map", point.header.frame_id, time_point, tf2::durationFromSec(5.0));
     tf2::doTransform(point, point, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__ << "," << ex.what());

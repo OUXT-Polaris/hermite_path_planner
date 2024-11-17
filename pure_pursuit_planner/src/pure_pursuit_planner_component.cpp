@@ -218,7 +218,7 @@ void PurePursuitPlannerComponent::currentPoseCallback(
     try {
       geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
         current_pose_->header.frame_id, path_->header.frame_id, time_point,
-        tf2::durationFromSec(1.0));
+        tf2::durationFromSec(5.0));
       tf2::doTransform(*current_pose_, current_pose_transformed_.get(), transform_stamped);
     } catch (tf2::ExtrapolationException & ex) {
       RCLCPP_ERROR(get_logger(), ex.what());
