@@ -449,7 +449,7 @@ geometry_msgs::msg::PoseStamped LocalWaypointServerComponent::TransformToPlannin
     std::chrono::nanoseconds(pose.header.stamp.nanosec));
   try {
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
-      planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(1.0));
+      planning_frame_id_, pose.header.frame_id, time_point, tf2::durationFromSec(3.0));
     tf2::doTransform(pose, pose_transformed, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR(get_logger(), ex.what());

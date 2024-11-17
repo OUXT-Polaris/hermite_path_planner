@@ -146,7 +146,7 @@ ObstaclePlannerComponent::addObstacleConstraints()
   try {
     geometry_msgs::msg::TransformStamped transform_stamped = buffer_.lookupTransform(
       path_.get().header.frame_id, current_pose_->header.frame_id, time_point,
-      tf2::durationFromSec(1.0));
+      tf2::durationFromSec(3.0));
     tf2::doTransform(current_pose_.get(), pose_transformed, transform_stamped);
   } catch (tf2::ExtrapolationException & ex) {
     RCLCPP_ERROR(get_logger(), ex.what());

@@ -79,6 +79,11 @@ install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
+# launch/conifg file
+install(DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
+)
+
 # Install header files
 install(
   DIRECTORY "include/"
