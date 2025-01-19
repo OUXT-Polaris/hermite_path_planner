@@ -75,6 +75,8 @@ extern "C" {
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <vector>
 
+#include "obstacle_waypoint.hpp"
+
 namespace local_waypoint_server
 {
 class LocalWaypointServerComponent : public rclcpp::Node
@@ -118,6 +120,8 @@ private:
   boost::optional<double> checkCollisionToCurrentPath();
   boost::optional<double> checkCollisionToPath(const hermite_path_msgs::msg::HermitePath & path);
   std::vector<geometry_msgs::msg::Pose> getLocalWaypointCandidates(double obstacle_t);
+  std::shared_ptr<obstacle_waypoint::ParamListener> param_listener_;
+  obstacle_waypoint::Params obstacle_waypoint_params_;
   bool checkObstacleInGoal() const;
   bool checkGoalReached() const;
   boost::optional<geometry_msgs::msg::Pose> evaluateCandidates(

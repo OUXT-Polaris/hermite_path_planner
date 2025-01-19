@@ -1,0 +1,9 @@
+obstacle_waypoint:
+  obstacle_distance: {
+    type: double,
+    default_value: 1.0,
+    description: "WayPoint and obstacle distance to reject goal_pose and stop in place",
+    validation: {
+      bounds<>: [ 0.0, 10.0 ]
+    }
+  }
